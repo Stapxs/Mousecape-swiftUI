@@ -950,7 +950,7 @@ struct CursorPreviewDropZone: View {
                 _ = loadImage(from: url)
             }
         case .failure(let error):
-            print("File import error: \(error)")
+            debugLog("File import error: \(error)")
         }
     }
 
@@ -959,7 +959,7 @@ struct CursorPreviewDropZone: View {
 
     private func loadImage(from url: URL) -> Bool {
         guard url.startAccessingSecurityScopedResource() else {
-            print("Failed to access security scoped resource: \(url)")
+            debugLog("Failed to access security scoped resource: \(url)")
             return false
         }
         defer { url.stopAccessingSecurityScopedResource() }
@@ -976,13 +976,13 @@ struct CursorPreviewDropZone: View {
         }
 
         guard let image = NSImage(contentsOf: url) else {
-            print("Failed to load image from: \(url)")
+            debugLog("Failed to load image from: \(url)")
             return false
         }
 
         // Get original image dimensions
         guard let originalBitmap = getOriginalBitmapRep(from: image) else {
-            print("Failed to get bitmap rep from image")
+            debugLog("Failed to get bitmap rep from image")
             return false
         }
 
@@ -999,7 +999,7 @@ struct CursorPreviewDropZone: View {
 
         // Scale image to standard size (64x64) with aspect fit and center
         guard let scaledBitmap = scaleImageToStandardSize(originalBitmap) else {
-            print("Failed to scale image")
+            debugLog("Failed to scale image")
             return false
         }
 
@@ -1014,7 +1014,7 @@ struct CursorPreviewDropZone: View {
         localRefreshTrigger += 1
         appState.cursorListRefreshTrigger += 1
 
-        print("Image imported successfully: \(originalWidth)x\(originalHeight) → \(standardCursorSize)x\(standardCursorSize)")
+        debugLog("Image imported successfully: \(originalWidth)x\(originalHeight) → \(standardCursorSize)x\(standardCursorSize)")
         return true
     }
 
@@ -1023,30 +1023,30 @@ struct CursorPreviewDropZone: View {
     /// Load an animated GIF file and extract all frames
     private func loadGIFImage(from url: URL) -> Bool {
         guard let data = try? Data(contentsOf: url) else {
-            print("Failed to read GIF data from: \(url)")
+            debugLog("Failed to read GIF data from: \(url)")
             return false
         }
 
         guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {
-            print("Failed to create image source from GIF")
+            debugLog("Failed to create image source from GIF")
             return false
         }
 
         let frameCount = CGImageSourceGetCount(imageSource)
         guard frameCount > 0 else {
-            print("GIF has no frames")
+            debugLog("GIF has no frames")
             return false
         }
 
         // For single-frame GIFs, treat as static image
         if frameCount == 1 {
             guard let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
-                print("Failed to get first GIF frame")
+                debugLog("Failed to get first GIF frame")
                 return false
             }
             let bitmap = NSBitmapImageRep(cgImage: cgImage)
             guard let scaledBitmap = scaleImageToStandardSize(bitmap) else {
-                print("Failed to scale GIF image")
+                debugLog("Failed to scale GIF image")
                 return false
             }
 
@@ -1059,7 +1059,7 @@ struct CursorPreviewDropZone: View {
             localRefreshTrigger += 1
             appState.cursorListRefreshTrigger += 1
 
-            print("Static GIF imported successfully")
+            debugLog("Static GIF imported successfully")
             return true
         }
 
@@ -1102,7 +1102,7 @@ struct CursorPreviewDropZone: View {
         }
 
         guard !frames.isEmpty else {
-            print("Failed to extract any frames from GIF")
+            debugLog("Failed to extract any frames from GIF")
             return false
         }
 
@@ -1129,7 +1129,7 @@ struct CursorPreviewDropZone: View {
         let originalFrameCount = frames.count
         if frames.count > maxFrameCount {
             let downsampledFrames = downsampleFrames(frames, targetCount: maxFrameCount)
-            print("GIF downsampled: \(originalFrameCount) → \(downsampledFrames.count) frames")
+            debugLog("GIF downsampled: \(originalFrameCount) → \(downsampledFrames.count) frames")
             frames = downsampledFrames
             // Adjust duration to maintain overall animation timing
             let durationMultiplier = Double(originalFrameCount) / Double(maxFrameCount)
@@ -1141,13 +1141,13 @@ struct CursorPreviewDropZone: View {
 
         // Create a sprite sheet (all frames stacked vertically)
         guard let spriteSheet = createSpriteSheet(from: frames, frameWidth: frameWidth, frameHeight: frameHeight) else {
-            print("Failed to create sprite sheet from GIF frames")
+            debugLog("Failed to create sprite sheet from GIF frames")
             return false
         }
 
         // Scale the sprite sheet
         guard let scaledSpriteSheet = scaleGIFSpriteSheet(spriteSheet, frameCount: frames.count, originalFrameWidth: frameWidth, originalFrameHeight: frameHeight) else {
-            print("Failed to scale GIF sprite sheet")
+            debugLog("Failed to scale GIF sprite sheet")
             return false
         }
 
@@ -1160,7 +1160,7 @@ struct CursorPreviewDropZone: View {
         localRefreshTrigger += 1
         appState.cursorListRefreshTrigger += 1
 
-        print("Animated GIF imported: \(frameWidth)x\(frameHeight), \(frames.count) frames, \(String(format: "%.3f", avgFrameDuration))s/frame")
+        debugLog("Animated GIF imported: \(frameWidth)x\(frameHeight), \(frames.count) frames, \(String(format: "%.3f", avgFrameDuration))s/frame")
         return true
     }
 
@@ -1365,7 +1365,7 @@ struct CursorPreviewDropZone: View {
 
             // Create bitmap from result
             guard let originalBitmap = result.createBitmapImageRep() else {
-                print("Failed to create bitmap from Windows cursor")
+                debugLog("Failed to create bitmap from Windows cursor")
                 return false
             }
 
@@ -1423,14 +1423,14 @@ struct CursorPreviewDropZone: View {
             if frameCount > 1 {
                 // Animated cursor: scale each frame and stack vertically
                 guard let scaledBitmap = scaleWindowsSpriteSheet(originalBitmap, frameCount: frameCount, originalFrameWidth: Int(originalWidth), originalFrameHeight: Int(singleFrameHeight)) else {
-                    print("Failed to scale animated cursor sprite sheet")
+                    debugLog("Failed to scale animated cursor sprite sheet")
                     return false
                 }
                 cursor.setRepresentation(scaledBitmap, for: targetScale)
             } else {
                 // Static cursor: scale to 64x64
                 guard let scaledBitmap = scaleImageToStandardSize(originalBitmap) else {
-                    print("Failed to scale Windows cursor")
+                    debugLog("Failed to scale Windows cursor")
                     return false
                 }
                 cursor.setRepresentation(scaledBitmap, for: targetScale)
@@ -1443,11 +1443,11 @@ struct CursorPreviewDropZone: View {
             appState.cursorListRefreshTrigger += 1
 
             let frameInfo = result.frameCount > 1 ? " (\(result.frameCount) frames)" : ""
-            print("Windows cursor imported: \(result.width)x\(result.height)\(frameInfo) → \(standardCursorSize)x\(standardCursorSize)")
+            debugLog("Windows cursor imported: \(result.width)x\(result.height)\(frameInfo) → \(standardCursorSize)x\(standardCursorSize)")
             return true
 
         } catch {
-            print("Failed to convert Windows cursor: \(error.localizedDescription)")
+            debugLog("Failed to convert Windows cursor: \(error.localizedDescription)")
             appState.imageImportWarningMessage = "Failed to import Windows cursor: \(error.localizedDescription)"
             appState.showImageImportWarning = true
             return false

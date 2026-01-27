@@ -73,7 +73,7 @@ extension FileManager {
         do {
             return try findOrCreateDirectory(.applicationSupportDirectory, in: .userDomainMask, appendingPathComponent: executableName)
         } catch {
-            print("Unable to find or create application support directory: \(error)")
+            debugLog("Unable to find or create application support directory: \(error)")
             return nil
         }
     }

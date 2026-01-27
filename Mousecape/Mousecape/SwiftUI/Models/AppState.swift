@@ -579,7 +579,7 @@ final class AppState: @unchecked Sendable {
             libraryController?.removeCape(cape.underlyingLibrary)
         } else {
             // Just remove from memory if no file exists
-            print("Warning: Cape has no file URL, removing from list only")
+            debugLog("Warning: Cape has no file URL, removing from list only")
         }
 
         loadCapes()
@@ -725,7 +725,7 @@ final class AppState: @unchecked Sendable {
             await processWithINFMapping(folderURL: folderURL, infMapping: infMapping)
         case .failure(let error):
             // Show INF parsing error and fallback to filename-based import
-            print("INF parsing failed: \(error.localizedDescription), using filename mapping")
+            debugLog("INF parsing failed: \(error.localizedDescription), using filename mapping")
             await processWithFilenameMapping(folderURL: folderURL)
         }
     }
@@ -769,13 +769,13 @@ final class AppState: @unchecked Sendable {
                 let cursorTypes = WindowsINFParser.cursorTypes(forPosition: position)
 
                 if cursorTypes.isEmpty {
-                    print("Skipping position \(position): no macOS equivalent")
+                    debugLog("Skipping position \(position): no macOS equivalent")
                     continue
                 }
 
                 // Create and scale bitmap
                 guard let originalBitmap = result.createBitmapImageRep() else {
-                    print("Failed to create bitmap for: \(result.filename)")
+                    debugLog("Failed to create bitmap for: \(result.filename)")
                     continue
                 }
 
@@ -787,7 +787,7 @@ final class AppState: @unchecked Sendable {
                 }
 
                 guard let finalBitmap = scaledBitmap else {
-                    print("Failed to scale bitmap for: \(result.filename)")
+                    debugLog("Failed to scale bitmap for: \(result.filename)")
                     continue
                 }
 
@@ -798,7 +798,7 @@ final class AppState: @unchecked Sendable {
                 for cursorType in cursorTypes {
                     // Skip if this cursor type was already added
                     if addedCursorTypes.contains(cursorType.rawValue) {
-                        print("Skipping duplicate cursor type: \(cursorType.rawValue) from position \(position)")
+                        debugLog("Skipping duplicate cursor type: \(cursorType.rawValue) from position \(position)")
                         continue
                     }
 
@@ -855,13 +855,13 @@ final class AppState: @unchecked Sendable {
                 let cursorTypes = WindowsCursorMapping.cursorTypes(for: result.filename)
 
                 if cursorTypes.isEmpty {
-                    print("Skipping unknown cursor: \(result.filename)")
+                    debugLog("Skipping unknown cursor: \(result.filename)")
                     continue
                 }
 
                 // Create bitmap from result
                 guard let originalBitmap = result.createBitmapImageRep() else {
-                    print("Failed to create bitmap for: \(result.filename)")
+                    debugLog("Failed to create bitmap for: \(result.filename)")
                     continue
                 }
 
@@ -874,7 +874,7 @@ final class AppState: @unchecked Sendable {
                 }
 
                 guard let finalBitmap = scaledBitmap else {
-                    print("Failed to scale bitmap for: \(result.filename)")
+                    debugLog("Failed to scale bitmap for: \(result.filename)")
                     continue
                 }
 
@@ -959,7 +959,7 @@ final class AppState: @unchecked Sendable {
                 // Select the new cape
                 selectedCape = capes.first { $0.identifier == identifier }
 
-                print("Imported \(importedCount) cursor(s) from \(fileCount) file(s)")
+                debugLog("Imported \(importedCount) cursor(s) from \(fileCount) file(s)")
 
                 // Show success message
                 isLoading = false

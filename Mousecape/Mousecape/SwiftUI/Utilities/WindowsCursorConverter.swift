@@ -107,7 +107,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
 
             // Check if file exists
             guard FileManager.default.fileExists(atPath: fileURL.path) else {
-                print("INF referenced file not found: \(filename)")
+                debugLog("INF referenced file not found: \(filename)")
                 continue
             }
 
@@ -116,7 +116,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
                 let result = try convert(fileURL: fileURL)
                 results.append((position: position, result: result))
             } catch {
-                print("Failed to convert \(filename): \(error.localizedDescription)")
+                debugLog("Failed to convert \(filename): \(error.localizedDescription)")
             }
         }
 
@@ -166,12 +166,13 @@ final class WindowsCursorConverter: @unchecked Sendable {
     private func convertParseResult(_ parseResult: WindowsCursorParseResult, filename: String) throws -> WindowsCursorResult {
         let maxFrameCount = 24
 
-        // Validate image size to prevent memory issues
-        try validateImageSize(parseResult.image, filename: filename)
+        // Validate single frame size to prevent importing oversized frames
+        // Note: Sprite sheet size validation is not needed since images are scaled to 64x64 per frame later
+        try validateSingleFrameSize(width: parseResult.width, height: parseResult.height, filename: filename)
 
         // Check if we need to downsample
         if parseResult.frameCount > maxFrameCount {
-            print("Windows cursor '\(filename)' has \(parseResult.frameCount) frames, downsampling to \(maxFrameCount)")
+            debugLog("Windows cursor '\(filename)' has \(parseResult.frameCount) frames, downsampling to \(maxFrameCount)")
 
             // Downsample the sprite sheet with autoreleasepool for memory management
             let downsampledData: Data? = autoreleasepool {
@@ -220,18 +221,16 @@ final class WindowsCursorConverter: @unchecked Sendable {
         )
     }
 
-    /// Validate image size to prevent memory issues
+    /// Validate single frame size to prevent importing oversized frames
     /// - Parameters:
-    ///   - image: CGImage to validate
+    ///   - width: Frame width in pixels
+    ///   - height: Frame height in pixels
     ///   - filename: Filename for error reporting
-    /// - Throws: WindowsCursorError.imageTooLarge if image exceeds maximum dimensions
-    private func validateImageSize(_ image: CGImage, filename: String) throws {
-        let maxDimension = 4096
-        let width = image.width
-        let height = image.height
-
-        if width > maxDimension || height > maxDimension {
-            print("Image '\(filename)' is too large: \(width)x\(height)")
+    /// - Throws: WindowsCursorError.imageTooLarge if frame exceeds maximum dimensions
+    private func validateSingleFrameSize(width: Int, height: Int, filename: String) throws {
+        let maxFrameSize = 512  // Maximum individual frame size
+        if width > maxFrameSize || height > maxFrameSize {
+            debugLog("Frame '\(filename)' is too large: \(width)x\(height), max is \(maxFrameSize)x\(maxFrameSize)")
             throw WindowsCursorError.imageTooLarge(width: width, height: height)
         }
     }
