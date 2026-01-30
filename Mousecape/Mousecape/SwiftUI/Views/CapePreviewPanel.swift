@@ -17,6 +17,7 @@ struct CapePreviewPanel: View {
     @Environment(AppState.self) private var appState
     @Environment(LocalizationManager.self) private var localization
     @State private var zoomedCursor: Cursor?
+    @State private var zoomTrigger: Int = 0 // Increment to force view recreation
     @State private var cachedCursors: [Cursor] = []
     @Namespace private var cursorNamespace
     @AppStorage("showAuthorInfo") private var showAuthorInfo = true
@@ -59,6 +60,7 @@ struct CapePreviewPanel: View {
                         zoomedCursor: zoomedCursor,
                         namespace: cursorNamespace
                     ) { cursor in
+                        zoomTrigger += 1
                         withAnimation(.spring(duration: 0.4, bounce: 0.2)) {
                             zoomedCursor = cursor
                         }
@@ -86,6 +88,7 @@ struct CapePreviewPanel: View {
                         zoomedCursor = nil
                     }
                 }
+                .id(zoomTrigger) // Force view recreation on each tap
             }
         }
         .onAppear {
@@ -129,6 +132,7 @@ struct CursorZoomOverlay: View {
     @Environment(LocalizationManager.self) private var localization
 
     @State private var showDetails = false
+    @State private var showAnimatedCursor = false
 
     var body: some View {
         ZStack {
@@ -141,9 +145,19 @@ struct CursorZoomOverlay: View {
 
             // Centered zoomed cursor with matched geometry
             VStack(spacing: 16) {
-                AnimatingCursorView(cursor: cursor, showHotspot: showHotspot, scale: 3)
-                    .frame(width: 128, height: 128)
-                    .matchedGeometryEffect(id: cursor.id, in: namespace)
+                ZStack {
+                    // Static view for transition (hidden after transition completes)
+                    StaticCursorFrameView(cursor: cursor, scale: 3)
+                        .frame(width: 128, height: 128)
+                        .matchedGeometryEffect(id: cursor.id, in: namespace)
+                        .opacity(showAnimatedCursor ? 0 : 1)
+
+                    // Animated view (shown after transition completes)
+                    if showAnimatedCursor {
+                        AnimatingCursorView(cursor: cursor, showHotspot: showHotspot, scale: 3)
+                            .frame(width: 128, height: 128)
+                    }
+                }
 
                 // Details fade in after the cursor arrives
                 if showDetails {
@@ -174,6 +188,10 @@ struct CursorZoomOverlay: View {
             return .handled
         }
         .onAppear {
+            // Switch to animated cursor after transition completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                showAnimatedCursor = true
+            }
             // Delay showing details until cursor animation completes
             withAnimation(.easeOut(duration: 0.3).delay(0.2)) {
                 showDetails = true
@@ -251,19 +269,23 @@ struct CursorPreviewCell: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            // Only show cursor here if not zoomed (it moves to overlay)
-            if !isZoomed {
+            ZStack {
+                // Animated view (always visible, does not participate in transition)
                 AnimatingCursorView(
                     cursor: cursor,
                     showHotspot: false,
                     scale: previewPanelScale
                 )
                 .frame(width: 64, height: 64)
-                .matchedGeometryEffect(id: cursor.id, in: namespace)
-            } else {
-                // Placeholder to maintain layout
-                Color.clear
-                    .frame(width: 64, height: 64)
+                .opacity(isZoomed ? 0 : 1)
+
+                // Static view for transition (invisible but participates in matchedGeometryEffect)
+                if !isZoomed {
+                    StaticCursorFrameView(cursor: cursor, scale: previewPanelScale)
+                        .frame(width: 64, height: 64)
+                        .matchedGeometryEffect(id: cursor.id, in: namespace)
+                        .opacity(0.001) // Nearly invisible but participates in layout
+                }
             }
 
             if !isZoomed {

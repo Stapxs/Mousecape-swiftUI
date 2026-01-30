@@ -198,6 +198,68 @@ struct StaticCursorImageView: View {
     }
 }
 
+// MARK: - Static Cursor Frame View (for Hero Animation)
+
+/// Static cursor frame view without Timer animation
+/// Used for matchedGeometryEffect transitions to avoid animation conflicts
+struct StaticCursorFrameView: View {
+    let cursor: Cursor
+    var frameIndex: Int = 0
+    var scale: CGFloat = 1.0
+
+    var body: some View {
+        GeometryReader { _ in
+            ZStack {
+                if let frameImage = getFrameImage(at: frameIndex) {
+                    let displaySize = CGSize(
+                        width: frameImage.size.width * scale,
+                        height: frameImage.size.height * scale
+                    )
+                    Image(nsImage: frameImage)
+                        .interpolation(.high)
+                        .resizable()
+                        .frame(width: displaySize.width, height: displaySize.height)
+                } else {
+                    Image(systemName: "cursorarrow")
+                        .font(.largeTitle)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    /// Extract a single frame from the sprite sheet
+    private func getFrameImage(at frameIndex: Int) -> NSImage? {
+        guard let image = cursor.image else { return nil }
+
+        let frameCount = max(1, cursor.frameCount)
+        let frameHeight = image.size.height / CGFloat(frameCount)
+        let frameWidth = image.size.width
+
+        guard frameWidth > 0, frameHeight > 0 else { return nil }
+
+        let sourceRect = NSRect(
+            x: 0,
+            y: image.size.height - CGFloat(frameIndex + 1) * frameHeight,
+            width: frameWidth,
+            height: frameHeight
+        )
+
+        let frameImage = NSImage(size: NSSize(width: frameWidth, height: frameHeight))
+        frameImage.lockFocus()
+        image.draw(
+            in: NSRect(x: 0, y: 0, width: frameWidth, height: frameHeight),
+            from: sourceRect,
+            operation: .copy,
+            fraction: 1.0
+        )
+        frameImage.unlockFocus()
+
+        return frameImage
+    }
+}
+
 // MARK: - Cursor Thumbnail View
 
 /// Small thumbnail for cursor preview
