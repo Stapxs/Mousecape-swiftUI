@@ -35,9 +35,9 @@ struct SettingsView: View {
                 Button(action: {
                     appState.currentPage = .home
                 }) {
-                    Image(systemName: "checkmark")
+                    Image(systemName: "chevron.left")
                 }
-                .help("Done")
+                .help("Back")
             }
         }
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
@@ -241,8 +241,14 @@ struct AdvancedSettingsView: View {
             }
 
             Section(localization.localized("Reset")) {
-                Button(localization.localized("Restore Default Settings"), role: .destructive) {
-                    showResetConfirmation = true
+                HStack {
+                    Button(localization.localized("Reset System Cursor")) {
+                        appState.resetToDefault()
+                    }
+
+                    Button(localization.localized("Restore Default Settings"), role: .destructive) {
+                        showResetConfirmation = true
+                    }
                 }
                 .confirmationDialog(
                     localization.localized("Restore Default Settings"),

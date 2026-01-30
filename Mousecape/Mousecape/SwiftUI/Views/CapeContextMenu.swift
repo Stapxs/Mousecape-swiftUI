@@ -57,6 +57,15 @@ struct CapeContextMenu: View {
         } label: {
             Label(localization.localized("Delete"), systemImage: "trash")
         }
+
+        Divider()
+
+        // Reset to system default cursor
+        Button {
+            appState.resetToDefault()
+        } label: {
+            Label(localization.localized("Reset System Cursor"), systemImage: "arrow.counterclockwise")
+        }
     }
 }
 
