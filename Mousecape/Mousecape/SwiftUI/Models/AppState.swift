@@ -168,7 +168,30 @@ final class AppState: @unchecked Sendable {
     }
 
     private func loadPreferences() {
-        // Reserved for future preferences loading
+        // Load and apply cursor scale on startup
+        applySavedCursorScale()
+    }
+
+    /// Load cursor scale from preferences and apply it
+    private func applySavedCursorScale() {
+        let preferenceDomain = "com.alexzielenski.Mousecape"
+        let cursorScaleKey = "MCCursorScale"
+
+        // Read saved scale value
+        if let value = CFPreferencesCopyAppValue(cursorScaleKey as CFString, preferenceDomain as CFString) as? Double {
+            debugLog("Loading saved cursor scale: \(value)")
+            // Apply the scale using ObjC function
+            let success = setCursorScale(Float(value))
+            if success {
+                debugLog("Successfully applied cursor scale on startup")
+            } else {
+                debugLog("Failed to apply cursor scale on startup")
+            }
+        } else {
+            debugLog("No saved cursor scale found, using default (1.0)")
+            // Apply default scale
+            _ = setCursorScale(1.0)
+        }
     }
 
     // MARK: - Cape Actions
