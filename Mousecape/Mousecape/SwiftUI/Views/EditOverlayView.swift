@@ -1235,6 +1235,7 @@ struct CursorPreviewDropZone: View {
     }
 
     /// Scale a GIF sprite sheet to standard cursor size
+    /// Crops each frame individually before scaling to prevent interpolation bleed across frame boundaries.
     private func scaleGIFSpriteSheet(_ original: NSBitmapImageRep, frameCount: Int, originalFrameWidth: Int, originalFrameHeight: Int) -> NSBitmapImageRep? {
         let targetSize = standardCursorSize
 
@@ -1264,6 +1265,9 @@ struct CursorPreviewDropZone: View {
         let offsetX = (targetSizeF - scaledWidth) / 2
         let offsetY = (targetSizeF - scaledHeight) / 2
 
+        // Get CGImage for pixel-precise frame cropping
+        guard let fullCGImage = original.cgImage else { return nil }
+
         NSGraphicsContext.saveGraphicsState()
         guard let context = NSGraphicsContext(bitmapImageRep: newBitmap) else {
             NSGraphicsContext.restoreGraphicsState()
@@ -1274,24 +1278,22 @@ struct CursorPreviewDropZone: View {
         NSColor.clear.setFill()
         NSRect(x: 0, y: 0, width: targetSize, height: targetSize * frameCount).fill()
 
-        let sourceImage = NSImage(size: NSSize(width: original.pixelsWide, height: original.pixelsHigh))
-        sourceImage.addRepresentation(original)
+        let totalDestHeight = CGFloat(targetSize * frameCount)
 
         for frameIndex in 0..<frameCount {
-            // Note: NSImage uses bottom-left origin coordinate system
-            // Frame 0 is at the TOP of the sprite sheet (highest Y in bottom-left coords)
-            let totalSourceHeight = CGFloat(original.pixelsHigh)
-            let totalDestHeight = CGFloat(targetSize * frameCount)
+            // Crop frame from sprite sheet using CGImage (top-left origin, integer pixels)
+            let cropRect = CGRect(x: 0, y: frameIndex * originalFrameHeight, width: originalFrameWidth, height: originalFrameHeight)
+            guard let frameCGImage = fullCGImage.cropping(to: cropRect) else { continue }
 
-            // Source rect: frame 0 is at top, so we read from (totalHeight - frameHeight) down
-            let srcY = totalSourceHeight - CGFloat(frameIndex + 1) * originalHeight
-            let srcRect = NSRect(x: 0, y: srcY, width: originalWidth, height: originalHeight)
+            // Create isolated NSImage for this single frame
+            let frameNSImage = NSImage(size: NSSize(width: originalWidth, height: originalHeight))
+            frameNSImage.addRepresentation(NSBitmapImageRep(cgImage: frameCGImage))
 
-            // Destination rect: frame 0 should be at top of new sprite sheet
+            // Destination rect: frame 0 should be at top of new sprite sheet (bottom-left coords)
             let dstY = totalDestHeight - CGFloat(frameIndex + 1) * targetSizeF + offsetY
             let dstRect = NSRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
 
-            sourceImage.draw(in: dstRect, from: srcRect, operation: .copy, fraction: 1.0)
+            frameNSImage.draw(in: dstRect, from: .zero, operation: .copy, fraction: 1.0)
         }
 
         NSGraphicsContext.restoreGraphicsState()
@@ -1471,6 +1473,7 @@ struct CursorPreviewDropZone: View {
     }
 
     /// Scale a Windows cursor sprite sheet (animated cursor with multiple frames stacked vertically)
+    /// Crops each frame individually before scaling to prevent interpolation bleed across frame boundaries.
     private func scaleWindowsSpriteSheet(_ original: NSBitmapImageRep, frameCount: Int, originalFrameWidth: Int, originalFrameHeight: Int) -> NSBitmapImageRep? {
         let targetSize = standardCursorSize
 
@@ -1503,6 +1506,9 @@ struct CursorPreviewDropZone: View {
         let offsetX = (targetSizeF - scaledWidth) / 2
         let offsetY = (targetSizeF - scaledHeight) / 2
 
+        // Get CGImage for pixel-precise frame cropping
+        guard let fullCGImage = original.cgImage else { return nil }
+
         // Draw into new bitmap
         NSGraphicsContext.saveGraphicsState()
         guard let context = NSGraphicsContext(bitmapImageRep: newBitmap) else {
@@ -1515,26 +1521,22 @@ struct CursorPreviewDropZone: View {
         NSColor.clear.setFill()
         NSRect(x: 0, y: 0, width: targetSize, height: targetSize * frameCount).fill()
 
-        // Create source image from original bitmap
-        let sourceImage = NSImage(size: NSSize(width: original.pixelsWide, height: original.pixelsHigh))
-        sourceImage.addRepresentation(original)
-
-        // Draw each frame
-        // Note: NSImage uses bottom-left origin coordinate system
-        // Frame 0 is at the TOP of the sprite sheet (highest Y in bottom-left coords)
-        let totalSourceHeight = CGFloat(original.pixelsHigh)
         let totalDestHeight = CGFloat(targetSize * frameCount)
 
         for frameIndex in 0..<frameCount {
-            // Source rect: frame 0 is at top, so we read from (totalHeight - frameHeight) down
-            let srcY = totalSourceHeight - CGFloat(frameIndex + 1) * originalHeight
-            let srcRect = NSRect(x: 0, y: srcY, width: originalWidth, height: originalHeight)
+            // Crop frame from sprite sheet using CGImage (top-left origin, integer pixels)
+            let cropRect = CGRect(x: 0, y: frameIndex * originalFrameHeight, width: originalFrameWidth, height: originalFrameHeight)
+            guard let frameCGImage = fullCGImage.cropping(to: cropRect) else { continue }
 
-            // Destination rect: frame 0 should be at top of new sprite sheet
+            // Create isolated NSImage for this single frame
+            let frameNSImage = NSImage(size: NSSize(width: originalWidth, height: originalHeight))
+            frameNSImage.addRepresentation(NSBitmapImageRep(cgImage: frameCGImage))
+
+            // Destination rect: frame 0 should be at top of new sprite sheet (bottom-left coords)
             let dstY = totalDestHeight - CGFloat(frameIndex + 1) * targetSizeF + offsetY
             let dstRect = NSRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
 
-            sourceImage.draw(in: dstRect, from: srcRect, operation: .copy, fraction: 1.0)
+            frameNSImage.draw(in: dstRect, from: .zero, operation: .copy, fraction: 1.0)
         }
 
         NSGraphicsContext.restoreGraphicsState()

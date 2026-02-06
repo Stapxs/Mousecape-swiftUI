@@ -94,12 +94,13 @@ MCCursorScale cursorScaleForScale(CGFloat scale) {
     // we only take version 2.0 documents.
     if (version >=  2.0) {
         if (frameCount && frameDuration && hotSpotX && hotSpotY && pointsWide && pointsHigh) {
-            
+
             self.frameCount    = frameCount.unsignedIntegerValue;
             self.frameDuration = frameDuration.doubleValue;
             self.hotSpot       = NSMakePoint(hotSpotX.doubleValue, hotSpotY.doubleValue);
             //            self.repeatCount   = repeatCount.unsignedIntegerValue;
-            
+            self.size          = NSMakeSize(pointsWide.doubleValue, pointsHigh.doubleValue);
+
             for (NSData *data in reps) {
                 // data in v2.0 documents are saved as PNGs
                 NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithData:data];
@@ -107,8 +108,6 @@ MCCursorScale cursorScaleForScale(CGFloat scale) {
 
                 [self setRepresentation:rep.retaggedSRGBSpace forScale:cursorScaleForScale(rep.pixelsWide / pointsWide.doubleValue)];
             }
-            
-            self.size          = NSMakeSize(pointsWide.doubleValue, pointsHigh.doubleValue);
 
             return YES;
         }
