@@ -1238,20 +1238,7 @@ struct CursorPreviewDropZone: View {
     private func scaleGIFSpriteSheet(_ original: NSBitmapImageRep, frameCount: Int, originalFrameWidth: Int, originalFrameHeight: Int) -> NSBitmapImageRep? {
         let targetSize = standardCursorSize
 
-        guard let newBitmap = NSBitmapImageRep(
-            bitmapDataPlanes: nil,
-            pixelsWide: targetSize,
-            pixelsHigh: targetSize * frameCount,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: .deviceRGB,
-            bytesPerRow: targetSize * 4,
-            bitsPerPixel: 32
-        ) else {
-            return nil
-        }
+        guard let fullCGImage = original.cgImage else { return nil }
 
         let originalWidth = CGFloat(originalFrameWidth)
         let originalHeight = CGFloat(originalFrameHeight)
@@ -1264,39 +1251,37 @@ struct CursorPreviewDropZone: View {
         let offsetX = (targetSizeF - scaledWidth) / 2
         let offsetY = (targetSizeF - scaledHeight) / 2
 
-        // Get CGImage for pixel-precise frame cropping
-        guard let fullCGImage = original.cgImage else { return nil }
+        let totalDestHeight = targetSize * frameCount
 
-        NSGraphicsContext.saveGraphicsState()
-        guard let context = NSGraphicsContext(bitmapImageRep: newBitmap) else {
-            NSGraphicsContext.restoreGraphicsState()
+        // Use CGContext directly (thread-safe, no NSGraphicsContext overhead)
+        guard let context = CGContext(
+            data: nil,
+            width: targetSize,
+            height: totalDestHeight,
+            bitsPerComponent: 8,
+            bytesPerRow: targetSize * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
             return nil
         }
-        NSGraphicsContext.current = context
 
-        NSColor.clear.setFill()
-        NSRect(x: 0, y: 0, width: targetSize, height: targetSize * frameCount).fill()
-
-        let totalDestHeight = CGFloat(targetSize * frameCount)
+        context.interpolationQuality = .high
 
         for frameIndex in 0..<frameCount {
             // Crop frame from sprite sheet using CGImage (top-left origin, integer pixels)
             let cropRect = CGRect(x: 0, y: frameIndex * originalFrameHeight, width: originalFrameWidth, height: originalFrameHeight)
             guard let frameCGImage = fullCGImage.cropping(to: cropRect) else { continue }
 
-            // Create isolated NSImage for this single frame
-            let frameNSImage = NSImage(size: NSSize(width: originalWidth, height: originalHeight))
-            frameNSImage.addRepresentation(NSBitmapImageRep(cgImage: frameCGImage))
-
             // Destination rect: frame 0 should be at top of new sprite sheet (bottom-left coords)
-            let dstY = totalDestHeight - CGFloat(frameIndex + 1) * targetSizeF + offsetY
-            let dstRect = NSRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
+            let dstY = CGFloat(totalDestHeight - (frameIndex + 1) * targetSize) + offsetY
+            let dstRect = CGRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
 
-            frameNSImage.draw(in: dstRect, from: .zero, operation: .copy, fraction: 1.0)
+            context.draw(frameCGImage, in: dstRect)
         }
 
-        NSGraphicsContext.restoreGraphicsState()
-        return newBitmap
+        guard let resultImage = context.makeImage() else { return nil }
+        return NSBitmapImageRep(cgImage: resultImage)
     }
 
     /// Get original bitmap representation from image
@@ -1320,21 +1305,7 @@ struct CursorPreviewDropZone: View {
     private func scaleImageToStandardSize(_ original: NSBitmapImageRep) -> NSBitmapImageRep? {
         let targetSize = standardCursorSize
 
-        // Create new bitmap with transparent background
-        guard let newBitmap = NSBitmapImageRep(
-            bitmapDataPlanes: nil,
-            pixelsWide: targetSize,
-            pixelsHigh: targetSize,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: .deviceRGB,
-            bytesPerRow: targetSize * 4,
-            bitsPerPixel: 32
-        ) else {
-            return nil
-        }
+        guard let sourceCGImage = original.cgImage else { return nil }
 
         // Calculate aspect-fit scaling
         let originalWidth = CGFloat(original.pixelsWide)
@@ -1349,28 +1320,25 @@ struct CursorPreviewDropZone: View {
         let offsetX = (targetSizeF - scaledWidth) / 2
         let offsetY = (targetSizeF - scaledHeight) / 2
 
-        // Draw into new bitmap
-        NSGraphicsContext.saveGraphicsState()
-        guard let context = NSGraphicsContext(bitmapImageRep: newBitmap) else {
-            NSGraphicsContext.restoreGraphicsState()
+        // Use CGContext directly (thread-safe, no NSGraphicsContext overhead)
+        guard let context = CGContext(
+            data: nil,
+            width: targetSize,
+            height: targetSize,
+            bitsPerComponent: 8,
+            bytesPerRow: targetSize * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
             return nil
         }
-        NSGraphicsContext.current = context
 
-        // Clear to transparent
-        NSColor.clear.setFill()
-        NSRect(x: 0, y: 0, width: targetSize, height: targetSize).fill()
+        context.interpolationQuality = .high
+        let destRect = CGRect(x: offsetX, y: offsetY, width: scaledWidth, height: scaledHeight)
+        context.draw(sourceCGImage, in: destRect)
 
-        // Draw scaled image centered
-        let sourceImage = NSImage(size: NSSize(width: originalWidth, height: originalHeight))
-        sourceImage.addRepresentation(original)
-
-        let destRect = NSRect(x: offsetX, y: offsetY, width: scaledWidth, height: scaledHeight)
-        sourceImage.draw(in: destRect, from: .zero, operation: .copy, fraction: 1.0)
-
-        NSGraphicsContext.restoreGraphicsState()
-
-        return newBitmap
+        guard let resultImage = context.makeImage() else { return nil }
+        return NSBitmapImageRep(cgImage: resultImage)
     }
 
     // MARK: - Windows Cursor Import
@@ -1476,21 +1444,7 @@ struct CursorPreviewDropZone: View {
     private func scaleWindowsSpriteSheet(_ original: NSBitmapImageRep, frameCount: Int, originalFrameWidth: Int, originalFrameHeight: Int) -> NSBitmapImageRep? {
         let targetSize = standardCursorSize
 
-        // Create new bitmap for the scaled sprite sheet
-        guard let newBitmap = NSBitmapImageRep(
-            bitmapDataPlanes: nil,
-            pixelsWide: targetSize,
-            pixelsHigh: targetSize * frameCount,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: .deviceRGB,
-            bytesPerRow: targetSize * 4,
-            bitsPerPixel: 32
-        ) else {
-            return nil
-        }
+        guard let fullCGImage = original.cgImage else { return nil }
 
         // Calculate aspect-fit scaling
         let originalWidth = CGFloat(originalFrameWidth)
@@ -1505,42 +1459,37 @@ struct CursorPreviewDropZone: View {
         let offsetX = (targetSizeF - scaledWidth) / 2
         let offsetY = (targetSizeF - scaledHeight) / 2
 
-        // Get CGImage for pixel-precise frame cropping
-        guard let fullCGImage = original.cgImage else { return nil }
+        let totalDestHeight = targetSize * frameCount
 
-        // Draw into new bitmap
-        NSGraphicsContext.saveGraphicsState()
-        guard let context = NSGraphicsContext(bitmapImageRep: newBitmap) else {
-            NSGraphicsContext.restoreGraphicsState()
+        // Use CGContext directly (thread-safe, no NSGraphicsContext overhead)
+        guard let context = CGContext(
+            data: nil,
+            width: targetSize,
+            height: totalDestHeight,
+            bitsPerComponent: 8,
+            bytesPerRow: targetSize * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
             return nil
         }
-        NSGraphicsContext.current = context
 
-        // Clear to transparent
-        NSColor.clear.setFill()
-        NSRect(x: 0, y: 0, width: targetSize, height: targetSize * frameCount).fill()
-
-        let totalDestHeight = CGFloat(targetSize * frameCount)
+        context.interpolationQuality = .high
 
         for frameIndex in 0..<frameCount {
             // Crop frame from sprite sheet using CGImage (top-left origin, integer pixels)
             let cropRect = CGRect(x: 0, y: frameIndex * originalFrameHeight, width: originalFrameWidth, height: originalFrameHeight)
             guard let frameCGImage = fullCGImage.cropping(to: cropRect) else { continue }
 
-            // Create isolated NSImage for this single frame
-            let frameNSImage = NSImage(size: NSSize(width: originalWidth, height: originalHeight))
-            frameNSImage.addRepresentation(NSBitmapImageRep(cgImage: frameCGImage))
-
             // Destination rect: frame 0 should be at top of new sprite sheet (bottom-left coords)
-            let dstY = totalDestHeight - CGFloat(frameIndex + 1) * targetSizeF + offsetY
-            let dstRect = NSRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
+            let dstY = CGFloat(totalDestHeight - (frameIndex + 1) * targetSize) + offsetY
+            let dstRect = CGRect(x: offsetX, y: dstY, width: scaledWidth, height: scaledHeight)
 
-            frameNSImage.draw(in: dstRect, from: .zero, operation: .copy, fraction: 1.0)
+            context.draw(frameCGImage, in: dstRect)
         }
 
-        NSGraphicsContext.restoreGraphicsState()
-
-        return newBitmap
+        guard let resultImage = context.makeImage() else { return nil }
+        return NSBitmapImageRep(cgImage: resultImage)
     }
 }
 

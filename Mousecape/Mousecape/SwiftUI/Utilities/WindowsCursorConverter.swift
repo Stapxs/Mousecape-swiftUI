@@ -19,7 +19,7 @@ struct WindowsCursorResult {
     let hotspotY: Int
     let frameCount: Int
     let frameDuration: Double
-    let imageData: Data  // PNG sprite sheet (for animated: frames stacked vertically)
+    let image: CGImage   // Sprite sheet (for animated: frames stacked vertically)
     let filename: String // Original filename without extension
 }
 
@@ -129,15 +129,26 @@ final class WindowsCursorConverter: @unchecked Sendable {
     /// - Parameter folderURL: URL to folder containing .cur/.ani files
     /// - Returns: Array of conversion results
     func convertFolderAsync(folderURL: URL) async throws -> [WindowsCursorResult] {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    let results = try self.convertFolder(folderURL: folderURL)
-                    continuation.resume(returning: results)
-                } catch {
-                    continuation.resume(throwing: error)
+        // Collect file URLs synchronously (NSDirectoryEnumerator is not available in async contexts)
+        let fileURLs = collectCursorFileURLs(in: folderURL)
+
+        guard !fileURLs.isEmpty else {
+            return []
+        }
+
+        return try await withThrowingTaskGroup(of: WindowsCursorResult?.self) { group in
+            for fileURL in fileURLs {
+                group.addTask {
+                    return try? self.convert(fileURL: fileURL)
                 }
             }
+            var results: [WindowsCursorResult] = []
+            for try await result in group {
+                if let result = result {
+                    results.append(result)
+                }
+            }
+            return results
         }
     }
 
@@ -147,19 +158,50 @@ final class WindowsCursorConverter: @unchecked Sendable {
     ///   - infMapping: Parsed INF mapping from install.inf
     /// - Returns: Array of (position, result) tuples for successful conversions
     func convertFolderWithINFAsync(folderURL: URL, infMapping: WindowsINFMapping) async throws -> [(position: Int, result: WindowsCursorResult)] {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    let results = try self.convertFolderWithINF(folderURL: folderURL, infMapping: infMapping)
-                    continuation.resume(returning: results)
-                } catch {
-                    continuation.resume(throwing: error)
+        return try await withThrowingTaskGroup(of: (Int, WindowsCursorResult)?.self) { group in
+            for (position, filename) in infMapping.cursorFilesByPosition {
+                group.addTask {
+                    let fileURL = folderURL.appendingPathComponent(filename)
+                    guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                        debugLog("INF referenced file not found: \(filename)")
+                        return nil
+                    }
+                    do {
+                        let result = try self.convert(fileURL: fileURL)
+                        return (position, result)
+                    } catch {
+                        debugLog("Failed to convert \(filename): \(error.localizedDescription)")
+                        return nil
+                    }
                 }
             }
+            var results: [(position: Int, result: WindowsCursorResult)] = []
+            for try await item in group {
+                if let (pos, res) = item {
+                    results.append((position: pos, result: res))
+                }
+            }
+            return results
         }
     }
 
     // MARK: - Private Methods
+
+    /// Collect all .cur/.ani file URLs in a folder (synchronous, for use before async dispatch)
+    private func collectCursorFileURLs(in folderURL: URL) -> [URL] {
+        let fileManager = FileManager.default
+        guard let enumerator = fileManager.enumerator(at: folderURL, includingPropertiesForKeys: nil) else {
+            return []
+        }
+        var fileURLs: [URL] = []
+        for case let fileURL as URL in enumerator {
+            let ext = fileURL.pathExtension.lowercased()
+            if ext == "cur" || ext == "ani" {
+                fileURLs.append(fileURL)
+            }
+        }
+        return fileURLs
+    }
 
     /// Convert a parse result to WindowsCursorResult
     /// Downsamples to max 24 frames if needed to comply with system limits
@@ -175,7 +217,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
             debugLog("Windows cursor '\(filename)' has \(parseResult.frameCount) frames, downsampling to \(maxFrameCount)")
 
             // Downsample the sprite sheet with autoreleasepool for memory management
-            let downsampledData: Data? = autoreleasepool {
+            let downsampledImage: CGImage? = autoreleasepool {
                 return downsampleSpriteSheet(
                     parseResult.image,
                     fromFrameCount: parseResult.frameCount,
@@ -185,7 +227,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
                 )
             }
 
-            guard let downsampledData = downsampledData else {
+            guard let downsampledImage = downsampledImage else {
                 throw WindowsCursorError.imageDecodeFailed
             }
 
@@ -199,16 +241,12 @@ final class WindowsCursorConverter: @unchecked Sendable {
                 hotspotY: parseResult.hotspotY,
                 frameCount: maxFrameCount,
                 frameDuration: adjustedDuration,
-                imageData: downsampledData,
+                image: downsampledImage,
                 filename: filename
             )
         }
 
         // No downsampling needed
-        guard let pngData = parseResult.pngData() else {
-            throw WindowsCursorError.imageDecodeFailed
-        }
-
         return WindowsCursorResult(
             width: parseResult.width,
             height: parseResult.height,
@@ -216,7 +254,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
             hotspotY: parseResult.hotspotY,
             frameCount: parseResult.frameCount,
             frameDuration: parseResult.frameDuration,
-            imageData: pngData,
+            image: parseResult.image,
             filename: filename
         )
     }
@@ -242,8 +280,8 @@ final class WindowsCursorConverter: @unchecked Sendable {
     ///   - toFrameCount: Target number of frames
     ///   - frameWidth: Width of each frame
     ///   - frameHeight: Height of each frame
-    /// - Returns: Downsampled sprite sheet as PNG data
-    private func downsampleSpriteSheet(_ spriteSheet: CGImage, fromFrameCount: Int, toFrameCount: Int, frameWidth: Int, frameHeight: Int) -> Data? {
+    /// - Returns: Downsampled sprite sheet as CGImage
+    private func downsampleSpriteSheet(_ spriteSheet: CGImage, fromFrameCount: Int, toFrameCount: Int, frameWidth: Int, frameHeight: Int) -> CGImage? {
         guard fromFrameCount > toFrameCount else { return nil }
 
         // Calculate which frames to keep (uniform sampling)
@@ -288,21 +326,9 @@ final class WindowsCursorConverter: @unchecked Sendable {
         }
 
         guard let newCGImage = context.makeImage() else { return nil }
-        return cgImageToPNG(newCGImage)
+        return newCGImage
     }
 
-    /// Convert CGImage to PNG data
-    private func cgImageToPNG(_ image: CGImage) -> Data? {
-        let mutableData = NSMutableData()
-        guard let destination = CGImageDestinationCreateWithData(mutableData, "public.png" as CFString, 1, nil) else {
-            return nil
-        }
-        CGImageDestinationAddImage(destination, image, nil)
-        guard CGImageDestinationFinalize(destination) else {
-            return nil
-        }
-        return mutableData as Data
-    }
 }
 
 // MARK: - NSBitmapImageRep Extension
@@ -312,14 +338,7 @@ extension WindowsCursorResult {
     /// Create NSBitmapImageRep from the result
     /// For animated cursors, returns a sprite sheet with all frames stacked vertically
     func createBitmapImageRep() -> NSBitmapImageRep? {
-        guard let image = NSImage(data: imageData) else { return nil }
-
-        // Get the bitmap representation
-        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            return nil
-        }
-
-        return NSBitmapImageRep(cgImage: cgImage)
+        return NSBitmapImageRep(cgImage: image)
     }
 
     /// Create MCCursor from the result
