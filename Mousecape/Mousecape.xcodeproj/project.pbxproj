@@ -24,7 +24,6 @@
 		DE36620B2EFAAAB600D94521 /* LocalizationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE36620C2EFAAAB600D94521 /* LocalizationManager.swift */; };
 		DE525A822EFE93C200A315A3 /* WindowsCursorConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7F2EFE93C200A315A3 /* WindowsCursorConverter.swift */; };
 		DE525A832EFE93C200A315A3 /* OrderedSetSortedInsert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7E2EFE93C200A315A3 /* OrderedSetSortedInsert.swift */; };
-		DE525A842EFE93C200A315A3 /* WindowsCursorMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A802EFE93C200A315A3 /* WindowsCursorMapping.swift */; };
 		DE525A852EFE93C200A315A3 /* DirectoryLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7D2EFE93C200A315A3 /* DirectoryLocations.swift */; };
 		DE654C422F0A6DB40025E5A0 /* WindowsINFParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */; };
 		DE6B14B42F0512EE00742257 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
@@ -148,7 +147,6 @@
 		DE525A7D2EFE93C200A315A3 /* DirectoryLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryLocations.swift; sourceTree = "<group>"; };
 		DE525A7E2EFE93C200A315A3 /* OrderedSetSortedInsert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedSetSortedInsert.swift; sourceTree = "<group>"; };
 		DE525A7F2EFE93C200A315A3 /* WindowsCursorConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorConverter.swift; sourceTree = "<group>"; };
-		DE525A802EFE93C200A315A3 /* WindowsCursorMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorMapping.swift; sourceTree = "<group>"; };
 		DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsINFParser.swift; sourceTree = "<group>"; };
 		DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorParser.swift; sourceTree = "<group>"; };
 		DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorImageScaler.swift; sourceTree = "<group>"; };
@@ -329,7 +327,6 @@
 				DE525A7D2EFE93C200A315A3 /* DirectoryLocations.swift */,
 				DE525A7E2EFE93C200A315A3 /* OrderedSetSortedInsert.swift */,
 				DE525A7F2EFE93C200A315A3 /* WindowsCursorConverter.swift */,
-				DE525A802EFE93C200A315A3 /* WindowsCursorMapping.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -664,7 +661,6 @@
 				DE654C422F0A6DB40025E5A0 /* WindowsINFParser.swift in Sources */,
 				DE525A822EFE93C200A315A3 /* WindowsCursorConverter.swift in Sources */,
 				DE525A832EFE93C200A315A3 /* OrderedSetSortedInsert.swift in Sources */,
-				DE525A842EFE93C200A315A3 /* WindowsCursorMapping.swift in Sources */,
 				DE525A852EFE93C200A315A3 /* DirectoryLocations.swift in Sources */,
 				FAAEF950189EFC9800145DF8 /* apply.m in Sources */,
 				DE6B14B42F0512EE00742257 /* WindowsCursorParser.swift in Sources */,

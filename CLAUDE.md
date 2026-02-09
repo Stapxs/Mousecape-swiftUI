@@ -105,7 +105,6 @@ SwiftUI/
 │   ├── LocalizationManager.swift（多语言支持）
 │   ├── WindowsCursorParser.swift
 │   ├── WindowsCursorConverter.swift
-│   ├── WindowsCursorMapping.swift
 │   └── WindowsINFParser.swift
 └── Helpers/
     ├── AnimatingCursorView.swift
@@ -143,7 +142,6 @@ Cape 是二进制 plist 文件（`.cape` 扩展名），包含：
 - `WindowsCursorParser.swift` - 原生 Swift 解析器，支持 .cur/.ani 格式
 - `WindowsCursorConverter.swift` - 转换器，将解析结果转为 Mousecape 格式
 - `WindowsINFParser.swift` - 解析 Windows install.inf 文件，基于 `[Scheme.Reg]` 位置映射
-- `WindowsCursorMapping.swift` - 文件名 fallback 映射（当无有效 INF 时使用）
 
 ### INF 解析逻辑
 

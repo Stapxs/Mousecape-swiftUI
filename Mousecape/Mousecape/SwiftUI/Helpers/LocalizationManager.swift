@@ -222,12 +222,20 @@ private let localizationStrings: [AppLanguage: [String: String]] = [
         // Windows Import Messages
         "Importing Windows cursors...": "Importing Windows cursors...",
         "No valid cursor files found in the selected folder.": "No valid cursor files found in the selected folder.",
+        "No valid install.inf file found.": "No valid install.inf file found.",
         "No cursors could be mapped to macOS cursor types.": "No cursors could be mapped to macOS cursor types.",
         "Successfully imported": "Successfully imported",
         "cursor(s) from": "cursor(s) from",
         "file(s).": "file(s).",
         "Failed to access library directory.": "Failed to access library directory.",
         "Failed to import Windows cursors:": "Failed to import Windows cursors:",
+
+        // INF Parse Errors
+        "INF file not found:": "INF file not found:",
+        "Failed to read INF file (encoding error):": "Failed to read INF file (encoding error):",
+        "No [Scheme.Reg] section found in INF file": "No [Scheme.Reg] section found in INF file",
+        "No cursor paths found in [Scheme.Reg]": "No cursor paths found in [Scheme.Reg]",
+        "No valid cursor filenames could be resolved": "No valid cursor filenames could be resolved",
 
         // Cape Validation Errors
         "Cape validation failed": "Cape validation failed",
@@ -438,12 +446,20 @@ private let localizationStrings: [AppLanguage: [String: String]] = [
         // Windows Import Messages
         "Importing Windows cursors...": "正在导入Windows光标...",
         "No valid cursor files found in the selected folder.": "所选文件夹中未找到有效的光标文件。",
+        "No valid install.inf file found.": "未找到有效的install.inf文件。",
         "No cursors could be mapped to macOS cursor types.": "没有光标可以映射到macOS光标类型。",
         "Successfully imported": "成功导入",
         "cursor(s) from": "个光标，来自",
         "file(s).": "个文件。",
         "Failed to access library directory.": "无法访问库目录。",
         "Failed to import Windows cursors:": "导入Windows光标失败：",
+
+        // INF Parse Errors
+        "INF file not found:": "未找到INF文件：",
+        "Failed to read INF file (encoding error):": "读取INF文件失败（编码错误）：",
+        "No [Scheme.Reg] section found in INF file": "INF文件中未找到[Scheme.Reg]段",
+        "No cursor paths found in [Scheme.Reg]": "[Scheme.Reg]中未找到光标路径",
+        "No valid cursor filenames could be resolved": "无法解析出有效的光标文件名",
 
         // Cape Validation Errors
         "Cape validation failed": "Cape验证失败",

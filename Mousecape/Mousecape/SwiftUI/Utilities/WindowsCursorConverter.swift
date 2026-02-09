@@ -125,33 +125,6 @@ final class WindowsCursorConverter: @unchecked Sendable {
 
     // MARK: - Async Public API
 
-    /// Convert all cursor files in a folder asynchronously
-    /// - Parameter folderURL: URL to folder containing .cur/.ani files
-    /// - Returns: Array of conversion results
-    func convertFolderAsync(folderURL: URL) async throws -> [WindowsCursorResult] {
-        // Collect file URLs synchronously (NSDirectoryEnumerator is not available in async contexts)
-        let fileURLs = collectCursorFileURLs(in: folderURL)
-
-        guard !fileURLs.isEmpty else {
-            return []
-        }
-
-        return try await withThrowingTaskGroup(of: WindowsCursorResult?.self) { group in
-            for fileURL in fileURLs {
-                group.addTask {
-                    return try? self.convert(fileURL: fileURL)
-                }
-            }
-            var results: [WindowsCursorResult] = []
-            for try await result in group {
-                if let result = result {
-                    results.append(result)
-                }
-            }
-            return results
-        }
-    }
-
     /// Convert cursor files in a folder asynchronously using INF mapping (position-based)
     /// - Parameters:
     ///   - folderURL: URL to folder containing .cur/.ani files and install.inf
@@ -186,22 +159,6 @@ final class WindowsCursorConverter: @unchecked Sendable {
     }
 
     // MARK: - Private Methods
-
-    /// Collect all .cur/.ani file URLs in a folder (synchronous, for use before async dispatch)
-    private func collectCursorFileURLs(in folderURL: URL) -> [URL] {
-        let fileManager = FileManager.default
-        guard let enumerator = fileManager.enumerator(at: folderURL, includingPropertiesForKeys: nil) else {
-            return []
-        }
-        var fileURLs: [URL] = []
-        for case let fileURL as URL in enumerator {
-            let ext = fileURL.pathExtension.lowercased()
-            if ext == "cur" || ext == "ani" {
-                fileURLs.append(fileURL)
-            }
-        }
-        return fileURLs
-    }
 
     /// Convert a parse result to WindowsCursorResult
     /// Downsamples to max 24 frames if needed to comply with system limits

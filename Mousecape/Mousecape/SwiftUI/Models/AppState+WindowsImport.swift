@@ -40,9 +40,11 @@ extension AppState {
             // Use INF-based import (position-based mapping)
             await processWithINFMapping(folderURL: folderURL, infMapping: infMapping)
         case .failure(let error):
-            // Show INF parsing error and fallback to filename-based import
-            debugLog("INF parsing failed: \(error.localizedDescription), using filename mapping")
-            await processWithFilenameMapping(folderURL: folderURL)
+            debugLog("INF parsing failed: \(error.localizedDescription)")
+            isLoading = false
+            importResultMessage = "\(LocalizationManager.shared.localized("No valid install.inf file found.")) \(error.localizedUIDescription)"
+            importResultIsSuccess = false
+            showImportResult = true
         }
     }
 
@@ -132,86 +134,6 @@ extension AppState {
 
                     newCape.addCursor(cursor)
                     addedCursorTypes.insert(cursorType.rawValue)
-                    importedCount += 1
-                }
-            }
-
-            finishImport(newCape: newCape, capeName: capeName, importedCount: importedCount, fileCount: results.count)
-
-        } catch {
-            isLoading = false
-            importResultMessage = "\(LocalizationManager.shared.localized("Failed to import Windows cursors:")) \(error.localizedDescription)"
-            importResultIsSuccess = false
-            showImportResult = true
-        }
-    }
-
-    /// Process Windows cursors using filename mapping (fallback)
-    fileprivate func processWithFilenameMapping(folderURL: URL) async {
-        do {
-            let results = try await WindowsCursorConverter.shared.convertFolderAsync(folderURL: folderURL)
-
-            if results.isEmpty {
-                isLoading = false
-                importResultMessage = LocalizationManager.shared.localized("No valid cursor files found in the selected folder.")
-                importResultIsSuccess = false
-                showImportResult = true
-                return
-            }
-
-            // Create new cape with folder name (use unique name if duplicate exists)
-            let baseName = sanitizeCapeNameFromFolder(folderURL)
-            let capeName = findUniqueName(baseName: baseName, author: "Imported")
-            let newCape = CursorLibrary(name: capeName, author: "Imported")
-
-            // Process each cursor result
-            var importedCount = 0
-            for result in results {
-                // Get macOS cursor types for this Windows cursor
-                let cursorTypes = WindowsCursorMapping.cursorTypes(for: result.filename)
-
-                if cursorTypes.isEmpty {
-                    debugLog("Skipping unknown cursor: \(result.filename)")
-                    continue
-                }
-
-                // Create bitmap from result
-                guard let originalBitmap = result.createBitmapImageRep() else {
-                    debugLog("Failed to create bitmap for: \(result.filename)")
-                    continue
-                }
-
-                // Scale the bitmap to standard size (64x64 per frame)
-                let scaledBitmap: NSBitmapImageRep?
-                if result.frameCount > 1 {
-                    scaledBitmap = CursorImageScaler.scaleSpriteSheet(originalBitmap, frameCount: result.frameCount, originalFrameWidth: result.width, originalFrameHeight: result.height)
-                } else {
-                    scaledBitmap = CursorImageScaler.scaleImageToStandardSize(originalBitmap)
-                }
-
-                guard let finalBitmap = scaledBitmap else {
-                    debugLog("Failed to scale bitmap for: \(result.filename)")
-                    continue
-                }
-
-                // Calculate scaled hotspot
-                let (hotspotPointsX, hotspotPointsY) = CursorImageScaler.calculateScaledHotspot(hotspotX: result.hotspotX, hotspotY: result.hotspotY, originalWidth: result.width, originalHeight: result.height)
-
-                // Create a cursor for each mapped type
-                for cursorType in cursorTypes {
-                    let cursor = Cursor(identifier: cursorType.rawValue)
-                    cursor.frameCount = result.frameCount
-                    cursor.frameDuration = result.frameDuration
-                    cursor.hotSpot = NSPoint(x: hotspotPointsX, y: hotspotPointsY)
-                    cursor.size = NSSize(width: 32, height: 32)
-
-                    if let bitmapCopy = finalBitmap.copy() as? NSBitmapImageRep {
-                        cursor.setRepresentation(bitmapCopy, for: .scale200)
-                    } else {
-                        cursor.setRepresentation(finalBitmap, for: .scale200)
-                    }
-
-                    newCape.addCursor(cursor)
                     importedCount += 1
                 }
             }
