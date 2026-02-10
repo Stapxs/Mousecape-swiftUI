@@ -27,17 +27,17 @@ struct HomeView: View {
         // Group 1: New, Delete
         ToolbarItemGroup {
             Menu {
-                Button(String(localized:"New Cape")) {
+                Button("New Cape") {
                     appState.createNewCape()
                 }
                 Divider()
-                Button(String(localized:"Import from Windows Cursors...")) {
+                Button("Import from Windows Cursors...") {
                     appState.importWindowsCursorFolder()
                 }
             } label: {
                 Image(systemName: "plus")
             }
-            .help(String(localized:"New Cape"))
+            .help("New Cape")
 
             Button(action: {
                 if let cape = appState.selectedCape {
@@ -46,7 +46,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "minus")
             }
-            .help(String(localized:"Delete Cape"))
+            .help("Delete Cape")
             .disabled(appState.selectedCape == nil)
         }
 
@@ -61,7 +61,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "square.and.pencil")
             }
-            .help(String(localized:"Edit Cape"))
+            .help("Edit Cape")
             .disabled(appState.selectedCape == nil)
 
             Button(action: {
@@ -71,7 +71,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "checkmark.circle")
             }
-            .help(String(localized:"Apply Cape"))
+            .help("Apply Cape")
             .disabled(appState.selectedCape == nil)
         }
 
@@ -82,7 +82,7 @@ struct HomeView: View {
             Button(action: { appState.importCape() }) {
                 Image(systemName: "square.and.arrow.down")
             }
-            .help(String(localized:"Import Cape"))
+            .help("Import Cape")
 
             Button(action: {
                 if let cape = appState.selectedCape {
@@ -91,7 +91,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "square.and.arrow.up")
             }
-            .help(String(localized:"Export Cape"))
+            .help("Export Cape")
             .disabled(appState.selectedCape == nil)
         }
 
@@ -104,7 +104,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "gear")
             }
-            .help(String(localized:"Settings"))
+            .help("Settings")
         }
     }
 
@@ -143,9 +143,9 @@ struct HomeView: View {
                         }
                 } else {
                     ContentUnavailableView(
-                        String(localized:"Select a Cape"),
+                        "Select a Cape",
                         systemImage: "cursorarrow.click.2",
-                        description: Text(String(localized:"Choose a cape from the list to preview"))
+                        description: Text("Choose a cape from the list to preview")
                     )
                     .toolbar {
                         homeToolbarContent
@@ -160,7 +160,7 @@ struct HomeView: View {
         .toolbar(removing: .sidebarToggle)
         // Delete confirmation dialog
         .confirmationDialog(
-            String(localized:"Delete Cape"),
+            "Delete Cape",
             isPresented: $appState.showDeleteConfirmation,
             titleVisibility: .visible,
             presenting: appState.capeToDelete
@@ -168,7 +168,7 @@ struct HomeView: View {
             Button("\(String(localized:"Delete")) \"\(cape.name)\"", role: .destructive) {
                 appState.deleteCape(cape)
             }
-            Button(String(localized:"Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.capeToDelete = nil
             }
         } message: { cape in
@@ -176,34 +176,34 @@ struct HomeView: View {
         }
         // Discard changes confirmation alert (macOS native style)
         .alert(
-            String(localized:"Unsaved Changes"),
+            "Unsaved Changes",
             isPresented: $appState.showDiscardConfirmation
         ) {
-            Button(String(localized:"Save")) {
+            Button("Save") {
                 appState.closeEditWithSave()
             }
             .keyboardShortcut(.defaultAction)
 
-            Button(String(localized:"Don't Save"), role: .destructive) {
+            Button("Don't Save", role: .destructive) {
                 appState.closeEdit()
             }
 
-            Button(String(localized:"Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.showDiscardConfirmation = false
             }
         } message: {
-            Text(String(localized:"Do you want to save the changes you made?"))
+            Text("Do you want to save the changes you made?")
         }
         // Delete cursor confirmation dialog
         .confirmationDialog(
-            String(localized:"Delete Cursor?"),
+            "Delete Cursor?",
             isPresented: $appState.showDeleteCursorConfirmation,
             titleVisibility: .visible
         ) {
-            Button(String(localized:"Delete"), role: .destructive) {
+            Button("Delete", role: .destructive) {
                 appState.deleteSelectedCursor()
             }
-            Button(String(localized:"Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.showDeleteCursorConfirmation = false
             }
         } message: {
@@ -213,10 +213,10 @@ struct HomeView: View {
         }
         // Duplicate filename error alert
         .alert(
-            String(localized:"Duplicate Filename"),
+            "Duplicate Filename",
             isPresented: $appState.showDuplicateFilenameError
         ) {
-            Button(String(localized:"OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showDuplicateFilenameError = false
             }
         } message: {
@@ -224,10 +224,10 @@ struct HomeView: View {
         }
         // Validation error alert
         .alert(
-            String(localized:"Validation Error"),
+            "Validation Error",
             isPresented: $appState.showValidationError
         ) {
-            Button(String(localized:"OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showValidationError = false
             }
         } message: {
@@ -235,10 +235,10 @@ struct HomeView: View {
         }
         // Image import warning alert (non-square image)
         .alert(
-            String(localized:"Image Adjusted"),
+            "Image Adjusted",
             isPresented: $appState.showImageImportWarning
         ) {
-            Button(String(localized:"OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showImageImportWarning = false
             }
         } message: {
@@ -302,7 +302,7 @@ struct CapeDropOverlayView: View {
                     .font(.system(size: 36, weight: .light))
                     .foregroundStyle(.white)
 
-                Text(String(localized:"Drop .cape files to import"))
+                Text("Drop .cape files to import")
                     .font(.title3)
                     .foregroundStyle(.white)
             }
@@ -324,17 +324,17 @@ struct EmptyStateView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label(String(localized:"No Capes"), systemImage: "cursorarrow.slash")
+            Label("No Capes", systemImage: "cursorarrow.slash")
         } description: {
-            Text(String(localized:"Create a new cape or import an existing one to get started."))
+            Text("Create a new cape or import an existing one to get started.")
         } actions: {
             HStack(spacing: 12) {
-                Button(String(localized:"New Cape")) {
+                Button("New Cape") {
                     appState.createNewCape()
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button(String(localized:"Import Cape")) {
+                Button("Import Cape") {
                     appState.importCape()
                 }
                 .buttonStyle(.bordered)

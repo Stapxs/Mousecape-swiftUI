@@ -14,8 +14,8 @@ extension AppState {
     /// Import Windows cursors from a folder and create a new cape
     func importWindowsCursorFolder() {
         let panel = NSOpenPanel()
-        panel.title = "Select Windows Cursor Folder"
-        panel.message = "Choose a folder containing .cur and .ani files"
+        panel.title = String(localized: "Select Windows Cursor Folder")
+        panel.message = String(localized: "Choose a folder containing .cur and .ani files")
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = false

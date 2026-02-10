@@ -24,9 +24,9 @@
 		DE525A822EFE93C200A315A3 /* WindowsCursorConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7F2EFE93C200A315A3 /* WindowsCursorConverter.swift */; };
 		DE525A832EFE93C200A315A3 /* OrderedSetSortedInsert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7E2EFE93C200A315A3 /* OrderedSetSortedInsert.swift */; };
 		DE525A852EFE93C200A315A3 /* DirectoryLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE525A7D2EFE93C200A315A3 /* DirectoryLocations.swift */; };
+		DE53D4032F3B398800011C1F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE53D4022F3B398800011C1F /* Localizable.xcstrings */; };
 		DE654C422F0A6DB40025E5A0 /* WindowsINFParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */; };
 		DE6B14B42F0512EE00742257 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
-		DEA0B0012F59000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DEA0B0042F59000000000003 /* Localizable.strings */; };
 		DEAB0D642F39ADB000DB9EB0 /* CursorImageScaler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */; };
 		DEBC96002F16577D004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
 		DEBC96012F16577D004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
@@ -146,10 +146,9 @@
 		DE525A7D2EFE93C200A315A3 /* DirectoryLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryLocations.swift; sourceTree = "<group>"; };
 		DE525A7E2EFE93C200A315A3 /* OrderedSetSortedInsert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedSetSortedInsert.swift; sourceTree = "<group>"; };
 		DE525A7F2EFE93C200A315A3 /* WindowsCursorConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorConverter.swift; sourceTree = "<group>"; };
+		DE53D4022F3B398800011C1F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsINFParser.swift; sourceTree = "<group>"; };
 		DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorParser.swift; sourceTree = "<group>"; };
-		DEA0B0002F59000000000001 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		DEA0B0022F59000000000002 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorImageScaler.swift; sourceTree = "<group>"; };
 		DEBC95FE2F16577D004E6C07 /* MCLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCLogger.h; sourceTree = "<group>"; };
 		DEBC95FF2F16577D004E6C07 /* MCLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MCLogger.m; sourceTree = "<group>"; };
@@ -383,7 +382,7 @@
 		FAC69F6A189D603C00BC829D /* Mousecape */ = {
 			isa = PBXGroup;
 			children = (
-				DEA0B0042F59000000000003 /* Localizable.strings */,
+				DE53D4022F3B398800011C1F /* Localizable.xcstrings */,
 				DE3661FB2EFAAAB600D94521 /* SwiftUI */,
 				FA5733A32495667900103FCF /* Mousecape.entitlements */,
 				FAEE650D18A047E8003AA182 /* controllers */,
@@ -631,8 +630,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DEA0B0012F59000000000001 /* Localizable.strings in Resources */,
 				FAC69F7D189D603C00BC829D /* Images.xcassets in Resources */,
+				DE53D4032F3B398800011C1F /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -738,18 +737,6 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		DEA0B0042F59000000000003 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DEA0B0002F59000000000001 /* en */,
-				DEA0B0022F59000000000002 /* zh-Hans */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		FAC69F90189D603C00BC829D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -803,10 +790,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Debug;
 		};
@@ -856,10 +845,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};

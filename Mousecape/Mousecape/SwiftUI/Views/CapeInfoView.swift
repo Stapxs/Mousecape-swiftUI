@@ -39,11 +39,11 @@ struct CapeInfoView: View {
             VStack(spacing: 20) {
                 // Cape metadata form
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(String(localized:"Cape Information"))
+                    Text("Cape Information")
                         .font(.headline)
 
-                    LabeledContent(String(localized:"Name")) {
-                        TextField(String(localized:"Name"), text: Binding(
+                    LabeledContent("Name") {
+                        TextField("Name", text: Binding(
                             get: { cape.name },
                             set: { newValue in
                                 // Filter to only allow valid filename characters
@@ -65,8 +65,8 @@ struct CapeInfoView: View {
                         )
                     }
 
-                    LabeledContent(String(localized:"Author")) {
-                        TextField(String(localized:"Author"), text: Binding(
+                    LabeledContent("Author") {
+                        TextField("Author", text: Binding(
                             get: { cape.author },
                             set: { newValue in
                                 // Filter to only allow valid filename characters
@@ -88,8 +88,8 @@ struct CapeInfoView: View {
                         )
                     }
 
-                    LabeledContent(String(localized:"Version")) {
-                        TextField(String(localized:"Version"), value: Binding(
+                    LabeledContent("Version") {
+                        TextField("Version", value: Binding(
                             get: { cape.version },
                             set: { newValue in
                                 let oldValue = cape.version
@@ -113,12 +113,12 @@ struct CapeInfoView: View {
 
                     Divider()
 
-                    LabeledContent(String(localized:"Cursors")) {
+                    LabeledContent("Cursors") {
                         Text("\(cape.cursorCount)")
                             .foregroundStyle(.secondary)
                     }
 
-                    LabeledContent(String(localized:"File")) {
+                    LabeledContent("File") {
                         // Show current filename (updates after save)
                         Text(currentFilename)
                             .foregroundStyle(.secondary)

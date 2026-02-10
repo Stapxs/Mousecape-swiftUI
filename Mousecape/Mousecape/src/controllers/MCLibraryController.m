@@ -78,8 +78,8 @@
         return [NSError errorWithDomain:MCErrorDomain
                                    code:MCErrorInvalidFormatCode
                                userInfo:@{
-            NSLocalizedDescriptionKey: NSLocalizedString(@"Import failed", nil),
-            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"Unable to read the cape file.", nil)
+            NSLocalizedDescriptionKey: NSLocalizedString(@"error.import.failed", nil),
+            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"error.import.unreadable", nil)
         }];
     }
     return [self importCape:lib];

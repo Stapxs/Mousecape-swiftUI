@@ -17,7 +17,7 @@ struct SettingsView: View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             // Left sidebar: Category list
             List(SettingsCategory.allCases, selection: $selectedCategory) { category in
-                Label(NSLocalizedString(category.title, comment: ""), systemImage: category.icon)
+                Label(String(localized: String.LocalizationValue(category.title)), systemImage: category.icon)
                     .tag(category)
             }
             .listStyle(.sidebar)
@@ -72,19 +72,19 @@ struct GeneralSettingsView: View {
             // Helper Tool Section (moved from Advanced)
             HelperToolSettingsView()
 
-            Section(String(localized:"Startup")) {
-                Toggle(String(localized:"Apply Last Cape on Launch"), isOn: $applyLastCapeOnLaunch)
+            Section("Startup") {
+                Toggle("Apply Last Cape on Launch", isOn: $applyLastCapeOnLaunch)
             }
 
-            Section(String(localized:"Double-click Action")) {
-                Picker(String(localized:"When double-clicking a Cape"), selection: $doubleClickAction) {
-                    Text(String(localized:"Apply Cape")).tag(0)
-                    Text(String(localized:"Edit Cape")).tag(1)
-                    Text(String(localized:"Do Nothing")).tag(2)
+            Section("Double-click Action") {
+                Picker("When double-clicking a Cape", selection: $doubleClickAction) {
+                    Text("Apply Cape").tag(0)
+                    Text("Edit Cape").tag(1)
+                    Text("Do Nothing").tag(2)
                 }
             }
 
-            Section(String(localized:"Cursor Scale")) {
+            Section("Cursor Scale") {
                 VStack(alignment: .leading) {
                     Text("\(String(localized:"Global Scale:")) \(cursorScale, specifier: "%.1f")x")
                     Slider(value: $cursorScale, in: 0.5...2.0, step: 0.1) {
@@ -100,7 +100,7 @@ struct GeneralSettingsView: View {
                         _ = setCursorScale(Float(newValue))
                     }
 
-                    Text(String(localized:"Scale changes are applied immediately."))
+                    Text("Scale changes are applied immediately.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -108,7 +108,7 @@ struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(String(localized:"General"))
+        .navigationTitle("General")
         .onAppear {
             loadCursorScale()
         }
@@ -150,30 +150,30 @@ struct AppearanceSettingsView: View {
 
     var body: some View {
         Form {
-            Section(String(localized:"Theme")) {
-                Picker(String(localized:"Appearance"), selection: $appearanceMode) {
-                    Text(String(localized:"Light")).tag(1)
-                    Text(String(localized:"Dark")).tag(2)
+            Section("Theme") {
+                Picker("Appearance", selection: $appearanceMode) {
+                    Text("Light").tag(1)
+                    Text("Dark").tag(2)
                 }
                 .pickerStyle(.radioGroup)
 
-                Toggle(String(localized:"Transparent Window"), isOn: $transparentWindow)
+                Toggle("Transparent Window", isOn: $transparentWindow)
                     .onChange(of: transparentWindow) { _, newValue in
                         updateWindowTransparency(newValue)
                     }
-                Text(String(localized:"Enable semi-transparent window background"))
+                Text("Enable semi-transparent window background")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section(String(localized:"List Display")) {
-                Toggle(String(localized:"Show Cursor Preview Animations"), isOn: $showPreviewAnimations)
-                Toggle(String(localized:"Show Cape Author Info"), isOn: $showAuthorInfo)
+            Section("List Display") {
+                Toggle("Show Cursor Preview Animations", isOn: $showPreviewAnimations)
+                Toggle("Show Cape Author Info", isOn: $showAuthorInfo)
             }
 
-            Section(String(localized:"Preview Panel")) {
-                Picker(String(localized:"Preview Grid Columns"), selection: $previewGridColumns) {
-                    Text(String(localized:"Auto (based on window size)")).tag(0)
+            Section("Preview Panel") {
+                Picker("Preview Grid Columns", selection: $previewGridColumns) {
+                    Text("Auto (based on window size)").tag(0)
                     Text("4 \(String(localized:"columns"))").tag(4)
                     Text("6 \(String(localized:"columns"))").tag(6)
                     Text("8 \(String(localized:"columns"))").tag(8)
@@ -182,7 +182,7 @@ struct AppearanceSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(String(localized:"Appearance"))
+        .navigationTitle("Appearance")
     }
 
     /// Update window transparency in real-time
@@ -215,57 +215,57 @@ struct AdvancedSettingsView: View {
 
     var body: some View {
         Form {
-            Section(String(localized:"Storage")) {
-                LabeledContent(String(localized:"Cape Folder")) {
+            Section("Storage") {
+                LabeledContent("Cape Folder") {
                     Text("~/Library/Application Support/Mousecape/capes")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                Button(String(localized:"Show in Finder")) {
+                Button("Show in Finder") {
                     appState.openCapeFolder()
                 }
             }
 
-            Section(String(localized:"Reset")) {
+            Section("Reset") {
                 HStack {
-                    Button(String(localized:"Reset System Cursor")) {
+                    Button("Reset System Cursor") {
                         appState.resetToDefault()
                         showResetCursorSuccess = true
                     }
 
-                    Button(String(localized:"Reset Sidebar Order")) {
+                    Button("Reset Sidebar Order") {
                         appState.resetCapeOrder()
                         showResetOrderSuccess = true
                     }
 
-                    Button(String(localized:"Restore Default Settings"), role: .destructive) {
+                    Button("Restore Default Settings", role: .destructive) {
                         showResetConfirmation = true
                     }
                 }
                 .confirmationDialog(
-                    String(localized:"Restore Default Settings"),
+                    "Restore Default Settings",
                     isPresented: $showResetConfirmation,
                     titleVisibility: .visible
                 ) {
-                    Button(String(localized:"Restore Default Settings"), role: .destructive) {
+                    Button("Restore Default Settings", role: .destructive) {
                         resetToDefaults()
                     }
-                    Button(String(localized:"Cancel"), role: .cancel) { }
+                    Button("Cancel", role: .cancel) { }
                 } message: {
-                    Text(String(localized:"This will reset all settings to their default values. This action cannot be undone."))
+                    Text("This will reset all settings to their default values. This action cannot be undone.")
                 }
             }
 
             #if DEBUG
-            Section(String(localized:"Debug")) {
-                LabeledContent(String(localized:"Log Folder")) {
+            Section("Debug") {
+                LabeledContent("Log Folder") {
                     Text("~/Library/Logs/Mousecape")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                LabeledContent(String(localized:"Log Files")) {
+                LabeledContent("Log Files") {
                     let files = DebugLogger.getAllLogFiles()
                     let size = DebugLogger.getTotalLogSize()
                     Text("\(files.count) files, \(ByteCountFormatter.string(fromByteCount: size, countStyle: .file))")
@@ -274,28 +274,28 @@ struct AdvancedSettingsView: View {
                 }
 
                 HStack {
-                    Button(String(localized:"Open Log Folder")) {
+                    Button("Open Log Folder") {
                         NSWorkspace.shared.open(DebugLogger.logsDirectory)
                     }
 
-                    Button(String(localized:"Export All Logs")) {
+                    Button("Export All Logs") {
                         exportLogs()
                     }
                     .disabled(isExportingLogs)
 
-                    Button(String(localized:"Clear All Logs"), role: .destructive) {
+                    Button("Clear All Logs", role: .destructive) {
                         DebugLogger.clearAllLogs()
                     }
                 }
 
-                Text(String(localized:"Logs are automatically deleted after 24 hours. Logs contain debug information for troubleshooting cursor issues."))
+                Text("Logs are automatically deleted after 24 hours. Logs contain debug information for troubleshooting cursor issues.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             #endif
 
-            Section(String(localized:"About")) {
-                LabeledContent(String(localized:"Version")) {
+            Section("About") {
+                LabeledContent("Version") {
                     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
                        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
                         Text("Mousecape v\(version) (\(build))")
@@ -303,18 +303,18 @@ struct AdvancedSettingsView: View {
                         Text("Mousecape v1.0.3")
                     }
                 }
-                LabeledContent(String(localized:"System Requirements")) {
+                LabeledContent("System Requirements") {
                     Text("macOS 15+")
                 }
-                LabeledContent(String(localized:"Original Author")) {
+                LabeledContent("Original Author") {
                     Text("\u{00A9} 2014-2025 Alex Zielenski")
                 }
-                LabeledContent(String(localized:"SwiftUI Redesign")) {
+                LabeledContent("SwiftUI Redesign") {
                     Text("\u{00A9} 2025 sdmj76")
                 }
 
                 HStack {
-                    Button(String(localized:"Check for Updates")) {
+                    Button("Check for Updates") {
                         checkForUpdates()
                     }
                     Button("GitHub") {
@@ -322,7 +322,7 @@ struct AdvancedSettingsView: View {
                             NSWorkspace.shared.open(url)
                         }
                     }
-                    Button(String(localized:"Report Issue")) {
+                    Button("Report Issue") {
                         if let url = URL(string: "https://github.com/sdmj76/Mousecape/issues") {
                             NSWorkspace.shared.open(url)
                         }
@@ -332,22 +332,22 @@ struct AdvancedSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(String(localized:"Advanced"))
+        .navigationTitle("Advanced")
         .alert(
-            String(localized:"Reset System Cursor"),
+            "Reset System Cursor",
             isPresented: $showResetCursorSuccess
         ) {
-            Button(String(localized:"OK"), role: .cancel) { }
+            Button("OK", role: .cancel) { }
         } message: {
-            Text(String(localized:"System cursor has been reset to default."))
+            Text("System cursor has been reset to default.")
         }
         .alert(
-            String(localized:"Reset Sidebar Order"),
+            "Reset Sidebar Order",
             isPresented: $showResetOrderSuccess
         ) {
-            Button(String(localized:"OK"), role: .cancel) { }
+            Button("OK", role: .cancel) { }
         } message: {
-            Text(String(localized:"Sidebar order has been reset to alphabetical."))
+            Text("Sidebar order has been reset to alphabetical.")
         }
     }
 
@@ -378,7 +378,7 @@ struct AdvancedSettingsView: View {
                 savePanel.allowedContentTypes = [.zip]
                 savePanel.nameFieldStringValue = zipURL.lastPathComponent
                 savePanel.canCreateDirectories = true
-                savePanel.title = "Export Debug Logs"
+                savePanel.title = String(localized: "Export Debug Logs")
 
                 if savePanel.runModal() == .OK, let destURL = savePanel.url {
                     do {

@@ -24,7 +24,7 @@ struct AddCursorSheet: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text(String(localized:"Add Cursor"))
+            Text("Add Cursor")
                 .font(.headline)
 
             cursorTypeList
@@ -42,9 +42,9 @@ struct AddCursorSheet: View {
     private var cursorTypeList: some View {
         if availableTypes.isEmpty {
             ContentUnavailableView(
-                String(localized:"All Cursor Types Added"),
+                "All Cursor Types Added",
                 systemImage: "checkmark.circle",
-                description: Text(String(localized:"This cape already contains all standard cursor types."))
+                description: Text("This cape already contains all standard cursor types.")
             )
         } else {
             ScrollView {
@@ -66,14 +66,14 @@ struct AddCursorSheet: View {
 
     private var buttonBar: some View {
         HStack {
-            Button(String(localized:"Cancel")) {
+            Button("Cancel") {
                 dismiss()
             }
             .keyboardShortcut(.cancelAction)
 
             Spacer()
 
-            Button(String(localized:"Add")) {
+            Button("Add") {
                 addSelectedCursor()
             }
             .keyboardShortcut(.defaultAction)

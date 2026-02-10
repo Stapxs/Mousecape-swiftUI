@@ -38,9 +38,9 @@ struct EditDetailContent: View {
                     .id(cursor.id)  // Force view recreation when cursor changes
             } else {
                 ContentUnavailableView(
-                    String(localized:"Select a Cursor"),
+                    "Select a Cursor",
                     systemImage: "cursorarrow.click",
-                    description: Text(String(localized:"Choose a cursor from the list to edit"))
+                    description: Text("Choose a cursor from the list to edit")
                 )
             }
         }
@@ -64,14 +64,14 @@ struct EditDetailContent: View {
                 }) {
                     Image(systemName: "plus")
                 }
-                .help(String(localized:"Add Cursor"))
+                .help("Add Cursor")
 
                 Button(action: {
                     appState.showDeleteCursorConfirmation = true
                 }) {
                     Image(systemName: "minus")
                 }
-                .help(String(localized:"Delete Cursor"))
+                .help("Delete Cursor")
                 .disabled(appState.editingSelectedCursor == nil)
 
                 Button(action: {
@@ -82,7 +82,7 @@ struct EditDetailContent: View {
                 }) {
                     Image(systemName: appState.showCapeInfo ? "info.circle.fill" : "info.circle")
                 }
-                .help(String(localized:"Cape Info"))
+                .help("Cape Info")
             }
 
             AdaptiveToolbarSpacer(.fixed)
@@ -94,7 +94,7 @@ struct EditDetailContent: View {
                 }) {
                     Image(systemName: "checkmark")
                 }
-                .help(String(localized:"Done"))
+                .help("Done")
             }
         }
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
@@ -164,11 +164,11 @@ struct CursorListView: View {
             CursorListRow(cursor: cursor, currentIdentifier: cursor.identifier)
                 .tag(cursor)
                 .contextMenu {
-                    Button(String(localized:"Duplicate")) {
+                    Button("Duplicate") {
                         duplicateCursor()
                     }
                     Divider()
-                    Button(String(localized:"Delete"), role: .destructive) {
+                    Button("Delete", role: .destructive) {
                         appState.showDeleteCursorConfirmation = true
                     }
                 }
@@ -328,7 +328,7 @@ struct CursorDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Type section
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized:"Type"))
+                        Text("Type")
                             .font(.headline)
 
                         Picker("", selection: $selectedType) {
@@ -372,7 +372,7 @@ struct CursorDetailView: View {
 
                     // Hotspot section
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized:"Hotspot"))
+                        Text("Hotspot")
                             .font(.headline)
 
                         HStack(spacing: 16) {
@@ -460,11 +460,11 @@ struct CursorDetailView: View {
 
                     // Animation section
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized:"Animation"))
+                        Text("Animation")
                             .font(.headline)
 
                         HStack {
-                            Text(String(localized:"Frames:"))
+                            Text("Frames:")
                             TextField("Frames", value: $frameCount, format: .number)
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 60)
@@ -495,7 +495,7 @@ struct CursorDetailView: View {
                         }
 
                         HStack {
-                            Text(String(localized:"Speed:"))
+                            Text("Speed:")
                             TextField("Speed", value: $fps, format: .number.precision(.fractionLength(1)))
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 60)
@@ -525,7 +525,7 @@ struct CursorDetailView: View {
                                         }
                                     )
                                 }
-                            Text(String(localized:"frames/sec"))
+                            Text("frames/sec")
                                 .foregroundStyle(.secondary)
                         }
 
@@ -618,11 +618,11 @@ struct CursorPreviewDropZone: View {
                         .font(.system(size: 48))
                         .foregroundStyle(.tertiary)
 
-                    Text(String(localized:"Drag image or click to select"))
+                    Text("Drag image or click to select")
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    Text(String(localized:"Recommended: 64×64 px (HiDPI 2x)"))
+                    Text("Recommended: 64×64 px (HiDPI 2x)")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }

@@ -320,7 +320,7 @@ final class AppState: @unchecked Sendable {
         } else {
             // Show open panel
             let panel = NSOpenPanel()
-            panel.title = "Import Cape"
+            panel.title = String(localized: "Import Cape")
             panel.allowedContentTypes = [UTType(filenameExtension: "cape")].compactMap { $0 }
             panel.allowsMultipleSelection = true
             panel.canChooseDirectories = false
@@ -610,8 +610,8 @@ final class AppState: @unchecked Sendable {
         } else {
             // Show save panel
             let panel = NSSavePanel()
-            panel.title = "Export Cape"
-            panel.nameFieldLabel = "Export As:"
+            panel.title = String(localized: "Export Cape")
+            panel.nameFieldLabel = String(localized: "Export As:")
             panel.nameFieldStringValue = "\(cape.name).cape"
             panel.allowedContentTypes = [UTType(filenameExtension: "cape")].compactMap { $0 }
             panel.canCreateDirectories = true

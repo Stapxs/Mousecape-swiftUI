@@ -48,15 +48,15 @@ enum INFParseError: Error, LocalizedError {
     var localizedUIDescription: String {
         switch self {
         case .fileNotFound(let path):
-            return "\(String(localized: "INF file not found:")) \(path)"
+            return "\(String(localized: "inf.error.noValidInf")) \(path)"
         case .encodingError(let path):
-            return "\(String(localized: "Failed to read INF file (encoding error):")) \(path)"
+            return "\(String(localized: "inf.error.encodingFailed")) \(path)"
         case .noSchemeRegSection:
-            return String(localized: "No [Scheme.Reg] section found in INF file")
+            return String(localized: "inf.error.noSchemeReg")
         case .noCursorPaths:
-            return String(localized: "No cursor paths found in [Scheme.Reg]")
+            return String(localized: "inf.error.noCursorPaths")
         case .noValidCursors:
-            return String(localized: "No valid cursor filenames could be resolved")
+            return String(localized: "inf.error.noValidFilenames")
         }
     }
 }

@@ -112,7 +112,7 @@ struct CapePreviewPanel: View {
 struct AppliedBadge: View {
 
     var body: some View {
-        Label(String(localized:"Applied"), systemImage: "checkmark.circle.fill")
+        Label("Applied", systemImage: "checkmark.circle.fill")
             .font(.caption2)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)

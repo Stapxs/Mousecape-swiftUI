@@ -31,7 +31,7 @@ struct MainView: View {
                 set: { appState.showImportResult = $0 }
             )
         ) {
-            Button(String(localized: "OK")) {
+            Button("OK") {
                 appState.showImportResult = false
             }
         } message: {
@@ -44,7 +44,7 @@ struct MainView: View {
                 set: { appState.showOperationResult = $0 }
             )
         ) {
-            Button(String(localized: "OK")) {
+            Button("OK") {
                 appState.showOperationResult = false
             }
         } message: {

@@ -17,10 +17,10 @@ struct HelperToolSettingsView: View {
     @State private var alertTitle = ""
 
     var body: some View {
-        Section(String(localized:"Helper Tool")) {
+        Section("Helper Tool") {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized:"Mousecape Helper"))
+                    Text("Mousecape Helper")
                         .font(.headline)
                     Text(isHelperInstalled ? String(localized:"Installed and running") : String(localized:"Not installed"))
                         .font(.caption)
@@ -34,7 +34,7 @@ struct HelperToolSettingsView: View {
                 }
             }
 
-            Text(String(localized:"Once installed, the helper tool will automatically apply cursors at system startup without manually applying them."))
+            Text("Once installed, the helper tool will automatically apply cursors at system startup without manually applying them.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -42,7 +42,7 @@ struct HelperToolSettingsView: View {
             checkHelperStatus()
         }
         .alert(alertTitle, isPresented: $showInstallAlert) {
-            Button(String(localized:"OK")) { }
+            Button("OK") { }
         } message: {
             Text(alertMessage)
         }

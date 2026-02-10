@@ -21,7 +21,7 @@ struct CapeContextMenu: View {
         Button {
             appState.applyCape(cape)
         } label: {
-            Label(String(localized:"Apply"), systemImage: "checkmark.circle")
+            Label("Apply", systemImage: "checkmark.circle")
         }
         .disabled(isApplied)
 
@@ -29,7 +29,7 @@ struct CapeContextMenu: View {
         Button {
             appState.editCape(cape)
         } label: {
-            Label(String(localized:"Edit"), systemImage: "square.and.pencil")
+            Label("Edit", systemImage: "square.and.pencil")
         }
 
         Divider()
@@ -38,14 +38,14 @@ struct CapeContextMenu: View {
         Button {
             appState.exportCape(cape)
         } label: {
-            Label(String(localized:"Export..."), systemImage: "square.and.arrow.up")
+            Label("Export...", systemImage: "square.and.arrow.up")
         }
 
         // Show in Finder
         Button {
             appState.showInFinder(cape)
         } label: {
-            Label(String(localized:"Show in Finder"), systemImage: "folder")
+            Label("Show in Finder", systemImage: "folder")
         }
 
         Divider()
@@ -54,7 +54,7 @@ struct CapeContextMenu: View {
         Button(role: .destructive) {
             appState.confirmDeleteCape(cape)
         } label: {
-            Label(String(localized:"Delete"), systemImage: "trash")
+            Label("Delete", systemImage: "trash")
         }
 
         Divider()
@@ -63,7 +63,7 @@ struct CapeContextMenu: View {
         Button {
             appState.resetToDefault()
         } label: {
-            Label(String(localized:"Reset System Cursor"), systemImage: "arrow.counterclockwise")
+            Label("Reset System Cursor", systemImage: "arrow.counterclockwise")
         }
     }
 }

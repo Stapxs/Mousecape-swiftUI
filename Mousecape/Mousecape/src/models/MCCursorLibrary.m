@@ -38,25 +38,25 @@ NSString *const MCLibraryDidSaveNotificationName = @"MCLibraryDidSave";
 
 + (NSDictionary<NSString *, NSString *> *)undoProperties {
     return @{
-        @"identifier": NSLocalizedString(@"identifier", @"Undo change cape identifier suffix"),
-        @"name":       NSLocalizedString(@"name", @"Undo change cape name suffix"),
-        @"author":     NSLocalizedString(@"author", @"Undo change cape author suffix"),
-        @"hiDPI":      NSLocalizedString(@"hiDPI", @"Undo change cape hidpi suffix"),
-        @"version":    NSLocalizedString(@"version", @"Undo change cape version suffix")
+        @"identifier": NSLocalizedString(@"undo.property.identifier", @"Undo change cape identifier suffix"),
+        @"name":       NSLocalizedString(@"undo.property.name", @"Undo change cape name suffix"),
+        @"author":     NSLocalizedString(@"undo.property.author", @"Undo change cape author suffix"),
+        @"hiDPI":      NSLocalizedString(@"undo.property.hidpi", @"Undo change cape hidpi suffix"),
+        @"version":    NSLocalizedString(@"undo.property.version", @"Undo change cape version suffix")
     };
 }
 
 + (NSDictionary<NSString *, NSString *> *)cursorUndoProperties {
     return @{
-        @"identifier"   : NSLocalizedString(@"cursor type", @"Undo change cursor type suffix"),
-        @"frameDuration": NSLocalizedString(@"frame duration", @"Undo change cursor frame duraiton suffix"),
-        @"frameCount"   : NSLocalizedString(@"frame count", @"Undo change cursor frame count suffix"),
-        @"size"         : NSLocalizedString(@"dimensions", @"Undo change cursor image dimensions suffix"),
-        @"hotSpot"      : NSLocalizedString(@"hotspot", @"Undo change cursor hotspot suffix"),
-        @"cursorRep100" : NSLocalizedString(@"1x Representation", @"Undo change cursor 1x rep suffix"),
-        @"cursorRep200" : NSLocalizedString(@"2x Rep", "Undo change cursor 2x rep suffix"),
-        @"cursorRep500" : NSLocalizedString(@"2x Rep", "Undo change cursor 5x rep suffix"),
-        @"cursorRep1000": NSLocalizedString(@"2x Rep", "Undo change cursor 10x rep suffix")
+        @"identifier"   : NSLocalizedString(@"undo.property.cursorType", @"Undo change cursor type suffix"),
+        @"frameDuration": NSLocalizedString(@"undo.property.frameDuration", @"Undo change cursor frame duraiton suffix"),
+        @"frameCount"   : NSLocalizedString(@"undo.property.frameCount", @"Undo change cursor frame count suffix"),
+        @"size"         : NSLocalizedString(@"undo.property.dimensions", @"Undo change cursor image dimensions suffix"),
+        @"hotSpot"      : NSLocalizedString(@"undo.property.hotspot", @"Undo change cursor hotspot suffix"),
+        @"cursorRep100" : NSLocalizedString(@"undo.property.rep1x", @"Undo change cursor 1x rep suffix"),
+        @"cursorRep200" : NSLocalizedString(@"undo.property.rep2x", "Undo change cursor 2x rep suffix"),
+        @"cursorRep500" : NSLocalizedString(@"undo.property.rep2x", "Undo change cursor 5x rep suffix"),
+        @"cursorRep1000": NSLocalizedString(@"undo.property.rep2x", "Undo change cursor 10x rep suffix")
     };
 }
 
@@ -124,7 +124,7 @@ NSString *const MCLibraryDidSaveNotificationName = @"MCLibraryDidSave";
         
         self.observers = @[ob1, ob2, ob3];
         
-        self.name           = NSLocalizedString(@"Unnamed", "Default New Cape Name");
+        self.name           = NSLocalizedString(@"cape.default.unnamed", "Default New Cape Name");
         self.author         = NSUserName();
         self.hiDPI          = YES;
         self.inCloud        = NO;
@@ -265,7 +265,7 @@ const char MCCursorPropertiesContext;
         [[self.undoManager prepareWithInvocationTarget: object] setValue:oldValue forKeyPath:keyPath];
         
         if (!self.undoManager.isUndoing) {
-            [self.undoManager setActionName:[[NSLocalizedString(@"Change ", "Undo Change Prefix") stringByAppendingString:decamelized] capitalizedString]];
+            [self.undoManager setActionName:[[NSLocalizedString(@"undo.action.prefix", "Undo Change Prefix") stringByAppendingString:decamelized] capitalizedString]];
         }
 
         if ([keyPath isEqualToString:@"identifier"]) {
@@ -302,7 +302,7 @@ const char MCCursorPropertiesContext;
     
     [[self.undoManager prepareWithInvocationTarget:self] removeCursor:cursor];
     if (!self.undoManager.isUndoing) {
-        [self.undoManager setActionName:NSLocalizedString(@"Add Cursor", "Add Cursor Undo Title")];
+        [self.undoManager setActionName:NSLocalizedString(@"undo.action.addCursor", "Add Cursor Undo Title")];
     }
     
     [self willChangeValueForKey:@"cursors" withSetMutation:NSKeyValueUnionSetMutation usingObjects:change];
@@ -316,7 +316,7 @@ const char MCCursorPropertiesContext;
     
     [[self.undoManager prepareWithInvocationTarget:self] addCursor:cursor];
     if (!self.undoManager.isUndoing) {
-        [self.undoManager setActionName:NSLocalizedString(@"Remove Cursor", @"Remove Cursor Undo Title")];
+        [self.undoManager setActionName:NSLocalizedString(@"undo.action.removeCursor", @"Remove Cursor Undo Title")];
     }
     
     [self willChangeValueForKey:@"cursors" withSetMutation:NSKeyValueMinusSetMutation usingObjects:change];
@@ -365,7 +365,7 @@ const char MCCursorPropertiesContext;
 
         // Check frame count
         if (cursor.frameCount > maxFrameCount) {
-            [frameCountErrors addObject:[NSString stringWithFormat:NSLocalizedString(@"%@ has %lu frames (maximum: %lu)", nil),
+            [frameCountErrors addObject:[NSString stringWithFormat:NSLocalizedString(@"validation.frameCount", nil),
                                         cursorName, (unsigned long)cursor.frameCount, (unsigned long)maxFrameCount]];
         }
 
@@ -375,19 +375,19 @@ const char MCCursorPropertiesContext;
         NSMutableArray *hotspotDetails = [NSMutableArray array];
 
         if (cursor.hotSpot.x < 0) {
-            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"X coordinate %.1f is negative", nil), cursor.hotSpot.x]];
+            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"validation.hotspot.xNegative", nil), cursor.hotSpot.x]];
             hotspotInvalid = YES;
         } else if (cursor.hotSpot.x >= cursor.size.width) {
-            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"X coordinate %.1f exceeds width %.1f", nil),
+            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"validation.hotspot.xExceedsWidth", nil),
                                         cursor.hotSpot.x, cursor.size.width]];
             hotspotInvalid = YES;
         }
 
         if (cursor.hotSpot.y < 0) {
-            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"Y coordinate %.1f is negative", nil), cursor.hotSpot.y]];
+            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"validation.hotspot.yNegative", nil), cursor.hotSpot.y]];
             hotspotInvalid = YES;
         } else if (cursor.hotSpot.y >= cursor.size.height) {
-            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"Y coordinate %.1f exceeds height %.1f", nil),
+            [hotspotDetails addObject:[NSString stringWithFormat:NSLocalizedString(@"validation.hotspot.yExceedsHeight", nil),
                                         cursor.hotSpot.y, cursor.size.height]];
             hotspotInvalid = YES;
         }
@@ -403,7 +403,7 @@ const char MCCursorPropertiesContext;
         NSMutableArray *errorDetails = [NSMutableArray array];
 
         if (frameCountErrors.count > 0) {
-            [errorDetails addObject:NSLocalizedString(@"Frame count issues:", nil)];
+            [errorDetails addObject:NSLocalizedString(@"validation.frameCountIssues", nil)];
             [errorDetails addObjectsFromArray:frameCountErrors];
         }
 
@@ -411,7 +411,7 @@ const char MCCursorPropertiesContext;
             if (errorDetails.count > 0) {
                 [errorDetails addObject:@""]; // Empty line separator
             }
-            [errorDetails addObject:NSLocalizedString(@"Hotspot position issues:", nil)];
+            [errorDetails addObject:NSLocalizedString(@"validation.hotspotIssues", nil)];
             [errorDetails addObjectsFromArray:hotspotErrors];
         }
 
@@ -420,8 +420,8 @@ const char MCCursorPropertiesContext;
         return [NSError errorWithDomain:MCErrorDomain
                                    code:(frameCountErrors.count > 0) ? MCErrorFrameCountExceededCode : MCErrorHotspotOutOfBoundsCode
                                userInfo:@{
-            NSLocalizedDescriptionKey: NSLocalizedString(@"Cape validation failed", nil),
-            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"This cape does not meet system requirements and cannot be imported.", nil),
+            NSLocalizedDescriptionKey: NSLocalizedString(@"validation.failed", nil),
+            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"validation.failedDetail", nil),
             NSLocalizedRecoverySuggestionErrorKey: errorMessage
         }];
     }
@@ -449,8 +449,8 @@ const char MCCursorPropertiesContext;
         
     if (duplicates.count > 0) {
         return [NSError errorWithDomain:MCErrorDomain code:MCErrorMultipleCursorIdentifiersCode userInfo:@{
-                                                                                                           NSLocalizedDescriptionKey: NSLocalizedString(@"Save failed", @"New Cape Failure Title"),
-                                                                                                           NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:NSLocalizedString(@"Multiple cursors with the name(s): %@ exist.", @"New Cape Failure Duplicate cursor name error"), duplicates] }];
+                                                                                                           NSLocalizedDescriptionKey: NSLocalizedString(@"error.save.failed", @"New Cape Failure Title"),
+                                                                                                           NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:NSLocalizedString(@"error.save.duplicateNames", @"New Cape Failure Duplicate cursor name error"), duplicates] }];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:MCLibraryWillSaveNotificationName object:self];
@@ -462,8 +462,8 @@ const char MCCursorPropertiesContext;
         return nil;
     }
     return [NSError errorWithDomain:MCErrorDomain code:MCErrorWriteFailCode userInfo:@{
-                                                                                       NSLocalizedDescriptionKey: NSLocalizedString(@"Save failed", @"New Cape Failure Title"),
-                                                                                       NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"Error writing cape to disk.", @"New Cape Filure Filesystem Error") }];
+                                                                                       NSLocalizedDescriptionKey: NSLocalizedString(@"error.save.failed", @"New Cape Failure Title"),
+                                                                                       NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"error.save.writeFailed", @"New Cape Filure Filesystem Error") }];
 }
 
 - (void)updateChangeCount:(NSDocumentChangeType)change {

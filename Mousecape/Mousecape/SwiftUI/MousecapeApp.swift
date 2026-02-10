@@ -438,8 +438,8 @@ struct ContentView: View {
 
         MainView()
             // Error alert
-            .alert(String(localized: "Error"), isPresented: $appState.showError) {
-                Button(String(localized: "OK")) {
+            .alert("Error", isPresented: $appState.showError) {
+                Button("OK") {
                     appState.showError = false
                 }
             } message: {
