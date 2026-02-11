@@ -10,8 +10,6 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
-
     var body: some View {
         ZStack {
             switch appState.currentPage {
@@ -27,17 +25,30 @@ struct MainView: View {
             }
         }
         .alert(
-            appState.importResultIsSuccess ? localization.localized("Import Complete") : localization.localized("Import Failed"),
+            appState.importResultIsSuccess ? String(localized: "Import Complete") : String(localized: "Import Failed"),
             isPresented: Binding(
                 get: { appState.showImportResult },
                 set: { appState.showImportResult = $0 }
             )
         ) {
-            Button(localization.localized("OK")) {
+            Button("OK") {
                 appState.showImportResult = false
             }
         } message: {
             Text(appState.importResultMessage)
+        }
+        .alert(
+            appState.operationResultIsSuccess ? String(localized: "Success") : String(localized: "Error"),
+            isPresented: Binding(
+                get: { appState.showOperationResult },
+                set: { appState.showOperationResult = $0 }
+            )
+        ) {
+            Button("OK") {
+                appState.showOperationResult = false
+            }
+        } message: {
+            Text(appState.operationResultMessage)
         }
     }
 }
@@ -78,5 +89,4 @@ struct LoadingOverlayView: View {
 #Preview {
     MainView()
         .environment(AppState.shared)
-        .environment(LocalizationManager.shared)
 }

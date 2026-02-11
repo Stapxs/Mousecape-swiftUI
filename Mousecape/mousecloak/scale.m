@@ -10,13 +10,13 @@
 #import "MCPrefs.h"
 #import <math.h>
 
-float cursorScale() {
+float cursorScale(void) {
     float value;
     CGSGetCursorScale(CGSMainConnectionID(), &value);
     return value;
 }
 
-float defaultCursorScale() {
+float defaultCursorScale(void) {
     float scale = [MCDefault(MCPreferencesCursorScaleKey) floatValue];
     if (scale < .5 || scale > 16)
         scale = 1;

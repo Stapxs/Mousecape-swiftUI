@@ -17,13 +17,14 @@ final class Cursor: Identifiable, Hashable {
     // MARK: - Properties (bridged from ObjC)
 
     var identifier: String {
-        get { objcCursor.identifier ?? "" }
+        get { objcCursor.identifier }
         set { objcCursor.identifier = newValue }
     }
 
     var name: String {
         // First try ObjC cursor name
-        if let objcName = objcCursor.name, !objcName.isEmpty {
+        let objcName = objcCursor.name
+        if !objcName.isEmpty {
             return objcName
         }
         // Then try to extract from identifier
@@ -168,18 +169,25 @@ final class Cursor: Identifiable, Hashable {
 extension Cursor {
     /// Get a preview image at the specified size
     func previewImage(size: CGFloat = 48) -> NSImage? {
-        guard let image = self.image else { return nil }
+        guard let image = self.image,
+              let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+
+        let frameCount = max(1, self.frameCount)
+        let pixelWidth = cgImage.width
+        let pixelHeight = cgImage.height
+        let framePixelHeight = pixelHeight / frameCount
+
+        guard pixelWidth > 0, framePixelHeight > 0 else { return nil }
+
+        // CGImage uses top-left origin: frame 0 is at Y=0
+        let cropRect = CGRect(x: 0, y: 0, width: pixelWidth, height: framePixelHeight)
+        guard let firstFrame = cgImage.cropping(to: cropRect) else { return nil }
 
         let previewImage = NSImage(size: NSSize(width: size, height: size))
         previewImage.lockFocus()
-
-        // Draw first frame only
         let drawRect = NSRect(x: 0, y: 0, width: size, height: size)
-        let frameHeight = image.size.height / CGFloat(max(1, frameCount))
-        let sourceRect = NSRect(x: 0, y: image.size.height - frameHeight, width: image.size.width, height: frameHeight)
-
-        image.draw(in: drawRect, from: sourceRect, operation: .copy, fraction: 1.0)
-
+        let frameNSImage = NSImage(cgImage: firstFrame, size: NSSize(width: pixelWidth, height: framePixelHeight))
+        frameNSImage.draw(in: drawRect, from: .zero, operation: .copy, fraction: 1.0)
         previewImage.unlockFocus()
         return previewImage
     }

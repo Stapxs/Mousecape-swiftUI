@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "MCCursorLibrary.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MCLibraryController : NSObject
-@property (readonly, weak) MCCursorLibrary *appliedCape;
+@property (readonly, weak, nullable) MCCursorLibrary *appliedCape;
 @property (nonatomic, readonly) NSUndoManager *undoManager;
 @property (readonly, copy) NSURL *libraryURL;
 
 - (instancetype)initWithURL:(NSURL *)url;
 
-- (NSError *)importCapeAtURL:(NSURL *)url;
-- (NSError *)importCape:(MCCursorLibrary *)cape;
+- (nullable NSError *)importCapeAtURL:(NSURL *)url;
+- (nullable NSError *)importCape:(MCCursorLibrary *)cape;
 
 - (void)addCape:(MCCursorLibrary *)cape;
 - (void)removeCape:(MCCursorLibrary *)cape;
@@ -35,3 +37,5 @@
 @interface MCLibraryController (Capes)
 @property (nonatomic, readonly) NSSet *capes;
 @end
+
+NS_ASSUME_NONNULL_END

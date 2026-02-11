@@ -11,7 +11,7 @@ import AppKit
 
 /// Debug version log manager
 final class DebugLogger: @unchecked Sendable {
-    nonisolated(unsafe) static let shared = DebugLogger()
+    static let shared = DebugLogger()
 
     private var logFileHandle: FileHandle?
     private var logFilePath: URL?

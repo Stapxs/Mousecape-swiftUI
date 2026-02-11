@@ -19,7 +19,7 @@ struct WindowsCursorResult {
     let hotspotY: Int
     let frameCount: Int
     let frameDuration: Double
-    let imageData: Data  // PNG sprite sheet (for animated: frames stacked vertically)
+    let image: CGImage   // Sprite sheet (for animated: frames stacked vertically)
     let filename: String // Original filename without extension
 }
 
@@ -125,37 +125,36 @@ final class WindowsCursorConverter: @unchecked Sendable {
 
     // MARK: - Async Public API
 
-    /// Convert all cursor files in a folder asynchronously
-    /// - Parameter folderURL: URL to folder containing .cur/.ani files
-    /// - Returns: Array of conversion results
-    func convertFolderAsync(folderURL: URL) async throws -> [WindowsCursorResult] {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    let results = try self.convertFolder(folderURL: folderURL)
-                    continuation.resume(returning: results)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
     /// Convert cursor files in a folder asynchronously using INF mapping (position-based)
     /// - Parameters:
     ///   - folderURL: URL to folder containing .cur/.ani files and install.inf
     ///   - infMapping: Parsed INF mapping from install.inf
     /// - Returns: Array of (position, result) tuples for successful conversions
     func convertFolderWithINFAsync(folderURL: URL, infMapping: WindowsINFMapping) async throws -> [(position: Int, result: WindowsCursorResult)] {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    let results = try self.convertFolderWithINF(folderURL: folderURL, infMapping: infMapping)
-                    continuation.resume(returning: results)
-                } catch {
-                    continuation.resume(throwing: error)
+        return try await withThrowingTaskGroup(of: (Int, WindowsCursorResult)?.self) { group in
+            for (position, filename) in infMapping.cursorFilesByPosition {
+                group.addTask {
+                    let fileURL = folderURL.appendingPathComponent(filename)
+                    guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                        debugLog("INF referenced file not found: \(filename)")
+                        return nil
+                    }
+                    do {
+                        let result = try self.convert(fileURL: fileURL)
+                        return (position, result)
+                    } catch {
+                        debugLog("Failed to convert \(filename): \(error.localizedDescription)")
+                        return nil
+                    }
                 }
             }
+            var results: [(position: Int, result: WindowsCursorResult)] = []
+            for try await item in group {
+                if let (pos, res) = item {
+                    results.append((position: pos, result: res))
+                }
+            }
+            return results
         }
     }
 
@@ -164,7 +163,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
     /// Convert a parse result to WindowsCursorResult
     /// Downsamples to max 24 frames if needed to comply with system limits
     private func convertParseResult(_ parseResult: WindowsCursorParseResult, filename: String) throws -> WindowsCursorResult {
-        let maxFrameCount = 24
+        let maxFrameCount = CursorImageScaler.maxFrameCount
 
         // Validate single frame size to prevent importing oversized frames
         // Note: Sprite sheet size validation is not needed since images are scaled to 64x64 per frame later
@@ -175,7 +174,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
             debugLog("Windows cursor '\(filename)' has \(parseResult.frameCount) frames, downsampling to \(maxFrameCount)")
 
             // Downsample the sprite sheet with autoreleasepool for memory management
-            let downsampledData: Data? = autoreleasepool {
+            let downsampledImage: CGImage? = autoreleasepool {
                 return downsampleSpriteSheet(
                     parseResult.image,
                     fromFrameCount: parseResult.frameCount,
@@ -185,7 +184,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
                 )
             }
 
-            guard let downsampledData = downsampledData else {
+            guard let downsampledImage = downsampledImage else {
                 throw WindowsCursorError.imageDecodeFailed
             }
 
@@ -199,16 +198,12 @@ final class WindowsCursorConverter: @unchecked Sendable {
                 hotspotY: parseResult.hotspotY,
                 frameCount: maxFrameCount,
                 frameDuration: adjustedDuration,
-                imageData: downsampledData,
+                image: downsampledImage,
                 filename: filename
             )
         }
 
         // No downsampling needed
-        guard let pngData = parseResult.pngData() else {
-            throw WindowsCursorError.imageDecodeFailed
-        }
-
         return WindowsCursorResult(
             width: parseResult.width,
             height: parseResult.height,
@@ -216,7 +211,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
             hotspotY: parseResult.hotspotY,
             frameCount: parseResult.frameCount,
             frameDuration: parseResult.frameDuration,
-            imageData: pngData,
+            image: parseResult.image,
             filename: filename
         )
     }
@@ -228,7 +223,7 @@ final class WindowsCursorConverter: @unchecked Sendable {
     ///   - filename: Filename for error reporting
     /// - Throws: WindowsCursorError.imageTooLarge if frame exceeds maximum dimensions
     private func validateSingleFrameSize(width: Int, height: Int, filename: String) throws {
-        let maxFrameSize = 512  // Maximum individual frame size
+        let maxFrameSize = CursorImageScaler.maxImportSize  // Maximum individual frame size
         if width > maxFrameSize || height > maxFrameSize {
             debugLog("Frame '\(filename)' is too large: \(width)x\(height), max is \(maxFrameSize)x\(maxFrameSize)")
             throw WindowsCursorError.imageTooLarge(width: width, height: height)
@@ -242,8 +237,8 @@ final class WindowsCursorConverter: @unchecked Sendable {
     ///   - toFrameCount: Target number of frames
     ///   - frameWidth: Width of each frame
     ///   - frameHeight: Height of each frame
-    /// - Returns: Downsampled sprite sheet as PNG data
-    private func downsampleSpriteSheet(_ spriteSheet: CGImage, fromFrameCount: Int, toFrameCount: Int, frameWidth: Int, frameHeight: Int) -> Data? {
+    /// - Returns: Downsampled sprite sheet as CGImage
+    private func downsampleSpriteSheet(_ spriteSheet: CGImage, fromFrameCount: Int, toFrameCount: Int, frameWidth: Int, frameHeight: Int) -> CGImage? {
         guard fromFrameCount > toFrameCount else { return nil }
 
         // Calculate which frames to keep (uniform sampling)
@@ -273,9 +268,14 @@ final class WindowsCursorConverter: @unchecked Sendable {
         context.clear(CGRect(x: 0, y: 0, width: frameWidth, height: newSheetHeight))
 
         // Draw selected frames
+        // Note: CGImage.cropping uses top-left origin (Y=0 at top)
+        // CGContext.draw uses bottom-left origin (Y=0 at bottom)
+        // Frame 0 is at the TOP of the sprite sheet
         for (destIndex, sourceIndex) in frameIndices.enumerated() {
+            // Source: CGImage uses top-left origin, frame 0 is at Y=0
             let srcY = sourceIndex * frameHeight
-            let dstY = destIndex * frameHeight
+            // Destination: CGContext uses bottom-left origin, frame 0 should be at top (highest Y)
+            let dstY = newSheetHeight - (destIndex + 1) * frameHeight
 
             if let croppedFrame = spriteSheet.cropping(to: CGRect(x: 0, y: srcY, width: frameWidth, height: frameHeight)) {
                 context.draw(croppedFrame, in: CGRect(x: 0, y: dstY, width: frameWidth, height: frameHeight))
@@ -283,21 +283,9 @@ final class WindowsCursorConverter: @unchecked Sendable {
         }
 
         guard let newCGImage = context.makeImage() else { return nil }
-        return cgImageToPNG(newCGImage)
+        return newCGImage
     }
 
-    /// Convert CGImage to PNG data
-    private func cgImageToPNG(_ image: CGImage) -> Data? {
-        let mutableData = NSMutableData()
-        guard let destination = CGImageDestinationCreateWithData(mutableData, "public.png" as CFString, 1, nil) else {
-            return nil
-        }
-        CGImageDestinationAddImage(destination, image, nil)
-        guard CGImageDestinationFinalize(destination) else {
-            return nil
-        }
-        return mutableData as Data
-    }
 }
 
 // MARK: - NSBitmapImageRep Extension
@@ -307,14 +295,7 @@ extension WindowsCursorResult {
     /// Create NSBitmapImageRep from the result
     /// For animated cursors, returns a sprite sheet with all frames stacked vertically
     func createBitmapImageRep() -> NSBitmapImageRep? {
-        guard let image = NSImage(data: imageData) else { return nil }
-
-        // Get the bitmap representation
-        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            return nil
-        }
-
-        return NSBitmapImageRep(cgImage: cgImage)
+        return NSBitmapImageRep(cgImage: image)
     }
 
     /// Create MCCursor from the result

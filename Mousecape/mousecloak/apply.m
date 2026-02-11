@@ -178,8 +178,8 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
 
     MMLog("  Lefty mode: %s", lefty ? "YES" : "NO");
     MMLog("  Is pointer: %s", pointer ? "YES" : "NO");
-    MMLog("  FrameCount: %@", frameCount);
-    MMLog("  FrameDuration: %@", frameDuration);
+    MMLog("  FrameCount: %s", frameCount.description.UTF8String);
+    MMLog("  FrameDuration: %s", frameDuration.description.UTF8String);
     //    NSNumber *repeatCount   = cursor[MCCursorDictionaryRepeatCountKey];
     
     CGPoint hotSpot         = CGPointMake([cursor[MCCursorDictionaryHotSpotXKey] doubleValue],

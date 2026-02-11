@@ -27,6 +27,10 @@ NSString *MCErrorDomain = @"com.alexzielenski.mousecape.error";
 // Hotspot validation constant
 const CGFloat   MCMaxHotspotValue                    = 31.99;
 
+// Cursor import limits
+const NSUInteger MCMaxFrameCount                     = 24;
+const NSInteger  MCMaxImportSize                     = 512;
+
 const CGFloat   MCCursorCreatorVersion               = 2.0;
 const CGFloat   MCCursorParserVersion                = 2.0;
 
@@ -49,7 +53,7 @@ const NSString *MCCursorDictionaryPointsWideKey      = @"PointsWide";
 const NSString *MCCursorDictionaryPointsHighKey      = @"PointsHigh";
 const NSString *MCCursorDictionaryRepresentationsKey = @"Representations";
 
-NSString *UUID() {
+NSString *UUID(void) {
     CFUUIDRef theUUID = CFUUIDCreate(NULL);
     CFStringRef string = CFUUIDCreateString(NULL, theUUID);
     CFRelease(theUUID);
@@ -73,7 +77,7 @@ NSString *MMGet(NSString *prompt) {
 
 void CGImageWriteToFile(CGImageRef image, CFStringRef path) {
 	CFURLRef url = CFURLCreateWithFileSystemPath(NULL, path , kCFURLPOSIXPathStyle, false);
-    CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
+    CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, CFSTR("public.png"), 1, NULL);
 	CFRelease(url);
 	
     CGImageDestinationAddImage(destination, image, nil);
@@ -94,7 +98,7 @@ NSData *pngDataForImage(id image) {
     // CGImage
     CGImageRef obj = (__bridge CGImageRef)image;
     CFMutableDataRef mutableData = CFDataCreateMutable(kCFAllocatorDefault, 0);
-    CGImageDestinationRef dest = CGImageDestinationCreateWithData(mutableData, kUTTypePNG, 1, NULL);
+    CGImageDestinationRef dest = CGImageDestinationCreateWithData(mutableData, CFSTR("public.png"), 1, NULL);
     CGImageDestinationAddImage(dest, obj, NULL);
     CGImageDestinationFinalize(dest);
     
@@ -303,4 +307,19 @@ BOOL MCCursorIsPointer(NSString *identifier) {
     });
 
     return [pointers containsObject:identifier];
+}
+
+void MCEnumerateAllCursorIdentifiers(void (NS_NOESCAPE ^block)(NSString *identifier)) {
+    NSUInteger i = 0;
+    NSString *key = nil;
+    while ((key = defaultCursors[i]) != nil) {
+        block(key);
+        i++;
+    }
+    for (NSString *name in MCArrowSynonyms()) {
+        block(name);
+    }
+    for (NSString *name in MCIBeamSynonyms()) {
+        block(name);
+    }
 }

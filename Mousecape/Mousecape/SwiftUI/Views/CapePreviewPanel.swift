@@ -15,8 +15,8 @@ private let previewPanelScale: CGFloat = 1.5
 struct CapePreviewPanel: View {
     let cape: CursorLibrary
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
     @State private var zoomedCursor: Cursor?
+    @State private var zoomTrigger: Int = 0 // Increment to force view recreation
     @State private var cachedCursors: [Cursor] = []
     @Namespace private var cursorNamespace
     @AppStorage("showAuthorInfo") private var showAuthorInfo = true
@@ -40,7 +40,7 @@ struct CapePreviewPanel: View {
                                 }
                             }
                             if showAuthorInfo {
-                                Text("\(localization.localized("by")) \(cape.author)")
+                                Text("\(String(localized:"by")) \(cape.author)")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
@@ -59,6 +59,7 @@ struct CapePreviewPanel: View {
                         zoomedCursor: zoomedCursor,
                         namespace: cursorNamespace
                     ) { cursor in
+                        zoomTrigger += 1
                         withAnimation(.spring(duration: 0.4, bounce: 0.2)) {
                             zoomedCursor = cursor
                         }
@@ -68,7 +69,7 @@ struct CapePreviewPanel: View {
 
                 // Bottom: Cursor count
                 HStack {
-                    Text("\(cape.cursorCount) \(cape.cursorCount == 1 ? localization.localized("cursor") : localization.localized("cursors"))")
+                    Text("\(cape.cursorCount) \(cape.cursorCount == 1 ? String(localized:"cursor") : String(localized:"cursors"))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Spacer()
@@ -86,6 +87,7 @@ struct CapePreviewPanel: View {
                         zoomedCursor = nil
                     }
                 }
+                .id(zoomTrigger) // Force view recreation on each tap
             }
         }
         .onAppear {
@@ -108,10 +110,9 @@ struct CapePreviewPanel: View {
 // MARK: - Applied Badge
 
 struct AppliedBadge: View {
-    @Environment(LocalizationManager.self) private var localization
 
     var body: some View {
-        Label(localization.localized("Applied"), systemImage: "checkmark.circle.fill")
+        Label("Applied", systemImage: "checkmark.circle.fill")
             .font(.caption2)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
@@ -126,24 +127,35 @@ struct CursorZoomOverlay: View {
     let namespace: Namespace.ID
     let onDismiss: () -> Void
     var showHotspot: Bool = false
-    @Environment(LocalizationManager.self) private var localization
 
     @State private var showDetails = false
+    @State private var showAnimatedCursor = false
+    @State private var isVisible = false
 
     var body: some View {
         ZStack {
             // Dimmed background - click to dismiss
-            Color.black.opacity(0.6)
+            Color.black.opacity(isVisible ? 0.6 : 0)
                 .ignoresSafeArea()
                 .onTapGesture {
-                    onDismiss()
+                    dismiss()
                 }
 
             // Centered zoomed cursor with matched geometry
             VStack(spacing: 16) {
-                AnimatingCursorView(cursor: cursor, showHotspot: showHotspot, scale: 3)
-                    .frame(width: 128, height: 128)
-                    .matchedGeometryEffect(id: cursor.id, in: namespace)
+                ZStack {
+                    // Static view for transition (used for enter animation)
+                    StaticCursorFrameView(cursor: cursor, scale: 3)
+                        .frame(width: 128, height: 128)
+                        .matchedGeometryEffect(id: cursor.id, in: namespace)
+                        .opacity(showAnimatedCursor ? 0 : 1)
+
+                    // Animated view (shown after transition completes)
+                    if showAnimatedCursor {
+                        AnimatingCursorView(cursor: cursor, showHotspot: showHotspot, scale: 3)
+                            .frame(width: 128, height: 128)
+                    }
+                }
 
                 // Details fade in after the cursor arrives
                 if showDetails {
@@ -156,7 +168,7 @@ struct CursorZoomOverlay: View {
                             .foregroundStyle(.secondary)
 
                         if cursor.frameCount > 1 {
-                            Text("\(cursor.frameCount) \(localization.localized("frames"))")
+                            Text("\(cursor.frameCount) \(String(localized:"frames"))")
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                         }
@@ -167,17 +179,36 @@ struct CursorZoomOverlay: View {
             .padding(24)
             .adaptiveGlass(in: RoundedRectangle(cornerRadius: 16))
             .shadow(radius: 20)
+            .opacity(isVisible ? 1 : 0)
+            .scaleEffect(isVisible ? 1 : 0.8)
         }
         .contentShape(Rectangle())
         .onKeyPress(.escape) {
-            onDismiss()
+            dismiss()
             return .handled
         }
         .onAppear {
+            // Fade in on appear
+            withAnimation(.easeOut(duration: 0.25)) {
+                isVisible = true
+            }
+            // Switch to animated cursor after transition completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                showAnimatedCursor = true
+            }
             // Delay showing details until cursor animation completes
             withAnimation(.easeOut(duration: 0.3).delay(0.2)) {
                 showDetails = true
             }
+        }
+    }
+
+    private func dismiss() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            isVisible = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            onDismiss()
         }
     }
 }
@@ -251,19 +282,23 @@ struct CursorPreviewCell: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            // Only show cursor here if not zoomed (it moves to overlay)
-            if !isZoomed {
+            ZStack {
+                // Animated view (always visible, does not participate in transition)
                 AnimatingCursorView(
                     cursor: cursor,
                     showHotspot: false,
                     scale: previewPanelScale
                 )
                 .frame(width: 64, height: 64)
-                .matchedGeometryEffect(id: cursor.id, in: namespace)
-            } else {
-                // Placeholder to maintain layout
-                Color.clear
-                    .frame(width: 64, height: 64)
+                .opacity(isZoomed ? 0 : 1)
+
+                // Static view for transition (invisible but participates in matchedGeometryEffect)
+                if !isZoomed {
+                    StaticCursorFrameView(cursor: cursor, scale: previewPanelScale)
+                        .frame(width: 64, height: 64)
+                        .matchedGeometryEffect(id: cursor.id, in: namespace)
+                        .opacity(0.001) // Nearly invisible but participates in layout
+                }
             }
 
             if !isZoomed {
@@ -293,6 +328,5 @@ struct CursorPreviewCell: View {
 #Preview {
     CapePreviewPanel(cape: CursorLibrary(name: "Preview Cape", author: "Test"))
         .environment(AppState.shared)
-        .environment(LocalizationManager.shared)
         .frame(width: 500, height: 400)
 }

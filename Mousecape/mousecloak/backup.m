@@ -39,7 +39,7 @@ void backupCursorForIdentifier(NSString *ident) {
     MMLog("    Backup result: %s", success ? "SUCCESS" : "FAILED");
 }
 
-void backupAllCursors() {
+void backupAllCursors(void) {
     MMLog("=== backupAllCursors ===");
     bool arrowRegistered = false;
     MCIsCursorRegistered(CGSMainConnectionID(), (char *)backupStringForIdentifier(@"com.apple.coregraphics.Arrow").UTF8String, &arrowRegistered);
@@ -49,28 +49,11 @@ void backupAllCursors() {
 //         we are already backed up
         return;
     }
-    // Backup main cursors first
-    MMLog("--- Backing up default cursors ---");
-    NSUInteger i = 0;
-    NSString *key = nil;
-    while ((key = defaultCursors[i]) != nil) {
-        backupCursorForIdentifier(key);
-        i++;
-    }
-
-    // Additionally, back up any Arrow synonyms the system may use (for macOS 26+ compatibility)
-    MMLog("--- Backing up Arrow synonyms ---");
-    NSArray<NSString *> *synonyms = MCArrowSynonyms();
-    for (NSString *name in synonyms) {
+    // Backup all cursors (default + synonyms)
+    MMLog("--- Backing up all cursors ---");
+    MCEnumerateAllCursorIdentifiers(^(NSString *name) {
         backupCursorForIdentifier(name);
-    }
-
-    // And also back up I-beam synonyms
-    MMLog("--- Backing up IBeam synonyms ---");
-    NSArray<NSString *> *ibeamSynonyms = MCIBeamSynonyms();
-    for (NSString *name in ibeamSynonyms) {
-        backupCursorForIdentifier(name);
-    }
+    });
     // no need to backup core cursors
     MMLog("=== backupAllCursors complete ===");
 }

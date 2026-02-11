@@ -11,14 +11,13 @@ import SwiftUI
 struct SettingsView: View {
     @State private var selectedCategory: SettingsCategory = .general
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    @Environment(LocalizationManager.self) private var localization
     @Environment(AppState.self) private var appState
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             // Left sidebar: Category list
             List(SettingsCategory.allCases, selection: $selectedCategory) { category in
-                Label(localization.localized(category.title), systemImage: category.icon)
+                Label(String(localized: String.LocalizationValue(category.title)), systemImage: category.icon)
                     .tag(category)
             }
             .listStyle(.sidebar)
@@ -35,9 +34,9 @@ struct SettingsView: View {
                 Button(action: {
                     appState.currentPage = .home
                 }) {
-                    Image(systemName: "checkmark")
+                    Image(systemName: "chevron.left")
                 }
-                .help("Done")
+                .help("Back")
             }
         }
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
@@ -62,7 +61,6 @@ struct GeneralSettingsView: View {
     @AppStorage("applyLastCapeOnLaunch") private var applyLastCapeOnLaunch = true
     @AppStorage("doubleClickAction") private var doubleClickAction = 0
     @State private var cursorScale: Double = 1.0
-    @Environment(LocalizationManager.self) private var localization
     @Environment(AppState.self) private var appState
 
     /// The key used by ObjC code for cursor scale
@@ -74,21 +72,21 @@ struct GeneralSettingsView: View {
             // Helper Tool Section (moved from Advanced)
             HelperToolSettingsView()
 
-            Section(localization.localized("Startup")) {
-                Toggle(localization.localized("Apply Last Cape on Launch"), isOn: $applyLastCapeOnLaunch)
+            Section("Startup") {
+                Toggle("Apply Last Cape on Launch", isOn: $applyLastCapeOnLaunch)
             }
 
-            Section(localization.localized("Double-click Action")) {
-                Picker(localization.localized("When double-clicking a Cape"), selection: $doubleClickAction) {
-                    Text(localization.localized("Apply Cape")).tag(0)
-                    Text(localization.localized("Edit Cape")).tag(1)
-                    Text(localization.localized("Do Nothing")).tag(2)
+            Section("Double-click Action") {
+                Picker("When double-clicking a Cape", selection: $doubleClickAction) {
+                    Text("Apply Cape").tag(0)
+                    Text("Edit Cape").tag(1)
+                    Text("Do Nothing").tag(2)
                 }
             }
 
-            Section(localization.localized("Cursor Scale")) {
+            Section("Cursor Scale") {
                 VStack(alignment: .leading) {
-                    Text("\(localization.localized("Global Scale:")) \(cursorScale, specifier: "%.1f")x")
+                    Text("\(String(localized:"Global Scale:")) \(cursorScale, specifier: "%.1f")x")
                     Slider(value: $cursorScale, in: 0.5...2.0, step: 0.1) {
                         Text("Scale")
                     } minimumValueLabel: {
@@ -102,7 +100,7 @@ struct GeneralSettingsView: View {
                         _ = setCursorScale(Float(newValue))
                     }
 
-                    Text(localization.localized("Scale changes are applied immediately."))
+                    Text("Scale changes are applied immediately.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -110,7 +108,7 @@ struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(localization.localized("General"))
+        .navigationTitle("General")
         .onAppear {
             loadCursorScale()
         }
@@ -145,58 +143,46 @@ struct AppearanceSettingsView: View {
     @AppStorage("showAuthorInfo") private var showAuthorInfo = true
     @AppStorage("previewGridColumns") private var previewGridColumns = 0
     @AppStorage("transparentWindow") private var transparentWindow = false
-    @Environment(LocalizationManager.self) private var localization
 
     private var isDarkMode: Bool {
         appearanceMode == 2
     }
 
     var body: some View {
-        @Bindable var localization = localization
-
         Form {
-            Section(localization.localized("Theme")) {
-                Picker(localization.localized("Appearance"), selection: $appearanceMode) {
-                    Text(localization.localized("Light")).tag(1)
-                    Text(localization.localized("Dark")).tag(2)
+            Section("Theme") {
+                Picker("Appearance", selection: $appearanceMode) {
+                    Text("Light").tag(1)
+                    Text("Dark").tag(2)
                 }
                 .pickerStyle(.radioGroup)
 
-                Toggle(localization.localized("Transparent Window"), isOn: $transparentWindow)
+                Toggle("Transparent Window", isOn: $transparentWindow)
                     .onChange(of: transparentWindow) { _, newValue in
                         updateWindowTransparency(newValue)
                     }
-                Text(localization.localized("Enable semi-transparent window background"))
+                Text("Enable semi-transparent window background")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section(localization.localized("Language")) {
-                Picker(localization.localized("Language"), selection: $localization.currentLanguage) {
-                    ForEach(AppLanguage.allCases) { language in
-                        Text(language.localizedDisplayName(for: localization.effectiveLanguage())).tag(language)
-                    }
-                }
-                .pickerStyle(.radioGroup)
+            Section("List Display") {
+                Toggle("Show Cursor Preview Animations", isOn: $showPreviewAnimations)
+                Toggle("Show Cape Author Info", isOn: $showAuthorInfo)
             }
 
-            Section(localization.localized("List Display")) {
-                Toggle(localization.localized("Show Cursor Preview Animations"), isOn: $showPreviewAnimations)
-                Toggle(localization.localized("Show Cape Author Info"), isOn: $showAuthorInfo)
-            }
-
-            Section(localization.localized("Preview Panel")) {
-                Picker(localization.localized("Preview Grid Columns"), selection: $previewGridColumns) {
-                    Text(localization.localized("Auto (based on window size)")).tag(0)
-                    Text("4 \(localization.localized("columns"))").tag(4)
-                    Text("6 \(localization.localized("columns"))").tag(6)
-                    Text("8 \(localization.localized("columns"))").tag(8)
+            Section("Preview Panel") {
+                Picker("Preview Grid Columns", selection: $previewGridColumns) {
+                    Text("Auto (based on window size)").tag(0)
+                    Text("4 \(String(localized:"columns"))").tag(4)
+                    Text("6 \(String(localized:"columns"))").tag(6)
+                    Text("8 \(String(localized:"columns"))").tag(8)
                 }
             }
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(localization.localized("Appearance"))
+        .navigationTitle("Appearance")
     }
 
     /// Update window transparency in real-time
@@ -223,50 +209,63 @@ struct AppearanceSettingsView: View {
 struct AdvancedSettingsView: View {
     @State private var showResetConfirmation = false
     @State private var isExportingLogs = false
+    @State private var showResetCursorSuccess = false
+    @State private var showResetOrderSuccess = false
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
 
     var body: some View {
         Form {
-            Section(localization.localized("Storage")) {
-                LabeledContent(localization.localized("Cape Folder")) {
+            Section("Storage") {
+                LabeledContent("Cape Folder") {
                     Text("~/Library/Application Support/Mousecape/capes")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                Button(localization.localized("Show in Finder")) {
+                Button("Show in Finder") {
                     appState.openCapeFolder()
                 }
             }
 
-            Section(localization.localized("Reset")) {
-                Button(localization.localized("Restore Default Settings"), role: .destructive) {
-                    showResetConfirmation = true
+            Section("Reset") {
+                HStack {
+                    Button("Reset System Cursor") {
+                        appState.resetToDefault()
+                        showResetCursorSuccess = true
+                    }
+
+                    Button("Reset Sidebar Order") {
+                        appState.resetCapeOrder()
+                        showResetOrderSuccess = true
+                    }
+
+                    Button("Restore Default Settings", role: .destructive) {
+                        showResetConfirmation = true
+                    }
                 }
                 .confirmationDialog(
-                    localization.localized("Restore Default Settings"),
+                    "Restore Default Settings",
                     isPresented: $showResetConfirmation,
                     titleVisibility: .visible
                 ) {
-                    Button(localization.localized("Restore Default Settings"), role: .destructive) {
+                    Button("Restore Default Settings", role: .destructive) {
                         resetToDefaults()
                     }
-                    Button(localization.localized("Cancel"), role: .cancel) { }
+                    Button("Cancel", role: .cancel) { }
                 } message: {
-                    Text(localization.localized("This will reset all settings to their default values. This action cannot be undone."))
+                    Text("This will reset all settings to their default values. This action cannot be undone.")
                 }
             }
 
             #if DEBUG
-            Section(localization.localized("Debug")) {
-                LabeledContent(localization.localized("Log Folder")) {
+            Section("Debug") {
+                LabeledContent("Log Folder") {
                     Text("~/Library/Logs/Mousecape")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                LabeledContent(localization.localized("Log Files")) {
+                LabeledContent("Log Files") {
                     let files = DebugLogger.getAllLogFiles()
                     let size = DebugLogger.getTotalLogSize()
                     Text("\(files.count) files, \(ByteCountFormatter.string(fromByteCount: size, countStyle: .file))")
@@ -275,47 +274,47 @@ struct AdvancedSettingsView: View {
                 }
 
                 HStack {
-                    Button(localization.localized("Open Log Folder")) {
+                    Button("Open Log Folder") {
                         NSWorkspace.shared.open(DebugLogger.logsDirectory)
                     }
 
-                    Button(localization.localized("Export All Logs")) {
+                    Button("Export All Logs") {
                         exportLogs()
                     }
                     .disabled(isExportingLogs)
 
-                    Button(localization.localized("Clear All Logs"), role: .destructive) {
+                    Button("Clear All Logs", role: .destructive) {
                         DebugLogger.clearAllLogs()
                     }
                 }
 
-                Text(localization.localized("Logs are automatically deleted after 24 hours. Logs contain debug information for troubleshooting cursor issues."))
+                Text("Logs are automatically deleted after 24 hours. Logs contain debug information for troubleshooting cursor issues.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             #endif
 
-            Section(localization.localized("About")) {
-                LabeledContent(localization.localized("Version")) {
+            Section("About") {
+                LabeledContent("Version") {
                     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
                        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
                         Text("Mousecape v\(version) (\(build))")
                     } else {
-                        Text("Mousecape v1.0.3")
+                        Text("Mousecape v1.0.4")
                     }
                 }
-                LabeledContent(localization.localized("System Requirements")) {
+                LabeledContent("System Requirements") {
                     Text("macOS 15+")
                 }
-                LabeledContent(localization.localized("Original Author")) {
+                LabeledContent("Original Author") {
                     Text("\u{00A9} 2014-2025 Alex Zielenski")
                 }
-                LabeledContent(localization.localized("SwiftUI Redesign")) {
+                LabeledContent("SwiftUI Redesign") {
                     Text("\u{00A9} 2025 sdmj76")
                 }
 
                 HStack {
-                    Button(localization.localized("Check for Updates")) {
+                    Button("Check for Updates") {
                         checkForUpdates()
                     }
                     Button("GitHub") {
@@ -323,7 +322,7 @@ struct AdvancedSettingsView: View {
                             NSWorkspace.shared.open(url)
                         }
                     }
-                    Button(localization.localized("Report Issue")) {
+                    Button("Report Issue") {
                         if let url = URL(string: "https://github.com/sdmj76/Mousecape/issues") {
                             NSWorkspace.shared.open(url)
                         }
@@ -333,7 +332,23 @@ struct AdvancedSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .navigationTitle(localization.localized("Advanced"))
+        .navigationTitle("Advanced")
+        .alert(
+            "Reset System Cursor",
+            isPresented: $showResetCursorSuccess
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("System cursor has been reset to default.")
+        }
+        .alert(
+            "Reset Sidebar Order",
+            isPresented: $showResetOrderSuccess
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Sidebar order has been reset to alphabetical.")
+        }
     }
 
     private func resetToDefaults() {
@@ -341,9 +356,6 @@ struct AdvancedSettingsView: View {
         let defaults = UserDefaults.standard
         let domain = Bundle.main.bundleIdentifier!
         defaults.removePersistentDomain(forName: domain)
-
-        // Reset language to system default
-        LocalizationManager.shared.currentLanguage = .system
     }
 
     #if DEBUG
@@ -366,7 +378,7 @@ struct AdvancedSettingsView: View {
                 savePanel.allowedContentTypes = [.zip]
                 savePanel.nameFieldStringValue = zipURL.lastPathComponent
                 savePanel.canCreateDirectories = true
-                savePanel.title = "Export Debug Logs"
+                savePanel.title = String(localized: "Export Debug Logs")
 
                 if savePanel.runModal() == .OK, let destURL = savePanel.url {
                     do {
@@ -404,6 +416,5 @@ struct AdvancedSettingsView: View {
 #Preview {
     SettingsView()
         .environment(AppState.shared)
-        .environment(LocalizationManager.shared)
         .frame(width: 600, height: 500)
 }

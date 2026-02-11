@@ -43,31 +43,14 @@ void restoreCursorForIdentifier(NSString *ident) {
     MMLog("    Removed backup cursor");
 }
 
-void resetAllCursors() {
+void resetAllCursors(void) {
     MMLog("=== resetAllCursors ===");
 
-    // Restore main cursors first
-    MMLog("--- Restoring default cursors ---");
-    NSUInteger i = 0;
-    NSString *key = nil;
-    while ((key = defaultCursors[i]) != nil) {
-        restoreCursorForIdentifier(backupStringForIdentifier(key));
-        i++;
-    }
-
-    // Also restore any Arrow synonyms that may have been backed up
-    MMLog("--- Restoring Arrow synonyms ---");
-    NSArray<NSString *> *synonyms = MCArrowSynonyms();
-    for (NSString *name in synonyms) {
+    // Restore all cursors (default + synonyms)
+    MMLog("--- Restoring all cursors ---");
+    MCEnumerateAllCursorIdentifiers(^(NSString *name) {
         restoreCursorForIdentifier(backupStringForIdentifier(name));
-    }
-
-    // And also restore I-beam synonyms
-    MMLog("--- Restoring IBeam synonyms ---");
-    NSArray<NSString *> *ibeamSynonyms = MCIBeamSynonyms();
-    for (NSString *name in ibeamSynonyms) {
-        restoreCursorForIdentifier(backupStringForIdentifier(name));
-    }
+    });
 
     // Restore auxiliary/core cursors
     MMLog("--- Restoring core cursors ---");

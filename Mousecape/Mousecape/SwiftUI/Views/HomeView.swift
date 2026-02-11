@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - Preview Scale Constants
 
@@ -14,8 +15,8 @@ private let sidebarPreviewScale: CGFloat = 1.5
 
 struct HomeView: View {
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var isDropTargeted = false
 
     // MARK: - Home Toolbar Content
     @ToolbarContentBuilder
@@ -23,20 +24,20 @@ struct HomeView: View {
         // Flexible spacer pushes buttons to the right (macOS 26+ only)
         AdaptiveToolbarSpacer(.flexible)
 
-        // Group 1: New, Delete, Edit
+        // Group 1: New, Delete
         ToolbarItemGroup {
             Menu {
-                Button(localization.localized("New Cape")) {
+                Button("New Cape") {
                     appState.createNewCape()
                 }
                 Divider()
-                Button(localization.localized("Import from Windows Cursors...")) {
+                Button("Import from Windows Cursors...") {
                     appState.importWindowsCursorFolder()
                 }
             } label: {
                 Image(systemName: "plus")
             }
-            .help(localization.localized("New Cape"))
+            .help("New Cape")
 
             Button(action: {
                 if let cape = appState.selectedCape {
@@ -45,9 +46,14 @@ struct HomeView: View {
             }) {
                 Image(systemName: "minus")
             }
-            .help(localization.localized("Delete Cape"))
+            .help("Delete Cape")
             .disabled(appState.selectedCape == nil)
+        }
 
+        AdaptiveToolbarSpacer(.fixed)
+
+        // Group 2: Edit, Apply
+        ToolbarItemGroup {
             Button(action: {
                 if let cape = appState.selectedCape {
                     appState.editCape(cape)
@@ -55,7 +61,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "square.and.pencil")
             }
-            .help(localization.localized("Edit Cape"))
+            .help("Edit Cape")
             .disabled(appState.selectedCape == nil)
 
             Button(action: {
@@ -65,18 +71,18 @@ struct HomeView: View {
             }) {
                 Image(systemName: "checkmark.circle")
             }
-            .help(localization.localized("Apply Cape"))
+            .help("Apply Cape")
             .disabled(appState.selectedCape == nil)
         }
 
         AdaptiveToolbarSpacer(.fixed)
 
-        // Group 2: Import, Export
+        // Group 3: Import, Export
         ToolbarItemGroup {
             Button(action: { appState.importCape() }) {
                 Image(systemName: "square.and.arrow.down")
             }
-            .help(localization.localized("Import Cape"))
+            .help("Import Cape")
 
             Button(action: {
                 if let cape = appState.selectedCape {
@@ -85,7 +91,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "square.and.arrow.up")
             }
-            .help(localization.localized("Export Cape"))
+            .help("Export Cape")
             .disabled(appState.selectedCape == nil)
         }
 
@@ -98,7 +104,7 @@ struct HomeView: View {
             }) {
                 Image(systemName: "gear")
             }
-            .help(localization.localized("Settings"))
+            .help("Settings")
         }
     }
 
@@ -137,9 +143,9 @@ struct HomeView: View {
                         }
                 } else {
                     ContentUnavailableView(
-                        localization.localized("Select a Cape"),
+                        "Select a Cape",
                         systemImage: "cursorarrow.click.2",
-                        description: Text(localization.localized("Choose a cape from the list to preview"))
+                        description: Text("Choose a cape from the list to preview")
                     )
                     .toolbar {
                         homeToolbarContent
@@ -154,74 +160,74 @@ struct HomeView: View {
         .toolbar(removing: .sidebarToggle)
         // Delete confirmation dialog
         .confirmationDialog(
-            localization.localized("Delete Cape"),
+            "Delete Cape",
             isPresented: $appState.showDeleteConfirmation,
             titleVisibility: .visible,
             presenting: appState.capeToDelete
         ) { cape in
-            Button("\(localization.localized("Delete")) \"\(cape.name)\"", role: .destructive) {
+            Button("\(String(localized:"Delete")) \"\(cape.name)\"", role: .destructive) {
                 appState.deleteCape(cape)
             }
-            Button(localization.localized("Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.capeToDelete = nil
             }
         } message: { cape in
-            Text("\(localization.localized("Are you sure you want to delete")) \"\(cape.name)\"? \(localization.localized("This action cannot be undone."))")
+            Text("\(String(localized:"Are you sure you want to delete")) \"\(cape.name)\"? \(String(localized:"This action cannot be undone."))")
         }
         // Discard changes confirmation alert (macOS native style)
         .alert(
-            localization.localized("Unsaved Changes"),
+            "Unsaved Changes",
             isPresented: $appState.showDiscardConfirmation
         ) {
-            Button(localization.localized("Save")) {
+            Button("Save") {
                 appState.closeEditWithSave()
             }
             .keyboardShortcut(.defaultAction)
 
-            Button(localization.localized("Don't Save"), role: .destructive) {
+            Button("Don't Save", role: .destructive) {
                 appState.closeEdit()
             }
 
-            Button(localization.localized("Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.showDiscardConfirmation = false
             }
         } message: {
-            Text(localization.localized("Do you want to save the changes you made?"))
+            Text("Do you want to save the changes you made?")
         }
         // Delete cursor confirmation dialog
         .confirmationDialog(
-            localization.localized("Delete Cursor?"),
+            "Delete Cursor?",
             isPresented: $appState.showDeleteCursorConfirmation,
             titleVisibility: .visible
         ) {
-            Button(localization.localized("Delete"), role: .destructive) {
+            Button("Delete", role: .destructive) {
                 appState.deleteSelectedCursor()
             }
-            Button(localization.localized("Cancel"), role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 appState.showDeleteCursorConfirmation = false
             }
         } message: {
             if let cursor = appState.editingSelectedCursor {
-                Text("\(localization.localized("Are you sure you want to delete")) '\(cursor.displayName)'?")
+                Text("\(String(localized:"Are you sure you want to delete")) '\(cursor.displayName)'?")
             }
         }
         // Duplicate filename error alert
         .alert(
-            localization.localized("Duplicate Filename"),
+            "Duplicate Filename",
             isPresented: $appState.showDuplicateFilenameError
         ) {
-            Button(localization.localized("OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showDuplicateFilenameError = false
             }
         } message: {
-            Text("\(localization.localized("A cape with the filename")) \"\(appState.duplicateFilename)\" \(localization.localized("already exists. Please change the Name or Author to use a different filename."))")
+            Text("\(String(localized:"A cape with the filename")) \"\(appState.duplicateFilename)\" \(String(localized:"already exists. Please change the Name or Author to use a different filename."))")
         }
         // Validation error alert
         .alert(
-            localization.localized("Validation Error"),
+            "Validation Error",
             isPresented: $appState.showValidationError
         ) {
-            Button(localization.localized("OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showValidationError = false
             }
         } message: {
@@ -229,10 +235,10 @@ struct HomeView: View {
         }
         // Image import warning alert (non-square image)
         .alert(
-            localization.localized("Image Adjusted"),
+            "Image Adjusted",
             isPresented: $appState.showImageImportWarning
         ) {
-            Button(localization.localized("OK"), role: .cancel) {
+            Button("OK", role: .cancel) {
                 appState.showImageImportWarning = false
             }
         } message: {
@@ -244,6 +250,70 @@ struct HomeView: View {
                 AddCursorSheet(cape: cape)
             }
         }
+        // Cape file drop-to-import (only active on home page, not during editing)
+        .overlay {
+            if isDropTargeted && !appState.isEditing {
+                CapeDropOverlayView()
+            }
+        }
+        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            guard !appState.isEditing else { return false }
+            return handleCapeDrop(providers)
+        }
+    }
+
+    // MARK: - Cape File Drop Handler
+
+    private func handleCapeDrop(_ providers: [NSItemProvider]) -> Bool {
+        var hasFileURL = false
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                hasFileURL = true
+                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                    guard let data = item as? Data,
+                          let url = URL(dataRepresentation: data, relativeTo: nil) else { return }
+                    DispatchQueue.main.async {
+                        if url.pathExtension.lowercased() == "cape" {
+                            appState.importCape(from: url)
+                        } else {
+                            appState.operationResultMessage = String(localized:"Unsupported format. Only .cape files can be imported.")
+                            appState.operationResultIsSuccess = false
+                            appState.showOperationResult = true
+                        }
+                    }
+                }
+            }
+        }
+        return hasFileURL
+    }
+}
+
+// MARK: - Cape Drop Overlay View
+
+struct CapeDropOverlayView: View {
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+
+            VStack(spacing: 12) {
+                Image(systemName: "square.and.arrow.down")
+                    .font(.system(size: 36, weight: .light))
+                    .foregroundStyle(.white)
+
+                Text("Drop .cape files to import")
+                    .font(.title3)
+                    .foregroundStyle(.white)
+            }
+            .padding(40)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
+                    .foregroundStyle(.white.opacity(0.6))
+            )
+        }
+        .allowsHitTesting(false)
     }
 }
 
@@ -251,21 +321,20 @@ struct HomeView: View {
 
 struct EmptyStateView: View {
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
 
     var body: some View {
         ContentUnavailableView {
-            Label(localization.localized("No Capes"), systemImage: "cursorarrow.slash")
+            Label("No Capes", systemImage: "cursorarrow.slash")
         } description: {
-            Text(localization.localized("Create a new cape or import an existing one to get started."))
+            Text("Create a new cape or import an existing one to get started.")
         } actions: {
             HStack(spacing: 12) {
-                Button(localization.localized("New Cape")) {
+                Button("New Cape") {
                     appState.createNewCape()
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button(localization.localized("Import Cape")) {
+                Button("Import Cape") {
                     appState.importCape()
                 }
                 .buttonStyle(.bordered)
@@ -278,6 +347,7 @@ struct EmptyStateView: View {
 
 struct CapeIconGridView: View {
     @Environment(AppState.self) private var appState
+    @State private var draggingCapeId: String?
 
     private let columns = [
         GridItem(.adaptive(minimum: 64, maximum: 80), spacing: 12)
@@ -289,14 +359,56 @@ struct CapeIconGridView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(appState.capes) { cape in
-                    CapeIconCell(cape: cape, onSelect: {
-                        appState.selectedCape = cape
-                    }, onDoubleClick: {
-                        handleDoubleClick(cape)
-                    })
+                    CapeIconCell(
+                        cape: cape,
+                        isDragging: draggingCapeId == cape.identifier,
+                        onSelect: {
+                            appState.selectedCape = cape
+                        },
+                        onDoubleClick: {
+                            handleDoubleClick(cape)
+                        }
+                    )
+                    .draggable(cape.identifier) {
+                        // Drag preview - without selection border
+                        CapeIconCell(
+                            cape: cape,
+                            isDragging: false,
+                            showSelection: false,
+                            onSelect: {},
+                            onDoubleClick: {}
+                        )
+                        .opacity(0.8)
+                        .onAppear {
+                            draggingCapeId = cape.identifier
+                        }
+                    }
+                    .dropDestination(for: String.self) { items, _ in
+                        guard let draggedId = items.first,
+                              let fromIndex = appState.capes.firstIndex(where: { $0.identifier == draggedId }),
+                              let toIndex = appState.capes.firstIndex(where: { $0.identifier == cape.identifier })
+                        else { return false }
+
+                        if fromIndex != toIndex {
+                            withAnimation(.spring(duration: 0.3, bounce: 0.2)) {
+                                appState.moveCape(
+                                    from: IndexSet(integer: fromIndex),
+                                    to: toIndex > fromIndex ? toIndex + 1 : toIndex
+                                )
+                            }
+                        }
+                        draggingCapeId = nil
+                        return true
+                    }
                 }
             }
             .padding()
+            .animation(.spring(duration: 0.3, bounce: 0.2), value: appState.capes.map { $0.identifier })
+        }
+        .onDrop(of: [.text], isTargeted: nil) { _ in
+            // Reset dragging state when drop ends outside valid targets
+            draggingCapeId = nil
+            return false
         }
     }
 
@@ -317,6 +429,8 @@ struct CapeIconGridView: View {
 
 struct CapeIconCell: View {
     let cape: CursorLibrary
+    var isDragging: Bool = false
+    var showSelection: Bool = true
     let onSelect: () -> Void
     let onDoubleClick: () -> Void
     @Environment(AppState.self) private var appState
@@ -324,7 +438,7 @@ struct CapeIconCell: View {
     @State private var lastClickTime: Date?
 
     private var isSelected: Bool {
-        appState.selectedCape?.id == cape.id
+        showSelection && appState.selectedCape?.id == cape.id
     }
 
     private var isApplied: Bool {
@@ -372,8 +486,10 @@ struct CapeIconCell: View {
             RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(isSelected ? Color.accentColor : .clear, lineWidth: 2)
         )
-        .scaleEffect(isHovered ? 1.05 : 1.0)
+        .scaleEffect(isDragging ? 1.05 : (isHovered ? 1.05 : 1.0))
+        .opacity(isDragging ? 0.5 : 1.0)
         .animation(.spring(duration: 0.2), value: isHovered)
+        .animation(.spring(duration: 0.2), value: isDragging)
         .onHover { isHovered = $0 }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -399,5 +515,4 @@ struct CapeIconCell: View {
 #Preview {
     HomeView()
         .environment(AppState.shared)
-        .environment(LocalizationManager.shared)
 }

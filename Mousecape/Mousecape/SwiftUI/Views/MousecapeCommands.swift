@@ -3,7 +3,6 @@
 //  Mousecape
 //
 //  System menu bar commands
-//  Removes Edit menu, Cape menu matches context menu
 //
 
 import SwiftUI
@@ -16,7 +15,26 @@ struct MousecapeCommands: Commands {
     }
 
     var body: some Commands {
-        // Replace default New Document command
+        // MARK: - Mousecape menu (App menu)
+        CommandGroup(after: .appSettings) {
+            Button("Settings...") {
+                Task { @MainActor in
+                    AppState.shared.currentPage = .settings
+                }
+            }
+            .keyboardShortcut(",", modifiers: .command)
+
+            Divider()
+
+            Button("Reset to Default") {
+                Task { @MainActor in
+                    AppState.shared.resetToDefault()
+                }
+            }
+            .keyboardShortcut("r", modifiers: .command)
+        }
+
+        // MARK: - File menu
         CommandGroup(replacing: .newItem) {
             Button("New Cape") {
                 Task { @MainActor in
@@ -25,6 +43,15 @@ struct MousecapeCommands: Commands {
             }
             .keyboardShortcut("n", modifiers: .command)
 
+            Button("Import from Windows...") {
+                Task { @MainActor in
+                    AppState.shared.importWindowsCursorFolder()
+                }
+            }
+            .keyboardShortcut("i", modifiers: [.command, .shift])
+
+            Divider()
+
             Button("Import Cape...") {
                 Task { @MainActor in
                     AppState.shared.importCape()
@@ -32,30 +59,33 @@ struct MousecapeCommands: Commands {
             }
             .keyboardShortcut("i", modifiers: .command)
 
-            Divider()
-
-            Button("Open Cape Folder") {
-                Task { @MainActor in
-                    AppState.shared.openCapeFolder()
-                }
-            }
-        }
-
-        // Save command - Cmd+S (saves in edit mode, exports otherwise)
-        CommandGroup(replacing: .saveItem) {
-            Button("Save") {
-                Task { @MainActor in
-                    if AppState.shared.isEditing, let cape = AppState.shared.editingCape {
-                        AppState.shared.saveCape(cape)
-                    } else if let cape = selectedCape {
+            Button("Export Cape...") {
+                if let cape = selectedCape {
+                    Task { @MainActor in
                         AppState.shared.exportCape(cape)
                     }
                 }
             }
-            .keyboardShortcut("s", modifiers: .command)
+            .keyboardShortcut("e", modifiers: .command)
+            .disabled(selectedCape == nil)
+
+            Divider()
+
+            Button("Delete Cape") {
+                if let cape = selectedCape {
+                    Task { @MainActor in
+                        AppState.shared.confirmDeleteCape(cape)
+                    }
+                }
+            }
+            .keyboardShortcut(.delete)
+            .disabled(selectedCape == nil)
         }
 
-        // Edit menu - Undo/Redo for edit mode
+        // Hide Save item (moved to Edit menu)
+        CommandGroup(replacing: .saveItem) { }
+
+        // MARK: - Edit menu
         CommandGroup(replacing: .undoRedo) {
             Button("Undo") {
                 Task { @MainActor in
@@ -72,91 +102,24 @@ struct MousecapeCommands: Commands {
             }
             .keyboardShortcut("z", modifiers: [.command, .shift])
             .disabled(!AppState.shared.canRedo || !AppState.shared.isEditing)
-        }
-
-        // Keep standard pasteboard/text editing commands for text fields
-
-        // Cape menu - matches context menu
-        CommandMenu("Cape") {
-            Button("Apply") {
-                if let cape = selectedCape {
-                    Task { @MainActor in
-                        AppState.shared.applyCape(cape)
-                    }
-                }
-            }
-            .keyboardShortcut("a", modifiers: [.command, .shift])
-            .disabled(selectedCape == nil)
-
-            Button("Edit") {
-                if let cape = selectedCape {
-                    Task { @MainActor in
-                        AppState.shared.editCape(cape)
-                    }
-                }
-            }
-            .keyboardShortcut("e", modifiers: .command)
-            .disabled(selectedCape == nil)
 
             Divider()
 
-            Button("Export...") {
-                if let cape = selectedCape {
-                    Task { @MainActor in
-                        AppState.shared.exportCape(cape)
-                    }
-                }
-            }
-            .keyboardShortcut("s", modifiers: [.command, .shift])
-            .disabled(selectedCape == nil)
-
-            Button("Show in Finder") {
-                if let cape = selectedCape {
-                    Task { @MainActor in
-                        AppState.shared.showInFinder(cape)
-                    }
-                }
-            }
-            .disabled(selectedCape == nil)
-
-            Divider()
-
-            Button("Reset to Default") {
+            Button("Save Cape") {
                 Task { @MainActor in
-                    AppState.shared.resetToDefault()
-                }
-            }
-            .keyboardShortcut("r", modifiers: .command)
-
-            Divider()
-
-            Button("Delete") {
-                if let cape = selectedCape {
-                    Task { @MainActor in
-                        AppState.shared.confirmDeleteCape(cape)
+                    if AppState.shared.isEditing, let cape = AppState.shared.editingCape {
+                        AppState.shared.saveCape(cape)
                     }
                 }
             }
-            .keyboardShortcut(.delete)
-            .disabled(selectedCape == nil)
+            .keyboardShortcut("s", modifiers: .command)
+            .disabled(!AppState.shared.isEditing)
         }
 
         // Hide system View menu (toolbar options)
         CommandGroup(replacing: .toolbar) { }
 
-        // Help menu
-        CommandGroup(replacing: .help) {
-            Button("Mousecape Help") {
-                if let url = URL(string: "https://github.com/alexzielenski/Mousecape#readme") {
-                    NSWorkspace.shared.open(url)
-                }
-            }
-
-            Button("Report an Issue") {
-                if let url = URL(string: "https://github.com/alexzielenski/Mousecape/issues") {
-                    NSWorkspace.shared.open(url)
-                }
-            }
-        }
+        // MARK: - Help menu (clear custom items, keep system default)
+        CommandGroup(replacing: .help) { }
     }
 }

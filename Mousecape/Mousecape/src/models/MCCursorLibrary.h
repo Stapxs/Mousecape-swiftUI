@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "MCCursor.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *const MCLibraryWillSaveNotificationName;
 extern NSString *const MCLibraryDidSaveNotificationName;
 
@@ -18,21 +20,21 @@ extern NSString *const MCLibraryDidSaveNotificationName;
 @property (nonatomic, copy)   NSString *author;
 @property (nonatomic, copy)   NSString *identifier;
 @property (nonatomic, copy)   NSNumber *version;
-@property (nonatomic, copy)   NSURL    *fileURL;
-@property (nonatomic, weak)   MCLibraryController *library;
+@property (nonatomic, copy, nullable)   NSURL    *fileURL;
+@property (nonatomic, weak, nullable)   MCLibraryController *library;
 @property (nonatomic, readonly) NSUndoManager *undoManager;
 @property (nonatomic, readonly, getter=isDirty) BOOL dirty;
 @property (nonatomic, assign, getter = isInCloud) BOOL inCloud;
 @property (nonatomic, assign, getter = isHiDPI)   BOOL hiDPI;
 
-+ (MCCursorLibrary *)cursorLibraryWithContentsOfFile:(NSString *)path;
-+ (MCCursorLibrary *)cursorLibraryWithContentsOfURL:(NSURL *)URL;
-+ (MCCursorLibrary *)cursorLibraryWithDictionary:(NSDictionary *)dictionary;
++ (nullable MCCursorLibrary *)cursorLibraryWithContentsOfFile:(NSString *)path;
++ (nullable MCCursorLibrary *)cursorLibraryWithContentsOfURL:(NSURL *)URL;
++ (nullable MCCursorLibrary *)cursorLibraryWithDictionary:(NSDictionary *)dictionary;
 + (MCCursorLibrary *)cursorLibraryWithCursors:(NSSet *)cursors;
 
-- (instancetype)initWithContentsOfFile:(NSString *)path;
-- (instancetype)initWithContentsOfURL:(NSURL *)URL;
-- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+- (nullable instancetype)initWithContentsOfFile:(NSString *)path;
+- (nullable instancetype)initWithContentsOfURL:(NSURL *)URL;
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dictionary;
 - (instancetype)initWithCursors:(NSSet *)cursors;
 
 - (NSSet *)cursorsWithIdentifier:(NSString *)identifier;
@@ -42,12 +44,12 @@ extern NSString *const MCLibraryDidSaveNotificationName;
 
 - (NSDictionary *)dictionaryRepresentation;
 - (BOOL)writeToFile:(NSString *)file atomically:(BOOL)atomically;
-- (NSError *)save;
+- (nullable NSError *)save;
 
 /// Validates the cape for system compatibility
 /// Returns nil if valid, or an NSError describing validation failures
 /// Rules: frameCount must be <= 24, hotspot must be within cursor size bounds (0 <= hotspot < size)
-- (NSError *)validateCape;
+- (nullable NSError *)validateCape;
 
 - (void)updateChangeCount:(NSDocumentChangeType)change;
 - (void)revertToSaved;
@@ -57,3 +59,5 @@ extern NSString *const MCLibraryDidSaveNotificationName;
 @interface MCCursorLibrary (Properties)
 @property (nonatomic, readonly, strong) NSSet *cursors;
 @end
+
+NS_ASSUME_NONNULL_END

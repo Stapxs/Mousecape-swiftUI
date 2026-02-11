@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSUInteger, MCCursorScale) {
     MCCursorScaleNone = 000,
     MCCursorScale100  = 100,
@@ -28,23 +30,25 @@ extern MCCursorScale cursorScaleForScale(CGFloat scale);
 //@property (assign) NSUInteger        repeatCount; // v2.01
 
 // creating a cursor from a dictionary
-+ (MCCursor *)cursorWithDictionary:(NSDictionary *)dict ofVersion:(CGFloat)version;
-- (id)initWithCursorDictionary:(NSDictionary *)dict ofVersion:(CGFloat)version;
++ (nullable MCCursor *)cursorWithDictionary:(NSDictionary *)dict ofVersion:(CGFloat)version;
+- (nullable id)initWithCursorDictionary:(NSDictionary *)dict ofVersion:(CGFloat)version;
 
-- (void)setRepresentation:(NSImageRep *)imageRep forScale:(MCCursorScale)scale;
+- (void)setRepresentation:(nullable NSImageRep *)imageRep forScale:(MCCursorScale)scale;
 - (void)removeRepresentationForScale:(MCCursorScale)scale;
 - (void)addFrame:(NSImageRep *)frame forScale:(MCCursorScale)scale;
 
-- (NSImageRep *)representationForScale:(MCCursorScale)scale;
-- (NSImageRep *)representationWithScale:(CGFloat)scale;
+- (nullable NSImageRep *)representationForScale:(MCCursorScale)scale;
+- (nullable NSImageRep *)representationWithScale:(CGFloat)scale;
 
 - (NSDictionary *)dictionaryRepresentation;
-+ (NSImageRep *)composeRepresentationWithFrames:(NSArray *)frames;
++ (nullable NSImageRep *)composeRepresentationWithFrames:(NSArray *)frames;
 
 // Derived Properties
-- (NSImage *)imageWithAllReps;
+- (nullable NSImage *)imageWithAllReps;
 @end
 
 @interface MCCursor (Properties)
 @property (nonatomic, readonly, strong) NSDictionary *representations;
 @end
+
+NS_ASSUME_NONNULL_END

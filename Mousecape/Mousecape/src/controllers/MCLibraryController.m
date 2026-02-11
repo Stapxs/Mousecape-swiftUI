@@ -11,6 +11,7 @@
 #import "restore.h"
 #import "create.h"
 #import "MCLogger.h"
+#import "MCPrefs.h"
 
 @interface MCLibraryController ()
 @property (nonatomic, readwrite, strong) NSUndoManager *undoManager;
@@ -51,7 +52,7 @@
     self.capes = [NSMutableSet set];
     NSString *capesPath = self.libraryURL.path;
     NSArray  *contents  = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:capesPath error:NULL];
-    NSString *applied   = [NSUserDefaults.standardUserDefaults stringForKey:MCPreferencesAppliedCursorKey];
+    NSString *applied   = MCDefault(MCPreferencesAppliedCursorKey);
 
     for (NSString *filename in contents) {
         // Ignore hidden files like .DS_Store
@@ -77,8 +78,8 @@
         return [NSError errorWithDomain:MCErrorDomain
                                    code:MCErrorInvalidFormatCode
                                userInfo:@{
-            NSLocalizedDescriptionKey: NSLocalizedString(@"Import failed", nil),
-            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"Unable to read the cape file.", nil)
+            NSLocalizedDescriptionKey: NSLocalizedString(@"error.import.failed", nil),
+            NSLocalizedFailureReasonErrorKey: NSLocalizedString(@"error.import.unreadable", nil)
         }];
     }
     return [self importCape:lib];
@@ -91,8 +92,24 @@
         return validationError; // Return validation error to caller
     }
 
+    // Check for duplicate identifier and auto-rename if needed
     if ([[self.capes valueForKeyPath:@"identifier"] containsObject:lib.identifier]) {
         lib.identifier = [lib.identifier stringByAppendingFormat:@".%@", UUID()];
+    }
+
+    // Check for duplicate name and auto-rename if needed
+    NSSet *existingNames = [self.capes valueForKeyPath:@"name"];
+    if ([existingNames containsObject:lib.name]) {
+        NSString *baseName = lib.name;
+        NSInteger counter = 1;
+        NSString *newName = [NSString stringWithFormat:@"%@ (%ld)", baseName, (long)counter];
+
+        while ([existingNames containsObject:newName]) {
+            counter++;
+            newName = [NSString stringWithFormat:@"%@ (%ld)", baseName, (long)counter];
+        }
+
+        lib.name = newName;
     }
 
     lib.fileURL = [self URLForCape:lib];

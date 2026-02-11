@@ -43,6 +43,22 @@ enum INFParseError: Error, LocalizedError {
             return "No valid cursor filenames could be resolved"
         }
     }
+
+    /// Localized description for display in UI
+    var localizedUIDescription: String {
+        switch self {
+        case .fileNotFound(let path):
+            return "\(String(localized: "inf.error.noValidInf")) \(path)"
+        case .encodingError(let path):
+            return "\(String(localized: "inf.error.encodingFailed")) \(path)"
+        case .noSchemeRegSection:
+            return String(localized: "inf.error.noSchemeReg")
+        case .noCursorPaths:
+            return String(localized: "inf.error.noCursorPaths")
+        case .noValidCursors:
+            return String(localized: "inf.error.noValidFilenames")
+        }
+    }
 }
 
 /// Parser for Windows cursor install.inf files

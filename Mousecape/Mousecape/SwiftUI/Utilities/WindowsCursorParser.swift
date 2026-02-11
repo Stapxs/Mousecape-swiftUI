@@ -308,6 +308,7 @@ struct WindowsCursorParser {
         // Parse chunks
         var anihData: ANIHeader?
         var rateData: [UInt32]?
+        var seqData: [UInt32]?
         var frames: [FrameData] = []
 
         while reader.remaining >= 8 {
@@ -317,8 +318,13 @@ struct WindowsCursorParser {
             if chunkID == Data("anih".utf8) {
                 anihData = try parseANIHChunk(reader: &reader, size: chunkSize)
             } else if chunkID == Data("rate".utf8) {
-                let numFrames = anihData?.numFrames ?? 0
-                rateData = try parseRateChunk(reader: &reader, size: chunkSize, numFrames: numFrames)
+                // Use numSteps (not numFrames) as rate entries correspond to animation steps.
+                // Fall back to size/4 if anih hasn't been parsed yet (chunk order not guaranteed).
+                let numEntries = anihData?.numSteps ?? UInt32(chunkSize / 4)
+                rateData = try parseRateChunk(reader: &reader, size: chunkSize, numEntries: numEntries)
+            } else if chunkID == Data("seq ".utf8) {
+                let numEntries = anihData?.numSteps ?? UInt32(chunkSize / 4)
+                seqData = try parseSeqChunk(reader: &reader, size: chunkSize, numEntries: numEntries)
             } else if chunkID == Data("LIST".utf8) {
                 let listType = try reader.readBytes(4)
                 if listType == Data("fram".utf8) {
@@ -338,6 +344,21 @@ struct WindowsCursorParser {
 
         guard !frames.isEmpty else {
             throw WindowsCursorParserError.invalidFormat("No frames found in ANI file")
+        }
+
+        // Apply seq chunk reordering: seq defines the playback order by indexing into unique frames
+        if let seq = seqData, !seq.isEmpty {
+            var orderedFrames: [FrameData] = []
+            for index in seq {
+                let i = Int(index)
+                if i < frames.count {
+                    orderedFrames.append(frames[i])
+                }
+            }
+            if !orderedFrames.isEmpty {
+                debugLog("Applied seq reordering: \(frames.count) unique frames → \(orderedFrames.count) animation steps")
+                frames = orderedFrames
+            }
         }
 
         // Use default values if anih not found
@@ -438,9 +459,9 @@ struct WindowsCursorParser {
         )
     }
 
-    private static func parseRateChunk(reader: inout BinaryReader, size: Int, numFrames: UInt32) throws -> [UInt32] {
+    private static func parseRateChunk(reader: inout BinaryReader, size: Int, numEntries: UInt32) throws -> [UInt32] {
         var rates: [UInt32] = []
-        let count = min(Int(numFrames), size / 4)
+        let count = min(Int(numEntries), size / 4)
 
         for _ in 0..<count {
             let rate = try reader.readUInt32()
@@ -454,6 +475,24 @@ struct WindowsCursorParser {
         }
 
         return rates
+    }
+
+    private static func parseSeqChunk(reader: inout BinaryReader, size: Int, numEntries: UInt32) throws -> [UInt32] {
+        var seq: [UInt32] = []
+        let count = min(Int(numEntries), size / 4)
+
+        for _ in 0..<count {
+            let index = try reader.readUInt32()
+            seq.append(index)
+        }
+
+        // Skip remaining bytes
+        let remaining = size - (count * 4)
+        if remaining > 0 {
+            try reader.skip(remaining)
+        }
+
+        return seq
     }
 
     private static func parseFramList(reader: inout BinaryReader, size: Int) throws -> [FrameData] {

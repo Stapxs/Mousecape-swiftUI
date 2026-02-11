@@ -11,7 +11,6 @@ import SwiftUI
 struct CapeContextMenu: View {
     let cape: CursorLibrary
     @Environment(AppState.self) private var appState
-    @Environment(LocalizationManager.self) private var localization
 
     private var isApplied: Bool {
         appState.appliedCape?.id == cape.id
@@ -22,7 +21,7 @@ struct CapeContextMenu: View {
         Button {
             appState.applyCape(cape)
         } label: {
-            Label(localization.localized("Apply"), systemImage: "checkmark.circle")
+            Label("Apply", systemImage: "checkmark.circle")
         }
         .disabled(isApplied)
 
@@ -30,7 +29,7 @@ struct CapeContextMenu: View {
         Button {
             appState.editCape(cape)
         } label: {
-            Label(localization.localized("Edit"), systemImage: "square.and.pencil")
+            Label("Edit", systemImage: "square.and.pencil")
         }
 
         Divider()
@@ -39,14 +38,14 @@ struct CapeContextMenu: View {
         Button {
             appState.exportCape(cape)
         } label: {
-            Label(localization.localized("Export..."), systemImage: "square.and.arrow.up")
+            Label("Export...", systemImage: "square.and.arrow.up")
         }
 
         // Show in Finder
         Button {
             appState.showInFinder(cape)
         } label: {
-            Label(localization.localized("Show in Finder"), systemImage: "folder")
+            Label("Show in Finder", systemImage: "folder")
         }
 
         Divider()
@@ -55,7 +54,16 @@ struct CapeContextMenu: View {
         Button(role: .destructive) {
             appState.confirmDeleteCape(cape)
         } label: {
-            Label(localization.localized("Delete"), systemImage: "trash")
+            Label("Delete", systemImage: "trash")
+        }
+
+        Divider()
+
+        // Reset to system default cursor
+        Button {
+            appState.resetToDefault()
+        } label: {
+            Label("Reset System Cursor", systemImage: "arrow.counterclockwise")
         }
     }
 }
@@ -71,5 +79,4 @@ struct CapeContextMenu: View {
         CapeContextMenu(cape: CursorLibrary(name: "Test Cape", author: "Test"))
     }
     .environment(AppState.shared)
-    .environment(LocalizationManager.shared)
 }

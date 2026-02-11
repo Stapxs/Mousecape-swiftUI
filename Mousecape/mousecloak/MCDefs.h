@@ -34,7 +34,9 @@
 #define WHITE   "\033[37m"      /* White */
 #define BOLD    "\033[1m"
 
-extern NSString *defaultCursors[];
+NS_ASSUME_NONNULL_BEGIN
+
+extern NSString * _Nullable defaultCursors[];
 extern NSString *MCErrorDomain;
 extern NSDictionary *cursorNameMap;
 
@@ -52,6 +54,10 @@ typedef NS_ENUM(NSInteger, MCErrorCode) {
 
 // Hotspot validation constants
 extern const CGFloat   MCMaxHotspotValue;  // Maximum hotspot coordinate value (31.99)
+
+// Cursor import limits
+extern const NSUInteger MCMaxFrameCount;   // Maximum animation frame count (24)
+extern const NSInteger  MCMaxImportSize;   // Maximum import image size in pixels (512)
 
 extern const CGFloat   MCCursorCreatorVersion;
 extern const CGFloat   MCCursorParserVersion;
@@ -80,9 +86,9 @@ extern NSString *nameForCursorIdentifier(NSString *identifier);
 extern NSString *cursorIdentifierForName(NSString *name);
 
 extern NSString *UUID(void);
-extern NSDictionary *capeWithIdentifier(NSString *identifier);
+extern NSDictionary * _Nullable capeWithIdentifier(NSString *identifier);
 extern void CGImageWriteToFile(CGImageRef image, CFStringRef path);
-extern NSData *pngDataForImage(id image);
+extern NSData * _Nullable pngDataForImage(id image);
 extern NSString *MMGet(NSString *prompt);
 
 extern CGError MCIsCursorRegistered(CGSConnectionID cid, char *cursorName, bool *registered);
@@ -92,4 +98,10 @@ extern BOOL MCCursorIsPointer(NSString *identifier);
 extern NSArray<NSString *> *MCArrowSynonyms(void);
 // Returns all known names the system may use for the I-beam (text) cursor on this OS version
 extern NSArray<NSString *> *MCIBeamSynonyms(void);
+
+/// Enumerate all cursor identifiers: default cursors + Arrow synonyms + IBeam synonyms
+extern void MCEnumerateAllCursorIdentifiers(void (NS_NOESCAPE ^block)(NSString *identifier));
+
+NS_ASSUME_NONNULL_END
+
 #endif
