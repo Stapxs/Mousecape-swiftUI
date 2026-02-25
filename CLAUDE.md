@@ -117,7 +117,51 @@ SwiftUI/
 - `CursorImageScaler.maxImportSize` = 512（最大导入图像尺寸）
 - ObjC 侧对应：`MCMaxFrameCount`、`MCMaxImportSize`（定义在 MCDefs.h/m）
 
-状态管理通过 `@Observable @MainActor AppState` 单例实现，带有手动撤销/重做栈。
+状态管理通过 `@Observable @MainActor AppState` 单例实现，带有手动撤销/重做栈（配对闭包）。
+
+### 编辑模式：简易模式 / 高级模式
+
+编辑界面支持两种模式，通过工具栏 Segmented Picker 切换，使用 `@AppStorage("cursorEditMode")` 持久化（0=简易，1=高级）。
+
+**简易模式（Simple）：** 以 Windows 光标分组（15 组）展示，编辑一个分组时自动同步到组内所有 macOS 光标类型（Auto-Alias）。
+
+**高级模式（Advanced）：** 逐个 macOS 光标类型编辑，保留完整控制。
+
+#### WindowsCursorGroup 枚举（AppEnums.swift）
+
+15 个分组对应 Windows 光标位置 0-14，复用 `WindowsINFParser.schemeRegPositionMapping` 映射到 macOS CursorType。
+
+#### Auto-Alias 机制
+
+- `Cursor.copy(withIdentifier:)` — 深拷贝光标（含图像）
+- `Cursor.copyMetadata(withIdentifier:)` — 只拷贝元数据（hotspot/fps/frameCount），共享图像引用（性能优化）
+- `CursorLibrary.syncCursorToAliases(_:)` — 完整同步到同组别名（图像导入时使用）
+- `CursorLibrary.syncMetadataToAliases(_:)` — 只同步元数据到别名（参数修改时使用，避免不必要的图像深拷贝）
+- `CursorLibrary.addCursorWithAliases(_:)` — 添加光标并自动创建同组别名
+- `CursorLibrary.removeGroupCursors(for:)` — 删除分组中所有光标
+
+#### 同步触发点（EditOverlayView.swift）
+
+- hotspotX/Y、frameCount、fps 的 onChange → `syncMetadataToAliases`
+- 图像导入（静态/GIF/Windows 光标）→ `syncCursorToAliases`
+- undo/redo 闭包中也包含 alias 同步，通过 `capturedEditMode` 捕获模式值
+
+#### 模式切换行为
+
+- 切换模式时强制清空选中状态（`selectedGroup = nil`、`selection = nil`），回到 "Select a Cursor" 空状态
+- 切换模式时关闭 info 面板
+- 进入编辑页面时为无选择状态，由用户手动选择
+- 删除光标后回到无选择状态
+- 简易模式下删除光标会删除整个分组（`removeGroupCursors`）
+
+#### 别名一致性检查
+
+简易模式下首次编辑分组时，检查组内别名是否有不同的 hotspot/frameCount/frameDuration。如有差异，弹出确认弹窗。Cancel 会清空选中状态回到空状态。
+
+#### AddCursorSheet 双模式
+
+- 简易模式：显示 `WindowsCursorGroup` 分组列表，添加时调用 `addCursorWithAliases`
+- 高级模式：显示完整 `CursorType` 列表（原有行为）
 
 ## 内存管理
 
@@ -159,22 +203,26 @@ INF 解析器自动检测文件编码，支持多种编码格式：
 
 | 位置 | Windows 光标 | macOS CursorType |
 |-----|-------------|------------------|
-| 0 | Normal Select | `.arrow`, `.arrowCtx` |
+| 0 | Normal Select | `.arrow`, `.arrowCtx`, `.arrowS`, `.ctxMenu` |
 | 1 | Help Select | `.help` |
 | 2 | Working in Background | `.wait` |
-| 3 | Busy | `.busy` |
-| 4 | Precision Select | `.crosshair` |
-| 5 | Text Select | `.iBeam`, `.iBeamXOR` |
-| 6 | Handwriting | `.open` |
+| 3 | Busy | `.busy`, `.countingUp`, `.countingDown`, `.countingUpDown` |
+| 4 | Precision Select | `.crosshair`, `.crosshair2`, `.cell`, `.cellXOR` |
+| 5 | Text Select | `.iBeam`, `.iBeamXOR`, `.iBeamS`, `.iBeamH` |
+| 6 | Handwriting | `.open`, `.closed` |
 | 7 | Unavailable | `.forbidden` |
-| 8 | Vertical Resize | `.resizeNS`, `.windowNS` |
-| 9 | Horizontal Resize | `.resizeWE`, `.windowEW` |
-| 10 | Diagonal Resize 1 | `.windowNWSE` |
-| 11 | Diagonal Resize 2 | `.windowNESW` |
-| 12 | Move | `.move` |
+| 8 | Vertical Resize | `.resizeNS`, `.windowNS`, `.resizeN`, `.resizeS`, `.windowN`, `.windowS` |
+| 9 | Horizontal Resize | `.resizeWE`, `.windowEW`, `.resizeW`, `.resizeE`, `.windowE`, `.windowW` |
+| 10 | Diagonal Resize 1 | `.windowNWSE`, `.windowNW`, `.windowSE` |
+| 11 | Diagonal Resize 2 | `.windowNESW`, `.windowNE`, `.windowSW` |
+| 12 | Move | `.move`, `.resizeSquare` |
 | 13 | Alternate Select | `.alias` |
 | 14 | Link Select | `.pointing`, `.link` |
 | 15-16 | Location/Person | 无 macOS 对应 |
+
+**未映射的类型（8个）：** `copy`, `copyDrag`, `camera`, `camera2`, `poof`, `zoomIn`, `zoomOut`, `empty` — 无合适的 Windows 对应类型。
+
+**覆盖率：** 44/52 macOS 光标类型被映射（85%）。
 
 路径解析支持两种格式：
 - `%10%\Cursors\%pointer%` - 从 `[Strings]` 段查找变量对应的文件名
@@ -332,9 +380,71 @@ IBeam（文本光标）也有替代名称。守护进程会处理这些变体。
 
 **GIF 帧解码失败处理：** ([EditOverlayView.swift:1071-1125](Mousecape/Mousecape/SwiftUI/Views/EditOverlayView.swift#L1071-L1125))
 - 统计失败帧数和失败率
-- 失败率 > 20% 时显示警告对话框
+- 失败率 > 20% 时通过 `appState.showImageImportWarning` 显示 SwiftUI alert
 - 调试日志记录每个失败的帧
 - 支持中英文本地化错误消息
+
+### 撤销/重做系统
+
+**配对闭包架构：** undo 和 redo 闭包配对存储为元组 `(undo: () -> Void, redo: () -> Void)`。
+
+```swift
+private var undoStack: [(undo: () -> Void, redo: () -> Void)] = []
+private var redoStack: [(undo: () -> Void, redo: () -> Void)] = []
+```
+
+- `registerUndo` 将 undo/redo 闭包配对压入 undoStack，同时清空 redoStack
+- `undo()` 从 undoStack 弹出条目，执行 undo 闭包，整个条目压入 redoStack
+- `redo()` 从 redoStack 弹出条目，执行 redo 闭包，整个条目压回 undoStack
+- 最大历史记录：20 步（`maxUndoHistory`）
+- `hasUnsavedChanges` 仅在 `registerUndo` 和 `markAsChanged` 时设为 true，undo 不会自动重置
+
+### AnimatingCursorView 帧缓存
+
+**架构：** 使用 `@State private var cachedFrames: [NSImage]` 预缓存所有帧，避免每次 Timer 触发时重新裁剪。
+
+```swift
+private func buildFrameCache() {
+    // 使用 CGImage.cropping(to:) 裁剪 sprite sheet
+    // 注意：NSImage(cgImage:size:) 的 size 参数必须使用 NSImage 逻辑尺寸（points），不能使用 CGImage 像素尺寸
+    let logicalWidth = image.size.width
+    let logicalFrameHeight = image.size.height / CGFloat(frameCount)
+    let nsImage = NSImage(cgImage: croppedCG, size: NSSize(width: logicalWidth, height: logicalFrameHeight))
+}
+```
+
+**关键注意事项：** NSImage logical size（points）vs CGImage pixel dimensions — HiDPI 下 CGImage 像素是 NSImage 逻辑尺寸的 2 倍，必须使用 `image.size`（逻辑尺寸）传给 `NSImage(cgImage:size:)`，否则预览图会显示为 2 倍大小。
+
+**缓存重建触发：** `.onAppear`、`cursor.frameCount` 变化、`cursor.id` 变化、`refreshTrigger` 变化。
+
+### 图像处理异步化
+
+**架构：** EditOverlayView 中的图像导入使用 `Task {}` + 文件级 `nonisolated` async 辅助函数，将耗时的图像解码/缩放移到后台。
+
+**Sendable 结果类型：**
+- `StaticImageResult` — 静态图像处理结果
+- `GIFProcessingResult` — GIF 处理结果（帧、时长、警告信息）
+- `WindowsCursorProcessingResult` — Windows 光标处理结果
+
+**加载状态：** `@State private var isLoadingImage` 控制 ProgressView 加载指示器显示，处理期间禁用拖放。
+
+**线程安全：** `CursorImageScaler.createSpriteSheet` 使用 CGContext（非 NSGraphicsContext），可安全在非主线程调用。
+
+### 二进制解析安全防护
+
+**WindowsCursorParser.swift 安全验证：**
+- **BMP 宽高上限：** `actualWidth/actualHeight <= CursorImageScaler.maxImportSize (512)`，防止恶意文件声明超大尺寸导致 OOM
+- **ANI chunkSize 验证：** `guard chunkSize > 0`，防止 chunkSize=0 导致无限循环
+- **CUR imageOffset 边界检查：** `guard imageOffset + imageSize <= data.count`，使用安全比较避免整数溢出
+- **拖放 URL scheme 验证：** `guard url.isFileURL`，拒绝非 file:// URL
+
+### 可访问性（Accessibility）
+
+编辑页面已添加 VoiceOver 支持：
+- `AnimatingCursorView` — accessibilityLabel + accessibilityValue（帧数/静态）
+- `HotspotIndicator` — accessibilityLabel + accessibilityValue（X/Y 坐标）
+- `CursorPreviewDropZone` — accessibilityLabel + accessibilityHint + accessibilityValue
+- 工具栏按钮、TextField、AddCursorSheet 列表行 — accessibilityLabel
 
 ## 日志系统
 

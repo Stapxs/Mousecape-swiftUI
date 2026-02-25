@@ -112,6 +112,52 @@ final class CursorLibrary: Identifiable, Hashable {
         cursors.first { $0.identifier == identifier }
     }
 
+    /// 将光标的所有属性同步到同组别名（覆盖已有）
+    func syncCursorToAliases(_ cursor: Cursor) {
+        guard let group = WindowsCursorGroup.group(for: cursor.identifier) else { return }
+        for cursorType in group.cursorTypes where cursorType.rawValue != cursor.identifier {
+            let aliasCursor = cursor.copy(withIdentifier: cursorType.rawValue)
+            // 直接操作底层 ObjC 对象，避免多次缓存失效
+            if let existing = objcLibrary.cursors.first(where: { ($0 as? MCCursor)?.identifier == cursorType.rawValue }) as? MCCursor {
+                objcLibrary.removeCursor(existing)
+            }
+            objcLibrary.addCursor(aliasCursor.underlyingCursor)
+        }
+        _cursors = nil  // 只在最后失效一次
+    }
+
+    /// 只同步元数据到别名（不深拷贝图像），用于 hotspot/fps/frameCount 变化时的快速同步
+    func syncMetadataToAliases(_ cursor: Cursor) {
+        guard let group = WindowsCursorGroup.group(for: cursor.identifier) else { return }
+        for cursorType in group.cursorTypes where cursorType.rawValue != cursor.identifier {
+            let aliasCursor = cursor.copyMetadata(withIdentifier: cursorType.rawValue)
+            // 直接操作底层 ObjC 对象，避免多次缓存失效
+            if let existing = objcLibrary.cursors.first(where: { ($0 as? MCCursor)?.identifier == cursorType.rawValue }) as? MCCursor {
+                objcLibrary.removeCursor(existing)
+            }
+            objcLibrary.addCursor(aliasCursor.underlyingCursor)
+        }
+        _cursors = nil  // 只在最后失效一次
+    }
+
+    /// 删除分组中所有光标（简易模式下删除整个分组用）
+    func removeGroupCursors(for group: WindowsCursorGroup) {
+        for cursorType in group.cursorTypes {
+            if let existing = self.cursor(withIdentifier: cursorType.rawValue) {
+                removeCursor(existing)
+            }
+        }
+    }
+
+    /// 添加光标并自动创建同组别名
+    func addCursorWithAliases(_ cursor: Cursor) {
+        if let existing = self.cursor(withIdentifier: cursor.identifier) {
+            removeCursor(existing)
+        }
+        addCursor(cursor)
+        syncCursorToAliases(cursor)
+    }
+
     // MARK: - Save & Load
 
     func save() throws {

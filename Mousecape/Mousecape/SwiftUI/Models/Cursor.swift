@@ -146,6 +146,40 @@ final class Cursor: Identifiable, Hashable {
         self.init(objcCursor: cursor)
     }
 
+    // MARK: - Copy
+
+    func copy(withIdentifier newIdentifier: String) -> Cursor {
+        let newCursor = Cursor(identifier: newIdentifier)
+        newCursor.frameCount = self.frameCount
+        newCursor.frameDuration = self.frameDuration
+        newCursor.size = self.size
+        newCursor.hotSpot = self.hotSpot
+        for scale in CursorScale.allCases {
+            if let rep = self.representation(for: scale),
+               let repCopy = rep.copy() as? NSImageRep {
+                newCursor.setRepresentation(repCopy, for: scale)
+            }
+        }
+        return newCursor
+    }
+
+    /// 只复制元数据（hotspot、fps、frameCount、size），共享图像引用
+    /// 用于 onChange 时的快速同步，避免不必要的图像深拷贝
+    func copyMetadata(withIdentifier newIdentifier: String) -> Cursor {
+        let newCursor = Cursor(identifier: newIdentifier)
+        newCursor.frameCount = self.frameCount
+        newCursor.frameDuration = self.frameDuration
+        newCursor.size = self.size
+        newCursor.hotSpot = self.hotSpot
+        // 共享图像引用而非深拷贝，因为光标图像设置后不会被修改
+        for scale in CursorScale.allCases {
+            if let rep = self.representation(for: scale) {
+                newCursor.setRepresentation(rep, for: scale)
+            }
+        }
+        return newCursor
+    }
+
     // MARK: - ObjC Bridge
 
     /// Get the underlying ObjC cursor object

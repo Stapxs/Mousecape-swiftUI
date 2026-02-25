@@ -97,11 +97,11 @@ final class AppState: @unchecked Sendable {
 
     // MARK: - Undo/Redo
 
-    /// Undo stack - stores closures to undo changes
-    private var undoStack: [() -> Void] = []
+    /// Undo stack - stores paired closures to undo/redo changes
+    private var undoStack: [(undo: () -> Void, redo: () -> Void)] = []
 
-    /// Redo stack - stores closures to redo changes
-    private var redoStack: [() -> Void] = []
+    /// Redo stack - stores paired closures to undo/redo changes
+    private var redoStack: [(undo: () -> Void, redo: () -> Void)] = []
 
     /// Maximum undo history size
     private let maxUndoHistory = 20
@@ -444,8 +444,8 @@ final class AppState: @unchecked Sendable {
         // Clear redo stack when new action is registered
         redoStack.removeAll()
 
-        // Add to undo stack
-        undoStack.append(undoAction)
+        // Add paired closures to undo stack
+        undoStack.append((undo: undoAction, redo: redoAction))
 
         // Limit stack size
         if undoStack.count > maxUndoHistory {
@@ -457,19 +457,16 @@ final class AppState: @unchecked Sendable {
 
     /// Undo the last change
     func undo() {
-        guard let undoAction = undoStack.popLast() else { return }
-        undoAction()
-
-        // If no more undo actions, check if we're back to saved state
-        if undoStack.isEmpty {
-            hasUnsavedChanges = false
-        }
+        guard let entry = undoStack.popLast() else { return }
+        entry.undo()
+        redoStack.append(entry)
     }
 
     /// Redo the last undone change
     func redo() {
-        guard let redoAction = redoStack.popLast() else { return }
-        redoAction()
+        guard let entry = redoStack.popLast() else { return }
+        entry.redo()
+        undoStack.append(entry)
         hasUnsavedChanges = true
     }
 
@@ -692,10 +689,16 @@ final class AppState: @unchecked Sendable {
     // MARK: - Cursor Actions (Edit Mode)
 
     /// Delete the currently selected cursor
+    /// In simple mode (editMode == 0), deletes the entire cursor group
     func deleteSelectedCursor() {
         guard let cape = editingCape, let cursor = editingSelectedCursor else { return }
-        cape.removeCursor(cursor)
-        editingSelectedCursor = cape.cursors.first
+        let editMode = UserDefaults.standard.integer(forKey: "cursorEditMode")
+        if editMode == 0, let group = WindowsCursorGroup.group(for: cursor.identifier) {
+            cape.removeGroupCursors(for: group)
+        } else {
+            cape.removeCursor(cursor)
+        }
+        editingSelectedCursor = nil
         markAsChanged()
         cursorListRefreshTrigger += 1
         showDeleteCursorConfirmation = false
