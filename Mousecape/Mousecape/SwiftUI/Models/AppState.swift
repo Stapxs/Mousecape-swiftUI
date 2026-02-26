@@ -378,7 +378,7 @@ final class AppState: @unchecked Sendable {
 
         // Save identifier for "Apply Last Cape on Launch" feature
         UserDefaults.standard.set(cape.identifier, forKey: "lastAppliedCapeIdentifier")
-        // Also write MCAppliedCursor for mousecloakhelper (ObjC helper daemon)
+        // Also write MCAppliedCursor for session monitor (ObjC listen.m)
         // Uses CFPreferences to write to current user + current host domain
         CFPreferencesSetValue(
             "MCAppliedCursor" as CFString,
@@ -405,7 +405,7 @@ final class AppState: @unchecked Sendable {
 
         // Clear last applied cape identifier
         UserDefaults.standard.removeObject(forKey: "lastAppliedCapeIdentifier")
-        // Also clear MCAppliedCursor for mousecloakhelper
+        // Also clear MCAppliedCursor for session monitor
         CFPreferencesSetValue(
             "MCAppliedCursor" as CFString,
             nil,

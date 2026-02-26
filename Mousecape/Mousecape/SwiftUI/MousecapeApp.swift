@@ -28,11 +28,16 @@ struct MousecapeApp: App {
         .commands {
             MousecapeCommands()
         }
+
+        MenuBarExtra("Mousecape", image: "MenuBarIcon") {
+            MenuBarContentView()
+                .environment(appState)
+        }
     }
 
     private func configureWindowAppearance() {
         DispatchQueue.main.async {
-            guard let window = NSApp.windows.first else { return }
+            guard let window = NSApp.windows.first(where: { $0.canBecomeMain }) else { return }
 
             // Make titlebar transparent for cleaner look
             window.titlebarAppearsTransparent = true
@@ -70,19 +75,67 @@ struct MousecapeApp: App {
     }
 }
 
+// MARK: - Menu Bar Content
+
+struct MenuBarContentView: View {
+    @Environment(AppState.self) private var appState
+
+    var body: some View {
+        if let cape = appState.appliedCape {
+            Text(String(localized: "Current Cursor: \(cape.name)"))
+        } else {
+            Text(String(localized: "Current Cursor: None"))
+        }
+
+        Divider()
+
+        Button(String(localized: "Open Mousecape")) {
+            AppDelegate.shared?.showMainWindow()
+        }
+
+        Button(String(localized: "Reset Cursors")) {
+            appState.resetToDefault()
+        }
+
+        Button(String(localized: "Settings")) {
+            AppDelegate.shared?.showMainWindow()
+            appState.currentPage = .settings
+        }
+
+        Divider()
+
+        Button(String(localized: "Quit Mousecape")) {
+            NSApp.terminate(nil)
+        }
+    }
+}
+
 // MARK: - App Delegate
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    private var windowDelegate: WindowDelegate?
+    private(set) var windowDelegate: WindowDelegate?
+    @MainActor private weak var mainWindow: NSWindow?
 
     @MainActor
     func setupWindowDelegate(for window: NSWindow, appState: AppState) {
+        mainWindow = window
+        windowDelegate?.stopObserving()
         windowDelegate = WindowDelegate(appState: appState)
         window.delegate = windowDelegate
         windowDelegate?.startObservingDirtyState()
     }
 
+    @MainActor private(set) static var shared: AppDelegate?
+
     func applicationWillFinishLaunching(_ notification: Notification) {
+        AppDelegate.shared = self
+
+        // If launched at login, start hidden (menu bar only)
+        let launchAtLogin = UserDefaults.standard.bool(forKey: "launchAtLogin")
+        if launchAtLogin && NSApp.currentEvent == nil {
+            NSApp.setActivationPolicy(.accessory)
+        }
+
         // Intercept file open events BEFORE SwiftUI creates new windows
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -93,29 +146,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Check and repair Helper asynchronously to avoid blocking UI
-        Task {
-            await checkAndRepairHelper()
-        }
-
-        // Apply last cape on launch if enabled
-        let applyLastCapeOnLaunch = UserDefaults.standard.bool(forKey: "applyLastCapeOnLaunch")
-        // Default to true if never set
-        if UserDefaults.standard.object(forKey: "applyLastCapeOnLaunch") == nil {
-            UserDefaults.standard.set(true, forKey: "applyLastCapeOnLaunch")
-        }
-
-        if applyLastCapeOnLaunch || UserDefaults.standard.object(forKey: "applyLastCapeOnLaunch") == nil {
-            // Get last applied cape identifier from preferences
-            if let lastCapeIdentifier = UserDefaults.standard.string(forKey: "lastAppliedCapeIdentifier") {
-                Task { @MainActor in
-                    let appState = AppState.shared
-                    if let cape = appState.capes.first(where: { $0.identifier == lastCapeIdentifier }) {
-                        appState.applyCape(cape)
-                    }
-                }
-            }
-        }
+        startSessionMonitor()
+        migrateFromOldHelper()
     }
 
     @objc private func handleOpenDocumentEvent(_ event: NSAppleEventDescriptor, withReplyEvent reply: NSAppleEventDescriptor) {
@@ -132,7 +164,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard !capeURLs.isEmpty else { return }
 
-        Task { @MainActor in
+        // Apple Event handler 在主线程执行，直接用 assumeIsolated 同步调用
+        MainActor.assumeIsolated {
+            AppDelegate.shared?.showMainWindow()
             let appState = AppState.shared
             appState.currentPage = .home
             for url in capeURLs {
@@ -141,127 +175,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Check if Helper is in a bad state (error 78) and repair it
-    /// This fixes the issue when app is updated while Helper is still running
-    private func checkAndRepairHelper() async {
-        let helperIdentifier = "com.sdmj76.mousecloakhelper"
-        let service = SMAppService.loginItem(identifier: helperIdentifier)
-
-        // Only check if Helper was previously enabled
-        guard service.status == .enabled else {
-            helperLog("Helper not enabled, skipping health check")
-            return
+    @MainActor
+    func showMainWindow() {
+        NSApp.setActivationPolicy(.regular)
+        // 优先用保存的引用，fallback 到 NSApp.windows 搜索
+        let window = mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain })
+        if let window = window {
+            window.orderFrontRegardless()
+            window.makeKey()
         }
+        NSApp.activate(ignoringOtherApps: true)
+        // Resume timer polling when window is shown
+        windowDelegate?.startObservingDirtyState()
+    }
 
-        helperLog("=== Helper Health Check ===")
-
-        // Check launchd status asynchronously
-        let launchdStatus = await checkHelperLaunchdStatus(helperIdentifier)
-        helperLog("launchd status: \(launchdStatus)")
-
-        // If Helper is running with exit code 78, it needs repair
-        if launchdStatus.contains("exit code: 78") || launchdStatus.contains("Not running") {
-            helperLog("Helper in bad state, attempting repair...")
-
-            // Force cleanup and re-register
-            await forceCleanupHelper(helperIdentifier)
-
-            do {
-                // Unregister first
-                try await service.unregister()
-                helperLog("Unregistered old Helper")
-
-                // Small delay to let launchd settle
-                try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-
-                // Re-register
-                try service.register()
-                helperLog("Re-registered Helper")
-
-                // Verify
-                let newStatus = await checkHelperLaunchdStatus(helperIdentifier)
-                helperLog("After repair - launchd status: \(newStatus)")
-
-                if newStatus.contains("Running") {
-                    helperLog("Helper repair successful!")
-                } else {
-                    helperLog("Helper repair may have failed, status: \(newStatus)")
-                }
-            } catch {
-                helperLog("Helper repair failed: \(error.localizedDescription)")
-            }
-        } else if launchdStatus.contains("Running") {
-            helperLog("Helper is healthy")
-        } else {
-            helperLog("Helper status unknown: \(launchdStatus)")
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            showMainWindow()
         }
-
-        helperLog("=== End Health Check ===")
+        return false
     }
 
-    private func forceCleanupHelper(_ identifier: String) async {
-        let uid = getuid()
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
-        process.arguments = ["bootout", "gui/\(uid)/\(identifier)"]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-
-        try? process.run()
-        process.waitUntilExit()
-        helperLog("launchctl bootout exit code: \(process.terminationStatus)")
-    }
-
-    private func checkHelperLaunchdStatus(_ identifier: String) async -> String {
-        return await withCheckedContinuation { continuation in
-            let process = Process()
-            let pipe = Pipe()
-            process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
-            process.arguments = ["list"]
-            process.standardOutput = pipe
-            process.standardError = FileHandle.nullDevice
-
-            do {
-                try process.run()
-                process.waitUntilExit()
-
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let output = String(data: data, encoding: .utf8) ?? ""
-
-                for line in output.components(separatedBy: "\n") {
-                    if line.contains(identifier) {
-                        let parts = line.split(separator: "\t").map(String.init)
-                        if parts.count >= 3 {
-                            let pid = parts[0]
-                            let exitCode = parts[1]
-                            if pid == "-" {
-                                continuation.resume(returning: "Not running (exit code: \(exitCode))")
-                                return
-                            } else {
-                                continuation.resume(returning: "Running (PID: \(pid), exit code: \(exitCode))")
-                                return
-                            }
-                        }
-                        continuation.resume(returning: line)
-                        return
-                    }
-                }
-                continuation.resume(returning: "Not found in launchctl list")
-            } catch {
-                continuation.resume(returning: "Check failed: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    private func helperLog(_ message: String) {
-        #if DEBUG
-        DebugLogger.shared.log(message, file: "HelperHealthCheck", line: 0)
-        #endif
-    }
-
-    // Quit app when last window is closed
+    // Keep app running when window is closed (menu bar stays active)
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return true
+        return false
     }
 
     // Close ObjC logging system on exit
@@ -269,6 +206,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         #if DEBUG
         MCLoggerClose()
         #endif
+    }
+
+    private func migrateFromOldHelper() {
+        guard !UserDefaults.standard.bool(forKey: "helperMigrated") else { return }
+        UserDefaults.standard.set(true, forKey: "helperMigrated")
+        DispatchQueue.global(qos: .utility).async {
+            let oldService = SMAppService.loginItem(identifier: "com.sdmj76.mousecloakhelper")
+            if oldService.status == .enabled {
+                try? oldService.unregister()
+                // launchctl bootout cleanup
+                let uid = getuid()
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+                process.arguments = ["bootout", "gui/\(uid)/com.sdmj76.mousecloakhelper"]
+                process.standardOutput = FileHandle.nullDevice
+                process.standardError = FileHandle.nullDevice
+                try? process.run()
+                process.waitUntilExit()
+            }
+        }
     }
 }
 
@@ -285,6 +242,8 @@ class WindowDelegate: NSObject, NSWindowDelegate {
     }
 
     func startObservingDirtyState() {
+        // Prevent duplicate timers
+        guard timer == nil else { return }
         // Use a timer to periodically check dirty state
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor in
@@ -293,8 +252,13 @@ class WindowDelegate: NSObject, NSWindowDelegate {
         }
     }
 
+    func stopObserving() {
+        timer?.invalidate()
+        timer = nil
+    }
+
     private func updateDocumentEdited() {
-        guard let window = NSApp.windows.first else { return }
+        guard let window = NSApp.windows.first(where: { $0.canBecomeMain }) else { return }
         // Use manual hasUnsavedChanges instead of ObjC isDirty
         let isDirty = appState.isEditing && appState.hasUnsavedChanges
         if window.isDocumentEdited != isDirty {
@@ -313,7 +277,17 @@ class WindowDelegate: NSObject, NSWindowDelegate {
             }
             return false
         }
-        return true
+
+        // Hide window instead of closing — keeps it alive for menu bar reopen
+        MainActor.assumeIsolated {
+            // Stop timer polling while window is hidden to reduce CPU usage
+            AppDelegate.shared?.windowDelegate?.stopObserving()
+            sender.orderOut(nil)
+            DispatchQueue.main.async {
+                NSApp.setActivationPolicy(.accessory)
+            }
+        }
+        return false
     }
 }
 
@@ -356,7 +330,7 @@ enum ToolbarHider {
 
     @MainActor
     private static func hideToolbarPlatter() {
-        guard let window = NSApp.windows.first else { return }
+        guard let window = NSApp.windows.first(where: { $0.canBecomeMain }) else { return }
         hideToolbarPlatterInView(window.contentView?.superview)
     }
 
@@ -443,7 +417,7 @@ struct AppearanceWrapper<Content: View>: View {
     }
 
     private func updateWindowOpacity(isDark: Bool) {
-        guard let window = NSApp.windows.first else { return }
+        guard let window = NSApp.windows.first(where: { $0.canBecomeMain }) else { return }
 
         if transparentWindow {
             window.isOpaque = false

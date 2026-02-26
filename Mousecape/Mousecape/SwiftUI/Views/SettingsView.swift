@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import ServiceManagement
 
 struct SettingsView: View {
     @State private var selectedCategory: SettingsCategory = .general
@@ -58,9 +59,11 @@ struct SettingsView: View {
 // MARK: - General Settings
 
 struct GeneralSettingsView: View {
-    @AppStorage("applyLastCapeOnLaunch") private var applyLastCapeOnLaunch = true
+    @AppStorage("launchAtLogin") private var launchAtLogin = false
     @AppStorage("doubleClickAction") private var doubleClickAction = 0
     @State private var cursorScale: Double = 1.0
+    @State private var loginToggleError: String?
+    @State private var showLoginError = false
     @Environment(AppState.self) private var appState
 
     /// The key used by ObjC code for cursor scale
@@ -69,11 +72,19 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            // Helper Tool Section (moved from Advanced)
-            HelperToolSettingsView()
-
             Section("Startup") {
-                Toggle("Apply Last Cape on Launch", isOn: $applyLastCapeOnLaunch)
+                Toggle("Launch at Login", isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { _, newValue in
+                        let service = SMAppService.mainApp
+                        do {
+                            if newValue { try service.register() }
+                            else { try service.unregister() }
+                        } catch {
+                            launchAtLogin = !newValue
+                            loginToggleError = error.localizedDescription
+                            showLoginError = true
+                        }
+                    }
             }
 
             Section("Double-click Action") {
@@ -111,6 +122,11 @@ struct GeneralSettingsView: View {
         .navigationTitle("General")
         .onAppear {
             loadCursorScale()
+        }
+        .alert("Login Item Error", isPresented: $showLoginError) {
+            Button("OK") { }
+        } message: {
+            Text(loginToggleError ?? "")
         }
     }
 

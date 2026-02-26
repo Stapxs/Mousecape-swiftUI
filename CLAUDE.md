@@ -7,7 +7,7 @@
 
 ## 项目概述
 
-Mousecape 是一款免费的 macOS 光标管理器，使用私有 CoreGraphics API 来自定义系统光标。它由三个构建目标组成，协同工作以应用和持久化自定义光标主题（"cape"）。
+Mousecape 是一款免费的 macOS 光标管理器，使用私有 CoreGraphics API 来自定义系统光标。它由两个构建目标组成，协同工作以应用和持久化自定义光标主题（"cape"）。
 
 **系统要求：** macOS Sequoia (15.0) 或更高版本
 
@@ -25,20 +25,19 @@ xcodebuild -project Mousecape/Mousecape.xcodeproj -target mousecloak build
 
 ## 架构
 
-### 三个构建目标
+### 两个构建目标
 
 1. **Mousecape**（GUI 应用）- 使用 SwiftUI 界面的主 macOS 应用程序
    - 入口：`Mousecape/SwiftUI/MousecapeApp.swift`
    - 自适应设计：macOS 26+ 使用液态玻璃（Liquid Glass），macOS 15 使用 Material 背景
+   - 菜单栏常驻：通过 `MenuBarExtra` 提供菜单栏图标，关闭窗口后程序不退出
+   - 开机启动：通过 `SMAppService.mainApp` 注册为系统登录项，启动时不弹窗，仅后台运行
+   - 内嵌会话监听：通过 `startSessionMonitor()` 监听用户会话变化和显示器重配置，自动重新应用光标
 
 2. **mousecloak**（CLI 工具）- 用于应用 cape 的命令行工具
    - 入口：`Mousecape/mousecloak/main.m`
    - 命令：`--apply`、`--reset`、`--create`、`--dump`、`--scale`、`--convert`、`--export`、`--listen`
    - 使用 GBCli 进行参数解析
-
-3. **com.sdmj76.mousecloakhelper**（LaunchAgent）- 后台守护进程
-   - 入口：`Mousecape/mousecloakHelper/main.m`
-   - 监听用户会话变化，在登录时重新应用光标
 
 ### 数据流
 
@@ -52,6 +51,9 @@ ObjC 模型 (MCCursor, MCCursorLibrary)
 MCLibraryController
     ↓
 私有 API (mousecloak/apply.m)
+
+会话监听（内嵌于主程序）:
+startSessionMonitor() → UserSpaceChanged / reconfigurationCallback → applyCapeAtPath()
 ```
 
 ### 核心数据模型（Mousecape/Mousecape/src/models/）
@@ -64,7 +66,9 @@ MCLibraryController
 - **CGSInternal/** - 私有 CoreGraphics API 头文件（CGSCursor.h 是关键）
 - **apply.m** - 通过 `CGSRegisterCursorWithImages()` 注册光标
 - **backup.m/restore.m** - 备份和恢复原始系统光标，使用 `MCEnumerateAllCursorIdentifiers()` 遍历所有光标
-- **listen.m** - 辅助守护进程的会话变化监听器
+- **listen.m** - 会话变化监听器，提供两个入口：
+  - `listener()` — 阻塞式，用于 CLI `--listen` 命令，启动独立 RunLoop
+  - `startSessionMonitor()` — 非阻塞式，用于主程序内嵌监听，附加到主 RunLoop
 - **MCDefs.h/m** - 共享常量（`MCMaxFrameCount`、`MCMaxImportSize`、`MCMaxHotspotValue`）和工具函数
 
 **Nullability：** 所有 ObjC 头文件均已添加 `NS_ASSUME_NONNULL_BEGIN/END` 注解，Swift 桥接时无需多余的 Optional 处理。
@@ -83,7 +87,7 @@ CGSCopyRegisteredCursorImages() // 读取当前光标数据
 
 ```
 SwiftUI/
-├── MousecapeApp.swift（入口）
+├── MousecapeApp.swift（入口、MenuBarExtra 菜单栏、AppDelegate 登录启动检测与旧 Helper 迁移、窗口生命周期管理）
 ├── Models/
 │   ├── AppState.swift（@Observable 状态管理）
 │   ├── AppState+WindowsImport.swift（Windows 光标文件夹导入）
@@ -97,7 +101,6 @@ SwiftUI/
 │   ├── EditOverlayView.swift（编辑时的叠层）
 │   ├── CapeInfoView.swift（Cape 元数据编辑器）
 │   ├── AddCursorSheet.swift（添加光标类型弹窗）
-│   ├── HelperToolSettingsView.swift（辅助工具安装管理）
 │   ├── CapePreviewPanel.swift
 │   └── MousecapeCommands.swift（菜单命令）
 ├── Utilities/
@@ -118,6 +121,17 @@ SwiftUI/
 - ObjC 侧对应：`MCMaxFrameCount`、`MCMaxImportSize`（定义在 MCDefs.h/m）
 
 状态管理通过 `@Observable @MainActor AppState` 单例实现，带有手动撤销/重做栈（配对闭包）。
+
+### 窗口生命周期管理
+
+**Activation Policy 切换模式：** 应用在 `.regular`（有 Dock 图标）和 `.accessory`（仅菜单栏）之间切换。
+
+**关键设计：**
+- **关闭窗口：** `windowShouldClose` 返回 `false`，用 `orderOut(nil)` 隐藏窗口而非销毁，保持 SwiftUI 视图树完整。`setActivationPolicy(.accessory)` 延迟到下一个 RunLoop 周期执行（`DispatchQueue.main.async`），等待窗口完全隐藏后再切换
+- **显示窗口：** `showMainWindow()` 使用 `orderFrontRegardless()` + `makeKey()` 强制显示窗口，不受 activation policy 切换时序限制
+- **主窗口引用：** `AppDelegate.mainWindow`（weak）在 `setupWindowDelegate` 时保存，避免每次通过 `NSApp.windows` 查找。查找时有 fallback：`mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain })`
+- **文件打开事件：** `handleOpenDocumentEvent` 使用 `MainActor.assumeIsolated` 同步执行（Apple Event handler 在主线程），避免 `Task` 异步延迟导致窗口显示失败
+- **WindowDelegate timer：** `setupWindowDelegate` 调用前先 `stopObserving()` 清理旧 timer，防止重复调用时 timer 泄漏
 
 ### 编辑模式：简易模式 / 高级模式
 
@@ -314,7 +328,7 @@ private func downsampleFrames(_ frames: [NSImage], targetCount: Int) -> [NSImage
 - `com.apple.coregraphics.Arrow`
 - `com.apple.coregraphics.ArrowCtx`
 
-IBeam（文本光标）也有替代名称。守护进程会处理这些变体。
+IBeam（文本光标）也有替代名称。主程序的内嵌会话监听器会处理这些变体。
 
 ## 光标验证与限制
 
@@ -555,10 +569,6 @@ DebugLogger.clearAllLogs()         // 清除所有日志
    - `Mousecape/Mousecape/Mousecape-Info.plist`
    - `CFBundleShortVersionString` 已设为 `$(MARKETING_VERSION)`，自动引用 Xcode 配置
 
-3. **守护进程 Info.plist**
-   - `Mousecape/mousecloakHelper/Info.plist`
-   - `CFBundleShortVersionString` 需手动修改
-
-4. **设置页面 fallback 版本号**
+3. **设置页面 fallback 版本号**
    - `Mousecape/Mousecape/SwiftUI/Views/SettingsView.swift`
    - 搜索 `Mousecape v`，修改 else 分支中的备用版本号

@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * _Nullable appliedCapePathForUser(NSString *user);
 extern void listener(void);
+extern void startSessionMonitor(void);
 
 NS_ASSUME_NONNULL_END
 

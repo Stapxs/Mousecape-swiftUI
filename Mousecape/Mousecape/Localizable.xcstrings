@@ -511,26 +511,6 @@
         }
       }
     },
-    "Apply Last Cape on Launch" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "启动时应用上次的Cape"
-          }
-        }
-      }
-    },
-    "Approval Required" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "需要批准"
-          }
-        }
-      }
-    },
     "Are you sure you want to delete" : {
       "localizations" : {
         "zh-Hans" : {
@@ -755,6 +735,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "创建新的Cape或导入现有Cape以开始使用。"
+          }
+        }
+      }
+    },
+    "Current Cursor: %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前光标：%@"
+          }
+        }
+      }
+    },
+    "Current Cursor: None" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前光标：无"
           }
         }
       }
@@ -1447,26 +1447,6 @@
         }
       }
     },
-    "Helper registered but may not be running. Please restart the app or reinstall the helper." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "辅助程序已注册但可能未运行。请重启应用或重新安装辅助程序。"
-          }
-        }
-      }
-    },
-    "Helper Tool" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "辅助工具"
-          }
-        }
-      }
-    },
     "Horizontal Resize" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1698,22 +1678,12 @@
         }
       }
     },
-    "Install" : {
+    "Launch at Login" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "安装"
-          }
-        }
-      }
-    },
-    "Installed and running" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已安装并运行"
+            "value" : "开机启动"
           }
         }
       }
@@ -1790,6 +1760,16 @@
         }
       }
     },
+    "Login Item Error" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录项错误"
+          }
+        }
+      }
+    },
     "Logs are automatically deleted after 24 hours. Logs contain debug information for troubleshooting cursor issues." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1811,6 +1791,9 @@
         }
       }
     },
+    "Mousecape" : {
+      "shouldTranslate" : false
+    },
     "Mousecape Dump" : {
       "comment" : "Mousecape dump cursor file name",
       "localizations" : {
@@ -1822,16 +1805,6 @@
         }
       },
       "shouldTranslate" : false
-    },
-    "Mousecape Helper" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mousecape 辅助程序"
-          }
-        }
-      }
     },
     "Mousecape v%@ (%@)" : {
       "localizations" : {
@@ -1949,22 +1922,23 @@
         }
       }
     },
+    "None" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无"
+          }
+        }
+      }
+    },
     "Normal Select" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "正常选择"
-          }
-        }
-      }
-    },
-    "Not installed" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未安装"
           }
         }
       }
@@ -1979,16 +1953,6 @@
         }
       }
     },
-    "Once installed, the helper tool will automatically apply cursors at system startup without manually applying them." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "安装后，辅助工具将在系统启动时自动应用光标，无需手动操作。"
-          }
-        }
-      }
-    },
     "Open Log Folder" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1996,6 +1960,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开日志文件夹"
+          }
+        }
+      }
+    },
+    "Open Mousecape" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 Mousecape"
           }
         }
       }
@@ -2016,16 +1990,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "覆盖别名光标？"
-          }
-        }
-      }
-    },
-    "Please approve Mousecape in System Settings > General > Login Items to enable the helper." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请在系统设置 > 通用 > 登录项中批准 Mousecape 以启用辅助程序。"
           }
         }
       }
@@ -2056,6 +2020,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "预览面板"
+          }
+        }
+      }
+    },
+    "Quit Mousecape" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 Mousecape"
           }
         }
       }
@@ -2096,6 +2070,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置"
+          }
+        }
+      }
+    },
+    "Reset Cursors" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置光标"
           }
         }
       }
@@ -2396,26 +2380,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "目标路径 %@ 不可写入。"
-          }
-        }
-      }
-    },
-    "The Mousecape helper was successfully installed." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mousecape辅助程序已成功安装。"
-          }
-        }
-      }
-    },
-    "The Mousecape helper was successfully uninstalled." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mousecape辅助程序已成功卸载。"
           }
         }
       }
@@ -2795,16 +2759,6 @@
         }
       }
     },
-    "Uninstall" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "卸载"
-          }
-        }
-      }
-    },
     "Unsaved Changes" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3006,16 +2960,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "垂直调整大小"
-          }
-        }
-      }
-    },
-    "Warning" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "警告"
           }
         }
       }

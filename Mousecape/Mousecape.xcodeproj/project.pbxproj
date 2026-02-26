@@ -29,28 +29,29 @@
 		DE6B14B42F0512EE00742257 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
 		DEAB0D642F39ADB000DB9EB0 /* CursorImageScaler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */; };
 		DEBC96002F16577D004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
-		DEBC96012F16577D004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
+
 		DEBC96032F1657A4004E6C07 /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC96022F1657A4004E6C07 /* DebugLogger.swift */; };
 		DEBC96042F165800004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
 		DED4B7D62F39BD5800CAFCCE /* CapeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */; };
-		DED4B7D72F39BD5800CAFCCE /* HelperToolSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7D52F39BD5800CAFCCE /* HelperToolSettingsView.swift */; };
+
 		DED4B7D82F39BD5800CAFCCE /* AddCursorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */; };
 		DED4B7DC2F39C14F00CAFCCE /* AppState+WindowsImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7DB2F39C14F00CAFCCE /* AppState+WindowsImport.swift */; };
 		FA000001UTITYPES00000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA000001UTITYPES00000000 /* UniformTypeIdentifiers.framework */; };
-		FA1DC01919527A73009E879C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA359844189DBA3800288163 /* SystemConfiguration.framework */; };
-		FA1DC01A19527A79009E879C /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA254779189D85890038E1D9 /* ApplicationServices.framework */; };
+
 		FA35983F189DA3BC00288163 /* MCPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35983E189DA3BC00288163 /* MCPrefs.m */; };
 		FA359840189DA3C100288163 /* MCPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35983E189DA3BC00288163 /* MCPrefs.m */; };
 		FA359849189DC40100288163 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA359848189DC40100288163 /* Security.framework */; };
 		FA35984D189DC55A00288163 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA35984C189DC55A00288163 /* ServiceManagement.framework */; };
+		DE4A92B52F4F8C0000288163 /* listen.m in Sources */ = {isa = PBXBuildFile; fileRef = FA359851189E035900288163 /* listen.m */; };
 		FA359852189E035900288163 /* listen.m in Sources */ = {isa = PBXBuildFile; fileRef = FA359851189E035900288163 /* listen.m */; };
+		DE4A92B62F4F8C0100288163 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA359844189DBA3800288163 /* SystemConfiguration.framework */; };
 		FA359853189E040D00288163 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA359844189DBA3800288163 /* SystemConfiguration.framework */; };
 		FA7582B8193D377300CE223C /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA7582B7193D377300CE223C /* ApplicationServices.framework */; };
 		FA8FF76B189D664400750E51 /* restore.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76A189D664400750E51 /* restore.m */; };
 		FA8FF76E189D66CB00750E51 /* backup.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76D189D66CB00750E51 /* backup.m */; };
 		FA8FF771189D66D800750E51 /* apply.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF770189D66D800750E51 /* apply.m */; };
 		FA8FF774189D67B100750E51 /* create.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF773189D67B100750E51 /* create.m */; };
-		FA9A48AB2353C6EF009CF05E /* NSBitmapImageRep+ColorSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = FABA44D321D9D7D0009B10D9 /* NSBitmapImageRep+ColorSpace.m */; };
+
 		FAAEF8F7189EB34700145DF8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAAEF8F6189EB34700145DF8 /* QuartzCore.framework */; };
 		FAAEF94E189EFC9300145DF8 /* create.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF773189D67B100750E51 /* create.m */; };
 		FAAEF94F189EFC9600145DF8 /* backup.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76D189D66CB00750E51 /* backup.m */; };
@@ -69,16 +70,14 @@
 		FAC69FDA189D632B00BC829D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC69F64189D603C00BC829D /* Cocoa.framework */; };
 		FAC69FDC189D636700BC829D /* MCDefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FDB189D636700BC829D /* MCDefs.m */; };
 		FAC69FDD189D636700BC829D /* MCDefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FDB189D636700BC829D /* MCDefs.m */; };
-		FAE5D56C1952700B007620DE /* MCDefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FDB189D636700BC829D /* MCDefs.m */; };
-		FAE5D56D1952700B007620DE /* MCPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35983E189DA3BC00288163 /* MCPrefs.m */; };
-		FAE5D5701952700B007620DE /* apply.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF770189D66D800750E51 /* apply.m */; };
-		FAE5D5721952700B007620DE /* listen.m in Sources */ = {isa = PBXBuildFile; fileRef = FA359851189E035900288163 /* listen.m */; };
-		FAE5D57619527245007620DE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FAE5D57519527245007620DE /* main.m */; };
-		FAE5D578195272DD007620DE /* scale.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAEF956189F4ED300145DF8 /* scale.m */; };
-		FAE5D57B195272F7007620DE /* backup.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76D189D66CB00750E51 /* backup.m */; };
-		FAE5D57C195272FE007620DE /* restore.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76A189D664400750E51 /* restore.m */; };
+
+
+
+
+
+
 		FAE5D57E19527359007620DE /* mousecloak in Copy Tool */ = {isa = PBXBuildFile; fileRef = FAC69FAD189D608900BC829D /* mousecloak */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		FAE5D580195273B5007620DE /* com.sdmj76.mousecloakhelper.app in Copy Helper */ = {isa = PBXBuildFile; fileRef = FAE5D54919526F82007620DE /* com.sdmj76.mousecloakhelper.app */; };
+
 		FAEE652F18A047E8003AA182 /* MCLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE651718A047E8003AA182 /* MCLibraryController.m */; };
 		FAEE653218A047E8003AA182 /* MCCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE651E18A047E8003AA182 /* MCCursor.m */; };
 		FAEE653318A047E8003AA182 /* MCCursorLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE652018A047E8003AA182 /* MCCursorLibrary.m */; };
@@ -115,17 +114,6 @@
 			name = "Copy Tool";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FAE5D57F1952737F007620DE /* Copy Helper */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
-			files = (
-				FAE5D580195273B5007620DE /* com.sdmj76.mousecloakhelper.app in Copy Helper */,
-			);
-			name = "Copy Helper";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -155,7 +143,7 @@
 		DEBC96022F1657A4004E6C07 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCursorSheet.swift; sourceTree = "<group>"; };
 		DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapeInfoView.swift; sourceTree = "<group>"; };
-		DED4B7D52F39BD5800CAFCCE /* HelperToolSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolSettingsView.swift; sourceTree = "<group>"; };
+
 		DED4B7DB2F39C14F00CAFCCE /* AppState+WindowsImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+WindowsImport.swift"; sourceTree = "<group>"; };
 		FA000001UTITYPES00000000 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		FA1DC01719527A56009E879C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -220,9 +208,8 @@
 		FAC69FD3189D609B00BC829D /* GBSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSettings.m; sourceTree = "<group>"; };
 		FAC69FD7189D623C00BC829D /* Mousecape-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Mousecape-Prefix.pch"; sourceTree = "<group>"; };
 		FAC69FDB189D636700BC829D /* MCDefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MCDefs.m; sourceTree = "<group>"; };
-		FAE5D54919526F82007620DE /* com.sdmj76.mousecloakhelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = com.sdmj76.mousecloakhelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FAE5D54C19526F82007620DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FAE5D57519527245007620DE /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+
+
 		FAEE651618A047E8003AA182 /* MCLibraryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MCLibraryController.h; sourceTree = "<group>"; };
 		FAEE651718A047E8003AA182 /* MCLibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MCLibraryController.m; sourceTree = "<group>"; };
 		FAEE651D18A047E8003AA182 /* MCCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MCCursor.h; sourceTree = "<group>"; };
@@ -240,6 +227,7 @@
 				FA35984D189DC55A00288163 /* ServiceManagement.framework in Frameworks */,
 				FA000001UTITYPES00000001 /* UniformTypeIdentifiers.framework in Frameworks */,
 				FA359849189DC40100288163 /* Security.framework in Frameworks */,
+				DE4A92B62F4F8C0100288163 /* SystemConfiguration.framework in Frameworks */,
 				FAC69F65189D603C00BC829D /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,15 +239,6 @@
 				FA7582B8193D377300CE223C /* ApplicationServices.framework in Frameworks */,
 				FA359853189E040D00288163 /* SystemConfiguration.framework in Frameworks */,
 				FAC69FDA189D632B00BC829D /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FAE5D54619526F82007620DE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FA1DC01A19527A79009E879C /* ApplicationServices.framework in Frameworks */,
-				FA1DC01919527A73009E879C /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,7 +271,6 @@
 			children = (
 				DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */,
 				DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */,
-				DED4B7D52F39BD5800CAFCCE /* HelperToolSettingsView.swift */,
 				DE3661F12EFAAAB600D94521 /* CapeContextMenu.swift */,
 				DE3661F22EFAAAB600D94521 /* CapePreviewPanel.swift */,
 				DE3661F32EFAAAB600D94521 /* EditOverlayView.swift */,
@@ -335,7 +313,6 @@
 			children = (
 				FAC69F6A189D603C00BC829D /* Mousecape */,
 				FAC69FAF189D608900BC829D /* mousecloak */,
-				FAE5D54A19526F82007620DE /* mousecloakHelper */,
 				FAC69F63189D603C00BC829D /* Frameworks */,
 				FAC69F62189D603C00BC829D /* Products */,
 			);
@@ -346,7 +323,6 @@
 			children = (
 				FAC69F61189D603C00BC829D /* Mousecape.app */,
 				FAC69FAD189D608900BC829D /* mousecloak */,
-				FAE5D54919526F82007620DE /* com.sdmj76.mousecloakhelper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -487,23 +463,6 @@
 			path = GBCli;
 			sourceTree = "<group>";
 		};
-		FAE5D54A19526F82007620DE /* mousecloakHelper */ = {
-			isa = PBXGroup;
-			children = (
-				FAE5D54B19526F82007620DE /* Supporting Files */,
-				FAE5D57519527245007620DE /* main.m */,
-			);
-			path = mousecloakHelper;
-			sourceTree = "<group>";
-		};
-		FAE5D54B19526F82007620DE /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				FAE5D54C19526F82007620DE /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		FAEE650D18A047E8003AA182 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -537,7 +496,6 @@
 				FAC69F5F189D603C00BC829D /* Resources */,
 				FAC69F5E189D603C00BC829D /* Frameworks */,
 				FAE5D57D1952734F007620DE /* Copy Tool */,
-				FAE5D57F1952737F007620DE /* Copy Helper */,
 			);
 			buildRules = (
 			);
@@ -566,23 +524,6 @@
 			productReference = FAC69FAD189D608900BC829D /* mousecloak */;
 			productType = "com.apple.product-type.tool";
 		};
-		FAE5D54819526F82007620DE /* com.sdmj76.mousecloakhelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FAE5D56719526F82007620DE /* Build configuration list for PBXNativeTarget "com.sdmj76.mousecloakhelper" */;
-			buildPhases = (
-				FAE5D54519526F82007620DE /* Sources */,
-				FAE5D54619526F82007620DE /* Frameworks */,
-				FAE5D54719526F82007620DE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = com.sdmj76.mousecloakhelper;
-			productName = mousecloakHelper;
-			productReference = FAE5D54919526F82007620DE /* com.sdmj76.mousecloakhelper.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -599,9 +540,6 @@
 					};
 					FAC69FAC189D608900BC829D = {
 						ProvisioningStyle = Automatic;
-					};
-					FAE5D54819526F82007620DE = {
-						CreatedOnToolsVersion = 6.0;
 					};
 				};
 			};
@@ -620,7 +558,6 @@
 			targets = (
 				FAC69F60189D603C00BC829D /* Mousecape */,
 				FAC69FAC189D608900BC829D /* mousecloak */,
-				FAE5D54819526F82007620DE /* com.sdmj76.mousecloakhelper */,
 			);
 		};
 /* End PBXProject section */
@@ -632,13 +569,6 @@
 			files = (
 				FAC69F7D189D603C00BC829D /* Images.xcassets in Resources */,
 				DE53D4032F3B398800011C1F /* Localizable.xcstrings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FAE5D54719526F82007620DE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -655,7 +585,6 @@
 				FAAEF94E189EFC9300145DF8 /* create.m in Sources */,
 				DEAB0D642F39ADB000DB9EB0 /* CursorImageScaler.swift in Sources */,
 				DED4B7D62F39BD5800CAFCCE /* CapeInfoView.swift in Sources */,
-				DED4B7D72F39BD5800CAFCCE /* HelperToolSettingsView.swift in Sources */,
 				DED4B7D82F39BD5800CAFCCE /* AddCursorSheet.swift in Sources */,
 				FAAEF94F189EFC9600145DF8 /* backup.m in Sources */,
 				FAAEF951189F0CC300145DF8 /* restore.m in Sources */,
@@ -686,6 +615,7 @@
 				FAC69FDC189D636700BC829D /* MCDefs.m in Sources */,
 				DEBC96042F165800004E6C07 /* MCLogger.m in Sources */,
 				FA359840189DA3C100288163 /* MCPrefs.m in Sources */,
+				DE4A92B52F4F8C0000288163 /* listen.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,23 +637,6 @@
 				DEBC96002F16577D004E6C07 /* MCLogger.m in Sources */,
 				FA8FF774189D67B100750E51 /* create.m in Sources */,
 				FABA44D421D9D7D0009B10D9 /* NSBitmapImageRep+ColorSpace.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FAE5D54519526F82007620DE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FAE5D57C195272FE007620DE /* restore.m in Sources */,
-				FAE5D57B195272F7007620DE /* backup.m in Sources */,
-				FAE5D57619527245007620DE /* main.m in Sources */,
-				FAE5D56C1952700B007620DE /* MCDefs.m in Sources */,
-				FAE5D56D1952700B007620DE /* MCPrefs.m in Sources */,
-				FAE5D5701952700B007620DE /* apply.m in Sources */,
-				FAE5D5721952700B007620DE /* listen.m in Sources */,
-				DEBC96012F16577D004E6C07 /* MCLogger.m in Sources */,
-				FAE5D578195272DD007620DE /* scale.m in Sources */,
-				FA9A48AB2353C6EF009CF05E /* NSBitmapImageRep+ColorSpace.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -975,94 +888,6 @@
 			};
 			name = Release;
 		};
-		FAE5D56319526F82007620DE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = mousecloakHelper/mousecloakHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "mousecloak/mousecloak-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Applications/Xcode6-Beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-					"$(PROJECT_DIR)/mousecloak/vendor",
-				);
-				INFOPLIST_FILE = mousecloakHelper/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				METAL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.mousecloakhelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = YES;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		FAE5D56419526F82007620DE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = mousecloakHelper/mousecloakHelper.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "mousecloak/mousecloak-Prefix.pch";
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Applications/Xcode6-Beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-					"$(PROJECT_DIR)/mousecloak/vendor",
-				);
-				INFOPLIST_FILE = mousecloakHelper/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				METAL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.mousecloakhelper;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = YES;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1089,15 +914,6 @@
 			buildConfigurations = (
 				FAC69FB7189D608A00BC829D /* Debug */,
 				FAC69FB8189D608A00BC829D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		FAE5D56719526F82007620DE /* Build configuration list for PBXNativeTarget "com.sdmj76.mousecloakhelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FAE5D56319526F82007620DE /* Debug */,
-				FAE5D56419526F82007620DE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

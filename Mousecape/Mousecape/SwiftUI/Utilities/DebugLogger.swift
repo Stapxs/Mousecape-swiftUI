@@ -81,7 +81,7 @@ final class DebugLogger: @unchecked Sendable {
         // Log user preferences
         log("--- User Preferences ---")
         let defaults = UserDefaults.standard
-        log("  applyLastCapeOnLaunch: \(defaults.bool(forKey: "applyLastCapeOnLaunch"))")
+        log("  launchAtLogin: \(defaults.bool(forKey: "launchAtLogin"))")
         log("  doubleClickAction: \(defaults.integer(forKey: "doubleClickAction"))")
         log("  language: \(defaults.string(forKey: "appLanguage") ?? "system")")
         log("  transparentBackground: \(defaults.bool(forKey: "transparentBackground"))")
