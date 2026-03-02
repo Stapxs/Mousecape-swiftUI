@@ -8,6 +8,8 @@
 
 #import "MCCursor.h"
 #import "NSBitmapImageRep+ColorSpace.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import <ImageIO/ImageIO.h>
 static MCCursorScale cursorScaleForScale(CGFloat scale) {
     if (scale < 0.0)
         return MCCursorScaleNone;
@@ -88,7 +90,8 @@ static MCCursorScale cursorScaleForScale(CGFloat scale) {
             self.size          = NSMakeSize(pointsWide.doubleValue, pointsHigh.doubleValue);
 
             for (NSData *data in reps) {
-                // data in v2.0 documents are saved as PNGs
+                // NSBitmapImageRep automatically detects format (PNG/TIFF/HEIF/etc)
+                // v2.0+ documents are saved as HEIF (lossless), but can read any format
                 NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithData:data];
                 rep.size = NSMakeSize(self.size.width, self.size.height * self.frameCount);
 
@@ -110,15 +113,32 @@ static MCCursorScale cursorScaleForScale(CGFloat scale) {
     drep[MCCursorDictionaryHotSpotYKey]      = @(self.hotSpot.y);
     drep[MCCursorDictionaryPointsWideKey]    = @(self.size.width);
     drep[MCCursorDictionaryPointsHighKey]    = @(self.size.height);
-    
-    NSMutableArray *pngs = [NSMutableArray array];
+
+    NSMutableArray *imageData = [NSMutableArray array];
     for (NSString *key in self.representations) {
         NSBitmapImageRep *rep = self.representations[key];
-        pngs[pngs.count] = [rep.ensuredSRGBSpace TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];
+        CGImageRef cgImage = rep.ensuredSRGBSpace.CGImage;
+
+        // Use CGImageDestination for HEIF encoding with lossless compression
+        NSMutableData *data = [NSMutableData data];
+        CGImageDestinationRef destination = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,
+                                                                              (__bridge CFStringRef)UTTypeHEIC.identifier,
+                                                                              1,
+                                                                              NULL);
+        if (destination) {
+            NSDictionary *options = @{
+                (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @1.0
+            };
+            CGImageDestinationAddImage(destination, cgImage, (__bridge CFDictionaryRef)options);
+            if (CGImageDestinationFinalize(destination)) {
+                imageData[imageData.count] = data;
+            }
+            CFRelease(destination);
+        }
     }
-    
-    drep[MCCursorDictionaryRepresentationsKey] = pngs;
-    
+
+    drep[MCCursorDictionaryRepresentationsKey] = imageData;
+
     return drep;
 }
 

@@ -257,14 +257,15 @@ MCCursor / MCCursorLibrary（ObjC 模型层）← 保留
 Cape 是二进制 plist 文件（`.cape` 扩展名），包含：
 - 元数据：名称、作者、标识符、版本、hiDPI 标志
 - 按标识符索引的光标字典（例如 `com.apple.coregraphics.Arrow`）
-- 每个光标包含 100x、200x、500x、1000x 缩放比例的 TIFF 数据表示（使用 LZW 压缩）
+- 每个光标包含 100x、200x、500x、1000x 缩放比例的 HEIF 数据表示（无损压缩，quality = 1.0）
 
 **Cape 库位置：** `~/Library/Application Support/Mousecape/capes/`
 
 **序列化实现：**
 - Swift 层：`Cursor.swift` 和 `CursorLibrary.swift` 提供 `toDictionary()` 和 `init(dictionary:)` 方法
 - 使用 NSDictionary 序列化（不使用 Codable），确保与旧版本 cape 文件完全兼容
-- 图像数据使用 TIFF + LZW 压缩格式存储，保持文件大小合理
+- 图像数据使用 HEIF 无损压缩格式存储（compressionFactor = 1.0），文件大小比 TIFF 小约 60%
+- 读取时通过 `NSBitmapImageRep(data:)` 自动检测格式，兼容旧版 PNG/TIFF cape 文件
 
 ## Windows 光标转换
 

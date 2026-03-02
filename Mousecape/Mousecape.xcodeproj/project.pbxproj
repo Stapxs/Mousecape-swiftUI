@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 86D2A987242A45FBB21AE949 /* ArgumentParser */; };
 		9CB312EE7052700D9F29C682 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B757C0780EA0A10BF1469 /* main.swift */; };
 		DE3661FD2EFAAAB600D94521 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3661F52EFAAAB600D94521 /* MainView.swift */; };
 		DE3661FE2EFAAAB600D94521 /* EditOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3661F32EFAAAB600D94521 /* EditOverlayView.swift */; };
@@ -60,9 +61,6 @@
 		FABA44D521D9D947009B10D9 /* NSBitmapImageRep+ColorSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = FABA44D321D9D7D0009B10D9 /* NSBitmapImageRep+ColorSpace.m */; };
 		FAC69F65189D603C00BC829D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC69F64189D603C00BC829D /* Cocoa.framework */; };
 		FAC69F7D189D603C00BC829D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAC69F7C189D603C00BC829D /* Images.xcassets */; };
-		FAC69FD4189D609B00BC829D /* GBCommandLineParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FCF189D609B00BC829D /* GBCommandLineParser.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
-		FAC69FD5189D609B00BC829D /* GBOptionsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FD1189D609B00BC829D /* GBOptionsHelper.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
-		FAC69FD6189D609B00BC829D /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FD3189D609B00BC829D /* GBSettings.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		FAC69FDA189D632B00BC829D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC69F64189D603C00BC829D /* Cocoa.framework */; };
 		FAC69FDC189D636700BC829D /* MCDefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FDB189D636700BC829D /* MCDefs.m */; };
 		FAC69FDD189D636700BC829D /* MCDefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FAC69FDB189D636700BC829D /* MCDefs.m */; };
@@ -70,7 +68,6 @@
 		FAEE652F18A047E8003AA182 /* MCLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE651718A047E8003AA182 /* MCLibraryController.m */; };
 		FAEE653218A047E8003AA182 /* MCCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE651E18A047E8003AA182 /* MCCursor.m */; };
 		FAEE653318A047E8003AA182 /* MCCursorLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = FAEE652018A047E8003AA182 /* MCCursorLibrary.m */; };
-		1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 86D2A987242A45FBB21AE949 /* ArgumentParser */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,8 +104,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7A5B757C0780EA0A10BF1469 /* main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = main.swift; path = main.swift; sourceTree = "<group>"; };
-		CF122E4B298E5744EE9F0578 /* mousecloak-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "mousecloak-Bridging-Header.h"; path = "mousecloak-Bridging-Header.h"; sourceTree = "<group>"; };
+		7A5B757C0780EA0A10BF1469 /* main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		CF122E4B298E5744EE9F0578 /* mousecloak-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "mousecloak-Bridging-Header.h"; sourceTree = "<group>"; };
 		DE3661E82EFAAAB600D94521 /* AnimatingCursorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatingCursorView.swift; sourceTree = "<group>"; };
 		DE3661E92EFAAAB600D94521 /* GlassEffectContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassEffectContainer.swift; sourceTree = "<group>"; };
 		DE3661EB2EFAAAB600D94521 /* AppEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnums.swift; sourceTree = "<group>"; };
@@ -199,25 +196,6 @@
 		FAEE651F18A047E8003AA182 /* MCCursorLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MCCursorLibrary.h; sourceTree = "<group>"; };
 		FAEE652018A047E8003AA182 /* MCCursorLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MCCursorLibrary.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-/* Begin XCRemoteSwiftPackageReference section */
-		F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-argument-parser";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-/* Begin XCSwiftPackageProductDependency section */
-		86D2A987242A45FBB21AE949 /* ArgumentParser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
-			productName = ArgumentParser;
-		};
-/* End XCSwiftPackageProductDependency section */
-
-
 
 /* Begin PBXFrameworksBuildPhase section */
 		FAC69F5E189D603C00BC829D /* Frameworks */ = {
@@ -240,8 +218,8 @@
 				FA7582B8193D377300CE223C /* ApplicationServices.framework in Frameworks */,
 				FA359853189E040D00288163 /* SystemConfiguration.framework in Frameworks */,
 				FAC69FDA189D632B00BC829D /* Cocoa.framework in Frameworks */,
-			
-				1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */,);
+				1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -387,7 +365,6 @@
 				DEBC95FE2F16577D004E6C07 /* MCLogger.h */,
 				DEBC95FF2F16577D004E6C07 /* MCLogger.m */,
 				FAC69FB9189D609B00BC829D /* CGSInternal */,
-				FAC69FCC189D609B00BC829D /* vendor */,
 				FAC69FCA189D609B00BC829D /* MCDefs.h */,
 				FAC69FDB189D636700BC829D /* MCDefs.m */,
 				FA35983D189DA3BC00288163 /* MCPrefs.h */,
@@ -443,23 +420,6 @@
 				FAC69FC9189D609B00BC829D /* CGSWorkspace.h */,
 			);
 			path = CGSInternal;
-			sourceTree = "<group>";
-		};
-		FAC69FCC189D609B00BC829D /* vendor */ = {
-			isa = PBXGroup;
-			children = (
-				FAC69FCD189D609B00BC829D /* GBCli */,
-			);
-			path = vendor;
-			sourceTree = "<group>";
-		};
-		FAC69FCD189D609B00BC829D /* GBCli */ = {
-			isa = PBXGroup;
-			children = (
-				FAC69FCE189D609B00BC829D /* GBCommandLineParser.h */,
-				FAC69FCF189D609B00BC829D /* GBCommandLineParser.m */,
-			);
-			path = GBCli;
 			sourceTree = "<group>";
 		};
 		FAEE650D18A047E8003AA182 /* controllers */ = {
@@ -519,13 +479,12 @@
 			dependencies = (
 			);
 			name = mousecloak;
-			productName = mousecloak;
-			productReference = FAC69FAD189D608900BC829D /* mousecloak */;
-			productType = "com.apple.product-type.tool";
 			packageProductDependencies = (
 				86D2A987242A45FBB21AE949 /* ArgumentParser */,
 			);
-
+			productName = mousecloak;
+			productReference = FAC69FAD189D608900BC829D /* mousecloak */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -555,6 +514,9 @@
 				"zh-Hans",
 			);
 			mainGroup = FAC69F58189D603C00BC829D;
+			packageReferences = (
+				F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+			);
 			productRefGroup = FAC69F62189D603C00BC829D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -562,10 +524,6 @@
 				FAC69F60189D603C00BC829D /* Mousecape */,
 				FAC69FAC189D608900BC829D /* mousecloak */,
 			);
-			packageReferences = (
-				F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-			);
-
 		};
 /* End PBXProject section */
 
@@ -929,6 +887,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		86D2A987242A45FBB21AE949 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F57CF9778ACF426B973D8948 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FAC69F59189D603C00BC829D /* Project object */;
 }

@@ -7,6 +7,8 @@
 
 import Foundation
 import AppKit
+import UniformTypeIdentifiers
+import ImageIO
 
 /// Swift wrapper around MCCursor for SwiftUI usage
 @Observable
@@ -258,16 +260,26 @@ final class Cursor: Identifiable, Hashable {
         dict["PointsWide"] = NSNumber(value: size.width)
         dict["PointsHigh"] = NSNumber(value: size.height)
 
-        // Convert all representations to TIFF data (LZW compression)
-        var tiffData: [Data] = []
+        // Convert all representations to HEIF data (lossless compression, quality = 1.0)
+        var heifData: [Data] = []
         for scale in CursorScale.allCases {
             if let rep = representation(for: scale) as? NSBitmapImageRep,
-               let tiff = rep.tiffRepresentation(using: NSBitmapImageRep.TIFFCompression.lzw, factor: 1.0) {
-                tiffData.append(tiff)
+               let cgImage = rep.cgImage {
+                // Use CGImageDestination for HEIF encoding with lossless compression
+                let data = NSMutableData()
+                if let destination = CGImageDestinationCreateWithData(data as CFMutableData, UTType.heic.identifier as CFString, 1, nil) {
+                    let options: [CFString: Any] = [
+                        kCGImageDestinationLossyCompressionQuality: 1.0
+                    ]
+                    CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
+                    if CGImageDestinationFinalize(destination) {
+                        heifData.append(data as Data)
+                    }
+                }
             }
         }
 
-        dict["Representations"] = tiffData
+        dict["Representations"] = heifData
 
         return dict
     }
