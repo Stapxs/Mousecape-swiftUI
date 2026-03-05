@@ -115,6 +115,7 @@ struct MenuBarContentView: View {
 class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var windowDelegate: WindowDelegate?
     @MainActor private weak var mainWindow: NSWindow?
+    private var isShowingWindow = false
 
     @MainActor
     func setupWindowDelegate(for window: NSWindow, appState: AppState) {
@@ -130,16 +131,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         AppDelegate.shared = self
 
-        // If launched at login, start hidden (menu bar only)
-        // Detect background launch: check if app was activated by user or system
+        // Read launchAtLogin preference
         let launchAtLogin = UserDefaults.standard.bool(forKey: "launchAtLogin")
-        let isBackgroundLaunch = !NSRunningApplication.current.isActive
 
-        if launchAtLogin && isBackgroundLaunch {
+        if launchAtLogin {
+            // 启动时直接设置为 accessory 模式，不创建窗口
             NSApp.setActivationPolicy(.accessory)
-            debugLog("Launched at login - starting in accessory mode")
-        } else {
-            debugLog("Launched manually - will show main window")
+            debugLog("Launch at login enabled - starting in accessory mode")
         }
 
         // Intercept file open events BEFORE SwiftUI creates new windows
@@ -154,6 +152,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         startSessionMonitor()
         migrateFromOldHelper()
+
+        // 不需要在这里隐藏窗口，因为 accessory 模式下窗口不会被创建
+        debugLog("Application finished launching")
     }
 
     @objc private func handleOpenDocumentEvent(_ event: NSAppleEventDescriptor, withReplyEvent reply: NSAppleEventDescriptor) {
@@ -183,38 +184,80 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func showMainWindow() {
-        debugLog("Exiting accessory mode - showing main window")
+        // Prevent duplicate calls
+        guard !isShowingWindow else {
+            debugLog("showMainWindow called but already showing window, ignoring")
+            return
+        }
+
+        isShowingWindow = true
+        debugLog("Showing main window")
 
         // Restore state if capes were cleared (window was destroyed)
         if AppState.shared.capes.isEmpty {
             AppState.shared.restoreStateAfterReopen()
         }
 
-        // 优先用保存的引用，fallback 到 NSApp.windows 搜索
-        let window = mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain })
-        if let window = window {
-            // 先显示窗口（在 accessory 模式下）
-            window.orderFrontRegardless()
-            window.makeKey()
-        }
-
-        // 然后异步切换 policy（延迟到下一个 RunLoop 周期）
-        DispatchQueue.main.async {
+        // 检查并切换 activation policy（如果需要）
+        if NSApp.activationPolicy() == .accessory {
             NSApp.setActivationPolicy(.regular)
-            NSApp.activate(ignoringOtherApps: true)
-            debugLog("Policy switched to regular, window activated")
+            debugLog("Policy switched from accessory to regular")
         }
 
-        // Resume timer polling and animations when window is shown
-        windowDelegate?.startObservingDirtyState()
-        AppState.shared.isWindowVisible = true
-        debugLog("Main window shown, animations resumed")
+        // 激活应用，这会触发 SwiftUI 创建窗口（如果还没创建）
+        NSApp.activate(ignoringOtherApps: true)
+        debugLog("App activated")
+
+        // 等待一小段时间让 SwiftUI 创建窗口
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            guard let self = self else { return }
+
+            // 查找窗口
+            if let window = self.mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain }) {
+                // 显示窗口
+                window.setIsVisible(true)
+                window.orderFrontRegardless()
+                window.makeKeyAndOrderFront(nil)
+                debugLog("Window made visible and ordered front")
+
+                // Resume timer polling and animations when window is shown
+                self.windowDelegate?.startObservingDirtyState()
+                AppState.shared.isWindowVisible = true
+                debugLog("Main window shown, animations resumed")
+            } else {
+                debugLog("WARNING: Window not found after activation, will retry")
+                // 如果还是没有窗口，再等一会儿重试
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let self = self else { return }
+                    if let window = self.mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain }) {
+                        window.setIsVisible(true)
+                        window.orderFrontRegardless()
+                        window.makeKeyAndOrderFront(nil)
+                        self.windowDelegate?.startObservingDirtyState()
+                        AppState.shared.isWindowVisible = true
+                        debugLog("Window shown after retry")
+                    } else {
+                        debugLog("ERROR: Window still not found after retry")
+                    }
+                }
+            }
+
+            // Reset flag after delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.isShowingWindow = false
+                debugLog("showMainWindow flag reset, ready for next call")
+            }
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !flag {
-            showMainWindow()
-        }
+        debugLog("applicationShouldHandleReopen called - hasVisibleWindows: \(flag), current policy: \(NSApp.activationPolicy().rawValue)")
+
+        // Always show main window when Dock icon is clicked, regardless of window visibility
+        // This handles both cases:
+        // 1. Window is hidden (accessory mode)
+        // 2. Window is minimized or behind other windows
+        showMainWindow()
         return false
     }
 

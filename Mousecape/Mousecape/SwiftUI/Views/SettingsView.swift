@@ -73,7 +73,7 @@ struct GeneralSettingsView: View {
     var body: some View {
         Form {
             Section("Startup") {
-                Toggle("Launch at Login", isOn: $launchAtLogin)
+                Toggle("Launch at Login (Silent)", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, newValue in
                         let service = SMAppService.mainApp
                         do {

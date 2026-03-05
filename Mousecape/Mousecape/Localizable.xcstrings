@@ -1006,17 +1006,6 @@
         }
       }
     },
-    "Duplicate" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "复制"
-          }
-        }
-      }
-    },
     "Duplicate Filename" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1673,12 +1662,12 @@
         }
       }
     },
-    "Launch at Login" : {
+    "Launch at Login (Silent)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开机启动"
+            "value" : "开机静默启动"
           }
         }
       }
@@ -1784,19 +1773,6 @@
       }
     },
     "Mousecape" : {
-      "shouldTranslate" : false
-    },
-    "Mousecape Dump" : {
-      "comment" : "Mousecape dump cursor file name",
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mousecape Dump"
-          }
-        }
-      },
       "shouldTranslate" : false
     },
     "Mousecape v%@ (%@)" : {
@@ -1911,17 +1887,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未找到有效的install.inf文件。"
-          }
-        }
-      }
-    },
-    "None" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无"
           }
         }
       }
