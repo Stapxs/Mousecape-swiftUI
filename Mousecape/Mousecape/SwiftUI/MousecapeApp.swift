@@ -28,11 +28,7 @@ struct MousecapeApp: App {
         .commands {
             MousecapeCommands()
         }
-
-        MenuBarExtra("Mousecape", image: "MenuBarIcon") {
-            MenuBarContentView()
-                .environment(appState)
-        }
+        // MenuBarExtra removed - now handled by MousecapeHelper
     }
 
     private func configureWindowAppearance() {
@@ -75,47 +71,11 @@ struct MousecapeApp: App {
     }
 }
 
-// MARK: - Menu Bar Content
-
-struct MenuBarContentView: View {
-    @Environment(AppState.self) private var appState
-
-    var body: some View {
-        if let cape = appState.appliedCape {
-            Text(String(localized: "Current Cursor: \(cape.name)"))
-        } else {
-            Text(String(localized: "Current Cursor: None"))
-        }
-
-        Divider()
-
-        Button(String(localized: "Open Mousecape")) {
-            AppDelegate.shared?.showMainWindow()
-        }
-
-        Button(String(localized: "Reset Cursors")) {
-            appState.resetToDefault()
-        }
-
-        Button(String(localized: "Settings")) {
-            AppDelegate.shared?.showMainWindow()
-            appState.currentPage = .settings
-        }
-
-        Divider()
-
-        Button(String(localized: "Quit Mousecape")) {
-            NSApp.terminate(nil)
-        }
-    }
-}
-
 // MARK: - App Delegate
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var windowDelegate: WindowDelegate?
     @MainActor private weak var mainWindow: NSWindow?
-    private var isShowingWindow = false
 
     @MainActor
     func setupWindowDelegate(for window: NSWindow, appState: AppState) {
@@ -131,15 +91,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         AppDelegate.shared = self
 
-        // Read launchAtLogin preference
-        let launchAtLogin = UserDefaults.standard.bool(forKey: "launchAtLogin")
-
-        if launchAtLogin {
-            // 启动时直接设置为 accessory 模式，不创建窗口
-            NSApp.setActivationPolicy(.accessory)
-            debugLog("Launch at login enabled - starting in accessory mode")
-        }
-
         // Intercept file open events BEFORE SwiftUI creates new windows
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -150,10 +101,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        startSessionMonitor()
+        migrateToHelper()
         migrateFromOldHelper()
 
-        // 不需要在这里隐藏窗口，因为 accessory 模式下窗口不会被创建
+        // Launch helper automatically when main app starts
+        launchHelper()
+
         debugLog("Application finished launching")
     }
 
@@ -184,69 +137,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func showMainWindow() {
-        // Prevent duplicate calls
-        guard !isShowingWindow else {
-            debugLog("showMainWindow called but already showing window, ignoring")
-            return
-        }
-
-        isShowingWindow = true
         debugLog("Showing main window")
 
-        // Restore state if capes were cleared (window was destroyed)
+        // Restore state if capes were cleared
         if AppState.shared.capes.isEmpty {
             AppState.shared.restoreStateAfterReopen()
         }
 
-        // 检查并切换 activation policy（如果需要）
-        if NSApp.activationPolicy() == .accessory {
-            NSApp.setActivationPolicy(.regular)
-            debugLog("Policy switched from accessory to regular")
-        }
-
-        // 激活应用，这会触发 SwiftUI 创建窗口（如果还没创建）
+        // Activate app and show window
         NSApp.activate(ignoringOtherApps: true)
-        debugLog("App activated")
 
-        // 等待一小段时间让 SwiftUI 创建窗口
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-            guard let self = self else { return }
-
-            // 查找窗口
-            if let window = self.mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain }) {
-                // 显示窗口
-                window.setIsVisible(true)
-                window.orderFrontRegardless()
-                window.makeKeyAndOrderFront(nil)
-                debugLog("Window made visible and ordered front")
-
-                // Resume timer polling and animations when window is shown
-                self.windowDelegate?.startObservingDirtyState()
-                AppState.shared.isWindowVisible = true
-                debugLog("Main window shown, animations resumed")
-            } else {
-                debugLog("WARNING: Window not found after activation, will retry")
-                // 如果还是没有窗口，再等一会儿重试
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else { return }
-                    if let window = self.mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain }) {
-                        window.setIsVisible(true)
-                        window.orderFrontRegardless()
-                        window.makeKeyAndOrderFront(nil)
-                        self.windowDelegate?.startObservingDirtyState()
-                        AppState.shared.isWindowVisible = true
-                        debugLog("Window shown after retry")
-                    } else {
-                        debugLog("ERROR: Window still not found after retry")
-                    }
-                }
-            }
-
-            // Reset flag after delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                self?.isShowingWindow = false
-                debugLog("showMainWindow flag reset, ready for next call")
-            }
+        if let window = mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain }) {
+            window.setIsVisible(true)
+            window.orderFrontRegardless()
+            window.makeKeyAndOrderFront(nil)
+            windowDelegate?.startObservingDirtyState()
+            AppState.shared.isWindowVisible = true
+            debugLog("Main window shown")
         }
     }
 
@@ -261,9 +168,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
-    // Keep app running when window is closed (menu bar stays active)
+    // Quit app when window is closed (no menu bar icon in main app)
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return false
+        return true
     }
 
     // Close ObjC logging system on exit
@@ -271,6 +178,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         #if DEBUG
         MCLoggerClose()
         #endif
+    }
+
+    private func migrateToHelper() {
+        guard !UserDefaults.standard.bool(forKey: "migratedToHelper") else { return }
+
+        // If old launch-at-login was enabled, enable helper
+        if UserDefaults.standard.bool(forKey: "launchAtLogin") {
+            let helper = SMAppService.loginItem(identifier: "com.sdmj76.MousecapeHelper")
+            do {
+                try helper.register()
+                debugLog("Helper registered for launch-at-login during migration")
+            } catch {
+                debugLog("Failed to register helper during migration: \(error)")
+            }
+        }
+
+        // Unregister old mainApp service
+        do {
+            try SMAppService.mainApp.unregister()
+            debugLog("Unregistered old mainApp service")
+        } catch {
+            debugLog("Failed to unregister mainApp: \(error)")
+        }
+
+        UserDefaults.standard.set(true, forKey: "migratedToHelper")
     }
 
     private func migrateFromOldHelper() {
@@ -289,6 +221,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 process.standardError = FileHandle.nullDevice
                 try? process.run()
                 process.waitUntilExit()
+            }
+        }
+    }
+
+    /// Launch MousecapeHelper when main app starts
+    private func launchHelper() {
+        // Helper is located at: Mousecape.app/Contents/Library/LoginItems/MousecapeHelper.app
+        let helperURL = Bundle.main.bundleURL
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("Library")
+            .appendingPathComponent("LoginItems")
+            .appendingPathComponent("MousecapeHelper.app")
+
+        // Check if helper exists
+        guard FileManager.default.fileExists(atPath: helperURL.path) else {
+            debugLog("Helper not found at: \(helperURL.path)")
+            return
+        }
+
+        // Check if helper is already running
+        let runningApps = NSWorkspace.shared.runningApplications
+        let helperBundleID = "com.sdmj76.MousecapeHelper"
+        if runningApps.contains(where: { $0.bundleIdentifier == helperBundleID }) {
+            debugLog("Helper is already running")
+            return
+        }
+
+        // Launch helper
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = false // Don't activate helper (it's a background app)
+
+        NSWorkspace.shared.openApplication(at: helperURL, configuration: configuration) { app, error in
+            if let error = error {
+                debugLog("Failed to launch helper: \(error.localizedDescription)")
+            } else {
+                debugLog("Helper launched successfully")
             }
         }
     }
@@ -343,26 +311,8 @@ class WindowDelegate: NSObject, NSWindowDelegate {
             return false
         }
 
-        // Hide window and clear memory, but don't actually close it
-        // This prevents SwiftUI from keeping the view tree alive
-        MainActor.assumeIsolated {
-            debugLog("Entering accessory mode - hiding main window")
-            // Stop timer polling before window hides
-            AppDelegate.shared?.windowDelegate?.stopObserving()
-            appState.isWindowVisible = false
-
-            // Clear all memory caches aggressively
-            appState.clearMemoryCaches()
-
-            // Hide the window
-            sender.orderOut(nil)
-
-            DispatchQueue.main.async {
-                NSApp.setActivationPolicy(.accessory)
-                debugLog("Accessory mode active - window hidden, memory cleared")
-            }
-        }
-        return false  // Don't close, just hide
+        // Main app has no menu bar icon, so closing window should quit the app
+        return true
     }
 }
 

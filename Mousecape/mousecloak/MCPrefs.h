@@ -9,7 +9,9 @@
 #ifndef Mousecape_MCPreferences_h
 #define Mousecape_MCPreferences_h
 
-#define kMCDomain @"com.alexzielenski.Mousecape"
+#import <Foundation/Foundation.h>
+
+#define kMCDomain @"com.sdmj76.Mousecape"
 
 NS_ASSUME_NONNULL_BEGIN
 

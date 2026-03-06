@@ -9,6 +9,7 @@
 #ifndef Mousecape_MCDefs_h
 #define Mousecape_MCDefs_h
 
+#import <AppKit/AppKit.h>
 #import "MCLogger.h"
 
 // In DEBUG mode, use file logging; in Release mode, use stdout only

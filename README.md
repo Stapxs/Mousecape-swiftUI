@@ -36,7 +36,7 @@ A free macOS cursor manager that allows you to easily replace Mac system pointer
 - Customize Mac system cursors, supporting both static and animated cursors
 - One-click import of Windows cursor formats (.cur / .ani)
 - Uses private, non-intrusive CoreGraphics API, safe and reliable
-- Menu bar icon stays active after closing the window, running silently in the background
+- Background helper with menu bar icon for quick access and cursor management
 - Optional launch at login to automatically apply your cursor theme
 
 ## Download & Installation
@@ -67,7 +67,12 @@ To view a copy of this license, visit https://creativecommons.org/licenses/by-nc
 1. Download and open the Mousecape app
 2. Go to **Settings → General** and enable **Launch at Login**
 
-When enabled, Mousecape starts in the background at login and automatically applies your last cursor theme. You can access it anytime from the menu bar icon.
+When enabled, MousecapeHelper starts in the background at login and automatically applies your last cursor theme. The helper provides a menu bar icon that you can use to:
+- Open the main Mousecape app
+- Apply or reset cursor themes
+- Quit the helper
+
+The main Mousecape app can be closed independently, while the helper continues running in the background to maintain your cursor theme.
 
 ### Import Windows Format Cursors
 
@@ -227,7 +232,7 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 - 自定义 Mac 系统光标，支持静态和动画光标
 - 一键导入 Windows 格式指针（.cur / .ani）
 - 使用私有、非侵入式的 CoreGraphics API，安全可靠
-- 关闭窗口后菜单栏图标常驻，后台静默运行
+- 后台助手提供菜单栏图标，快速访问和光标管理
 - 可选开机启动，自动应用光标主题
 
 ## 下载安装
@@ -258,7 +263,12 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 1. 下载并打开 Mousecape 应用
 2. 进入 **设置 → 通用**，开启 **Launch at Login**
 
-开启后，Mousecape 会在登录时后台启动并自动应用上次使用的光标主题。你可以随时通过菜单栏图标访问。
+开启后，MousecapeHelper 会在登录时后台启动并自动应用上次使用的光标主题。Helper 提供菜单栏图标，你可以通过它：
+- 打开主 Mousecape 应用
+- 应用或重置光标主题
+- 退出 Helper
+
+主 Mousecape 应用可以独立关闭，而 Helper 会继续在后台运行以维持你的光标主题。
 
 ### 导入 Windows 格式光标
 

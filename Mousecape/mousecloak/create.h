@@ -9,6 +9,8 @@
 #ifndef Mousecape_create_h
 #define Mousecape_create_h
 
+#import <Foundation/Foundation.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSError * _Nullable createCape(NSString *input, NSString *output, BOOL convert);

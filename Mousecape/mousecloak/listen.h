@@ -9,6 +9,8 @@
 #ifndef Mousecape_listen_h
 #define Mousecape_listen_h
 
+#import <Foundation/Foundation.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * _Nullable appliedCapePathForUser(NSString *user);

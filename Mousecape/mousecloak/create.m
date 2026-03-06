@@ -9,6 +9,7 @@
 #import "create.h"
 #import "NSCursor_Private.h"
 #import "NSBitmapImageRep+ColorSpace.h"
+#import "MCDefs.h"
 
 NSError *createCape(NSString *input, NSString *output, BOOL convert) {
     NSDictionary *cape;

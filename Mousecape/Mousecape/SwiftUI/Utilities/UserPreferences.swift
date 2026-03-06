@@ -15,7 +15,7 @@ final class UserPreferences {
 
     // MARK: - Constants
 
-    private let domain = "com.alexzielenski.Mousecape" as CFString
+    private let domain = "com.sdmj76.Mousecape" as CFString
 
     /// Preference keys
     struct Keys {

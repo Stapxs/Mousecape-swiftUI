@@ -94,7 +94,7 @@ final class DebugLogger: @unchecked Sendable {
         // Read mousecloak preferences from CFPreferences
         if let appliedCursor = CFPreferencesCopyValue(
             "MCAppliedCursor" as CFString,
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         ) as? String {
@@ -105,7 +105,7 @@ final class DebugLogger: @unchecked Sendable {
 
         if let cursorScale = CFPreferencesCopyValue(
             "MCCursorScale" as CFString,
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         ) as? Double {

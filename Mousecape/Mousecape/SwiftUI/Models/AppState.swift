@@ -235,7 +235,7 @@ final class AppState: @unchecked Sendable {
 
     /// Load cursor scale from preferences and apply it
     private func applySavedCursorScale() {
-        let preferenceDomain = "com.alexzielenski.Mousecape"
+        let preferenceDomain = "com.sdmj76.Mousecape"
         let cursorScaleKey = "MCCursorScale"
 
         // Read saved scale value
@@ -392,12 +392,12 @@ final class AppState: @unchecked Sendable {
         CFPreferencesSetValue(
             "MCAppliedCursor" as CFString,
             cape.identifier as CFString,
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         )
         CFPreferencesSynchronize(
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         )
@@ -418,12 +418,12 @@ final class AppState: @unchecked Sendable {
         CFPreferencesSetValue(
             "MCAppliedCursor" as CFString,
             nil,
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         )
         CFPreferencesSynchronize(
-            "com.alexzielenski.Mousecape" as CFString,
+            "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         )

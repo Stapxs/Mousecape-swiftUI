@@ -340,7 +340,7 @@ extension CursorLibrary {
         let success = dict.write(to: url, atomically: true)
         if !success {
             throw NSError(
-                domain: "com.alexzielenski.mousecape.error",
+                domain: "com.sdmj76.mousecape.error",
                 code: -2,
                 userInfo: [
                     NSLocalizedDescriptionKey: "Failed to save cape",

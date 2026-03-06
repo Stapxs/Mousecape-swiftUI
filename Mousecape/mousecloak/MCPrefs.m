@@ -43,5 +43,19 @@ void MCSetDefaultFor(id value, NSString *key, NSString *user, NSString *host) {
 #endif
     CFPreferencesSetValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)value, (__bridge CFStringRef)kMCDomain, (__bridge CFStringRef)user, (__bridge CFStringRef)host);
     //    CFPreferencesSynchronize((CFStringRef)kMCDomain, (CFStringRef)user, (CFStringRef)host);
+
+    // Post Darwin notification to notify Helper about preference change
+    if ([key isEqualToString:MCPreferencesAppliedCursorKey]) {
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFSTR("com.sdmj76.Mousecape.preferencesChanged"),
+            NULL,
+            NULL,
+            true
+        );
+#ifdef DEBUG
+        MMLog("Posted Darwin notification: com.sdmj76.Mousecape.preferencesChanged");
+#endif
+    }
 }
 

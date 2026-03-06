@@ -68,21 +68,28 @@ struct GeneralSettingsView: View {
 
     /// The key used by ObjC code for cursor scale
     private static let cursorScaleKey = "MCCursorScale"
-    private static let preferenceDomain = "com.alexzielenski.Mousecape"
+    private static let preferenceDomain = "com.sdmj76.Mousecape"
 
     var body: some View {
         Form {
             Section("Startup") {
-                Toggle("Launch at Login (Silent)", isOn: $launchAtLogin)
+                Toggle("Apply at Login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, newValue in
-                        let service = SMAppService.mainApp
+                        // Control MousecapeHelper's launch-at-login registration only
+                        let helper = SMAppService.loginItem(identifier: "com.sdmj76.MousecapeHelper")
                         do {
-                            if newValue { try service.register() }
-                            else { try service.unregister() }
+                            if newValue {
+                                try helper.register()
+                                debugLog("Helper registered for launch-at-login")
+                            } else {
+                                try helper.unregister()
+                                debugLog("Helper unregistered from launch-at-login")
+                            }
                         } catch {
                             launchAtLogin = !newValue
                             loginToggleError = error.localizedDescription
                             showLoginError = true
+                            debugLog("Failed to update helper status: \(error)")
                         }
                     }
             }

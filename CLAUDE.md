@@ -31,16 +31,22 @@ xcodebuild -project Mousecape/Mousecape.xcodeproj -target mousecloak build
 
 ## 架构
 
-### 两个构建目标
+### 三个构建目标
 
 1. **Mousecape**（GUI 应用）- 使用 SwiftUI 界面的主 macOS 应用程序
    - 入口：`Mousecape/SwiftUI/MousecapeApp.swift`
    - 自适应设计：macOS 26+ 使用液态玻璃（Liquid Glass），macOS 15 使用 Material 背景
-   - 菜单栏常驻：通过 `MenuBarExtra` 提供菜单栏图标，关闭窗口后程序不退出
-   - 开机启动：通过 `SMAppService.mainApp` 注册为系统登录项，根据用户设置的 `launchAtLogin` 偏好决定启动行为（开 = 后台启动，关 = 显示窗口）
-   - 内嵌会话监听：通过 `startSessionMonitor()` 监听用户会话变化和显示器重配置，自动重新应用光标
+   - 窗口管理：标准 `.regular` 模式，关闭窗口后程序退出
+   - 与 Helper 通信：通过 `SMAppService.loginItem(identifier:)` 控制 Helper 的启动/停止
 
-2. **mousecloak**（CLI 工具）- 用于应用 cape 的命令行工具
+2. **MousecapeHelper**（后台助手）- 负责开机启动和会话监听的独立应用
+   - 入口：`Mousecape/MousecapeHelper/MousecapeHelperApp.swift`
+   - 菜单栏常驻：通过 `MenuBarExtra` 提供菜单栏图标，可唤起主应用
+   - 开机启动：通过 `SMAppService.loginItem` 注册为系统登录项
+   - 会话监听：通过 `startSessionMonitor()` 监听用户会话变化和显示器重配置，自动重新应用光标
+   - 系统集成：作为 Login Item 注册，由系统管理生命周期
+
+3. **mousecloak**（CLI 工具）- 用于应用 cape 的命令行工具
    - 入口：`Mousecape/mousecloak/main.swift`
    - 命令：`apply`、`reset`、`create`、`dump`、`scale`、`convert`、`export`、`listen`
    - 使用 Swift ArgumentParser 进行参数解析
@@ -59,7 +65,10 @@ MCLibraryController
     ↓
 私有 API (mousecloak/apply.m)
 
-会话监听（内嵌于主程序）:
+主应用 ↔ Helper 通信:
+Mousecape (SMAppService API) ←→ MousecapeHelper (Login Item)
+    ↓ NSWorkspace.shared.open()
+Helper 会话监听:
 startSessionMonitor() → UserSpaceChanged / reconfigurationCallback → applyCapeAtPath()
 ```
 
@@ -131,17 +140,16 @@ SwiftUI/
 
 ### 窗口生命周期管理
 
-**Activation Policy 切换模式：** 应用在 `.regular`（有 Dock 图标）和 `.accessory`（仅菜单栏）之间切换。
+**简化设计：** 主应用使用标准 `.regular` 模式，关闭窗口后程序退出。开机启动和菜单栏功能由独立的 MousecapeHelper 负责。
 
 **关键设计：**
-- **启动行为决策：** 通过 `UserDefaults.standard.bool(forKey: "launchAtLogin")` 读取用户偏好。**launchAtLogin = false**：正常启动，`.regular` 模式，显示主窗口。**launchAtLogin = true**：后台启动，`.accessory` 模式，不创建窗口
-- **用户控制：** 用户通过"Launch at Login"开关明确控制启动行为，启动行为与用户设置保持一致
-- **静默启动实现：** `applicationWillFinishLaunching` 中直接设置 `.accessory` 模式，SwiftUI 不会创建窗口。当用户点击菜单栏时，`showMainWindow()` 切换到 `.regular` 模式并激活应用，触发 SwiftUI 延迟创建窗口
-- **延迟窗口创建：** `showMainWindow()` 中使用 `DispatchQueue.main.asyncAfter(deadline: .now() + 0.05)` 等待 SwiftUI 创建窗口，如果窗口未创建则再等待 0.1 秒重试
-- **关闭窗口：** `windowShouldClose` 返回 `false`，用 `orderOut(nil)` 隐藏窗口而非销毁，保持 SwiftUI 视图树完整。`setActivationPolicy(.accessory)` 延迟到下一个 RunLoop 周期执行（`DispatchQueue.main.async`），等待窗口完全隐藏后再切换
-- **显示窗口：** `showMainWindow()` 先检查当前 activation policy，如果是 `.accessory` 则切换到 `.regular`，然后调用 `NSApp.activate(ignoringOtherApps: true)` 触发 SwiftUI 创建窗口。等待窗口创建后使用 `orderFrontRegardless()` + `makeKey()` 显示窗口
-- **主窗口引用：** `AppDelegate.mainWindow`（weak）在 `setupWindowDelegate` 时保存，避免每次通过 `NSApp.windows` 查找。查找时有 fallback：`mainWindow ?? NSApp.windows.first(where: { $0.canBecomeMain })`
-- **文件打开事件：** `handleOpenDocumentEvent` 使用 `MainActor.assumeIsolated` 同步执行（Apple Event handler 在主线程），避免 `Task` 异步延迟导致窗口显示失败
+- **标准窗口行为：** 主应用始终使用 `.regular` 模式（有 Dock 图标），关闭窗口后程序正常退出
+- **Helper 独立运行：** MousecapeHelper 作为独立应用运行，提供菜单栏图标和开机启动功能
+- **XPC 通信：** 主应用通过 XPC 连接控制 Helper 的启动/停止和光标应用
+- **用户控制：** 用户通过"Launch at Login"开关控制 Helper 的开机启动行为
+- **菜单栏唤起：** 用户点击 Helper 的菜单栏图标可唤起主应用窗口
+- **文件打开事件：** `handleOpenDocumentEvent` 使用 `MainActor.assumeIsolated` 同步执行（Apple Event handler 在主线程）
+- **主窗口引用：** `AppDelegate.mainWindow`（weak）在 `setupWindowDelegate` 时保存，避免每次通过 `NSApp.windows` 查找
 - **WindowDelegate timer：** `setupWindowDelegate` 调用前先 `stopObserving()` 清理旧 timer，防止重复调用时 timer 泄漏
 
 ### 编辑模式：简易模式 / 高级模式

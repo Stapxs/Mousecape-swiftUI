@@ -10,6 +10,7 @@
 #import "apply.h"
 #import <SystemConfiguration/SystemConfiguration.h>
 #import "MCPrefs.h"
+#import "MCDefs.h"
 #import "CGSCursor.h"
 #import <Cocoa/Cocoa.h>
 #import "scale.h"
