@@ -4,12 +4,31 @@
   </a>
   <h2 id="koishi">Mousecape-swiftUI</h1>
 
+<p>
+  <!-- GitHub Downloads -->
+  <a href="https://github.com/sdmj76/Mousecape-swiftUI/releases">
+    <img src="https://img.shields.io/github/downloads/sdmj76/Mousecape-swiftUI/total" alt="GitHub all releases">
+  </a>
+  <!-- GitHub Release Version -->
+  <a href="https://github.com/sdmj76/Mousecape-swiftUI/releases">
+    <img src="https://img.shields.io/github/v/release/sdmj76/Mousecape-swiftUI" alt="GitHub release (with filter)">
+  </a>
+  <!-- GitHub Issues -->
+  <a href="https://github.com/sdmj76/Mousecape-swiftUI/issues">
+    <img src="https://img.shields.io/github/issues/sdmj76/Mousecape-swiftUI" alt="GitHub issues">
+  </a>
+  <!-- GitHub Stars -->
+  <a href="https://github.com/sdmj76/Mousecape-swiftUI/stargazers">
+    <img src="https://img.shields.io/github/stars/sdmj76/Mousecape-swiftUI" alt="GitHub Repo stars">
+  </a>
+</p>
+
 A free macOS cursor manager that allows you to easily replace Mac system pointers.
 <br/>一款免费的 macOS 光标管理器，让你轻松替换 Mac 系统指针。
 <br/>
 <br/>
-**Built with SwiftUI, fully adapted to Liquid Glass design language, with complete support for macOS Tahoe.
-<br/>使用 SwiftUI 构建，全面适配液态玻璃设计语言，完整支持 macOS Tahoe。**
+**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion to Windows cursor.
+<br/>适配 macOS 26，全面采用液态玻璃设计。支持一键转换Windows光标**
 <br/>
 <br/>
 **[English](#english-section) | [中文](#chinese-section)**
@@ -87,9 +106,17 @@ If the folder contains an `*.inf` file, Mousecape will automatically parse it to
 ### Import/Export **.cape** Format Cursors
 
 - Click the "Import" button, then select the **.cape** format cursor file in the Finder window
+- Or drag and drop **.cape** files directly onto the app window to import
 - Click the "Export" button, then choose where to save the **.cape** cursor file
 
 > **.cape** is Mousecape's proprietary cursor format, containing a complete set of cursors in one file
+
+### Reset System Cursor
+
+If you want to revert to the default macOS cursor, you can:
+
+- Click **Settings → Reset System Cursor**
+- Or use the keyboard shortcut **Cmd+R**
 
 ### Supported Image Formats
 
@@ -301,9 +328,17 @@ Mousecape 支持批量导入 Windows 光标主题：
 ### 导入/导出 **.cape** 格式光标
 
 - 点击 "导入" 按键，在弹出的finder窗口，选择要导入的 **.cape** 格式光标
+- 或直接将 **.cape** 文件拖放到应用窗口即可导入
 - 点击 "导出" 按键，在弹出的finder窗口，选择要保存 **.cape** 光标的位置
 
 > **.cape** 为 Mousecape 专用光标格式，文件内包含了一整套光标的内容
+
+### 重置系统光标
+
+如果你想恢复为 macOS 默认光标，可以：
+
+- 点击 **设置 → 重置为系统光标**
+- 或使用快捷键 **Cmd+R**
 
 ### 支持的图片格式
 
