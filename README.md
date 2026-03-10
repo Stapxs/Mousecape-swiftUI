@@ -50,24 +50,20 @@ A free macOS cursor manager that allows you to easily replace Mac system pointer
 
 ## Features
 
-**System Requirements:** macOS Sequoia (15) or later
-
 - Customize Mac system cursors, supporting both static and animated cursors
-- One-click import of Windows cursor formats (.cur / .ani)
+- One-click import of Windows cursor formats (.cur / .ani), mapping 85% of macOS cursor types
 - Uses private, non-intrusive CoreGraphics API, safe and reliable
-- Background helper with menu bar icon for quick access and cursor management
-- Optional launch at login to automatically apply your cursor theme
 
 ## Download & Installation
-
-Download the latest version from the [Releases](https://github.com/sdmj76/Mousecape/releases) section of this GitHub page.
-
-If you encounter any problems, we recommend that you first check the [Troubleshooting](#Troubleshooting_en) section.
 
 ### System Requirements
 
 - macOS Sequoia (15) or later
 - Support Architectures: runs on both Intel and Apple Silicon Macs
+
+<br>Download the latest version from the [Releases](https://github.com/sdmj76/Mousecape-swiftUI/releases) section of this GitHub page.
+
+If you encounter any problems, we recommend that you first check the [Troubleshooting](#Troubleshooting_en) section.
 
 ## Example Cursors
 
@@ -77,23 +73,23 @@ This repository includes an example Kiriko.cape file, available for [download he
 
 This cursor set was created by [ArakiCC](https://space.bilibili.com/14913641).
 
-To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-nd/4.0/
-
 ## Getting Started
 
-### Set Up Launch at Login (Optional, for automatic cursor application after restart)
+<details>
+<summary>Set Up Launch at Login</summary>
 
 1. Download and open the Mousecape app
 2. Go to **Settings → General** and enable **Launch at Login**
 
-When enabled, MousecapeHelper starts in the background at login and automatically applies your last cursor theme. The helper provides a menu bar icon that you can use to:
-- Open the main Mousecape app
-- Apply or reset cursor themes
+When enabled, Mousecape starts in the background at login and provides a menu bar icon that you can use to:
+- Open the Mousecape app
+- Reset cursor themes
 - Quit the helper
 
-The main Mousecape app can be closed independently, while the helper continues running in the background to maintain your cursor theme.
-
-### Import Windows Format Cursors
+</details>
+<br>
+<details>
+<summary>Import Windows Format Cursors</summary>
 
 Mousecape supports batch importing Windows cursor themes:
 
@@ -103,7 +99,10 @@ Mousecape supports batch importing Windows cursor themes:
 
 If the folder contains an `*.inf` file, Mousecape will automatically parse it to map cursor files to the correct cursor types. Otherwise, it will use filename-based matching.
 
-### Create Custom Cursor Sets
+</details>
+<br>
+<details>
+<summary>Create Custom Cursor Sets</summary>
 
 1. Click the "+" button to add a new cursor set
 2. Click the "+" button to add pointers to customize
@@ -111,25 +110,54 @@ If the folder contains an `*.inf` file, Mousecape will automatically parse it to
 4. Adjust hotspot position and other parameters for each cursor
 5. Save and apply your theme
 
-### Import/Export **.cape** Format Cursors
+**Simple / Advanced Mode**
+
+Mousecape offers two editing modes, switchable via the toolbar:
+
+- **Simple Mode**: Displays cursors in 15 Windows cursor groups. Editing one cursor automatically applies changes to all related macOS cursor types in the same group.
+- **Advanced Mode**: Edit each of the 52 macOS cursor types individually for full control.
+
+The home screen preview also supports Simple/Advanced display modes, configurable in **Settings → Appearance → Preview Panel**.
+
+</details>
+<br>
+<details>
+<summary>Import/Export .cape Format Cursors</summary>
 
 - Click the "Import" button, then select the **.cape** format cursor file in the Finder window
 - Or drag and drop **.cape** files directly onto the app window to import
+- Or double-click a **.cape** file in Finder to open it directly in Mousecape
 - Click the "Export" button, then choose where to save the **.cape** cursor file
 
 > **.cape** is Mousecape's proprietary cursor format, containing a complete set of cursors in one file
+>
+> **Note:** Cape files saved with v1.1.0+ use HEIF image format and may not be compatible with older versions of Mousecape. Existing cape files will be automatically upgraded to the new format when saved.
 
-### Reset System Cursor
+</details>
+<br>
+<details>
+<summary>Reset System Cursor</summary>
 
 If you want to revert to the default macOS cursor, you can:
 
 - Click **Settings → Reset System Cursor**
 - Or use the keyboard shortcut **Cmd+R**
 
-### Supported Image Formats
+</details>
+<br>
+<details>
+<summary>Supported Image Formats</summary>
 
 - **Standard image formats**: PNG, JPEG, TIFF, GIF
 - **Windows cursor formats**: .cur (static), .ani (animated)
+
+</details>
+
+<a id="Troubleshooting_en"></a>
+
+## Troubleshooting
+
+If you encounter issues, please check the common solutions below first. For more help, please [submit an Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues).
 
 ### Cursor Limitations
 
@@ -150,22 +178,9 @@ Due to macOS system limitations, Mousecape has the following restrictions:
 
 **Example:** A 32-frame GIF animation will be downsampled to 24 frames, and the frame duration will be increased to maintain the original animation speed.
 
-<a id="Troubleshooting_en"></a>
-
-## Troubleshooting
-
-If you encounter issues, please check the common solutions below first. For more help, please [submit an Issue](https://github.com/sdmj76/Mousecape/issues).
-
-### Migrating from Older Versions
-
-If you previously installed an older version of Mousecape with a separate helper daemon, the new version will automatically unregister the old `com.sdmj76.mousecloakhelper` LaunchAgent on first launch. No manual action is needed.
-
-If you still see the old daemon running, you can manually remove it:
-```bash
-launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
-```
-
-### Cursor Animation Only Works in Dock Area
+<br>
+<details>
+<summary>Cursor Animation Only Works in Dock Area</summary>
 
 **Symptoms:** Custom cursor animations only appear when hovering over the Dock, but revert to the default system cursor elsewhere.
 
@@ -180,7 +195,10 @@ launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
 
 The pointer must use the default color scheme (white outline, black fill) for Mousecape to work properly.
 
-### Animated Cursor Import Failed
+</details>
+<br>
+<details>
+<summary>Animated Cursor Import Failed</summary>
 
 **Symptoms:** Animated cursor files (.ani or .gif) fail to import or are rejected.
 
@@ -191,7 +209,10 @@ The pointer must use the default color scheme (white outline, black fill) for Mo
 - The animation speed is preserved by adjusting frame duration
 - If import still fails, ensure the file is not corrupted and try re-downloading
 
-### Chinese Cursor Theme Display Issues
+</details>
+<br>
+<details>
+<summary>Chinese Cursor Theme Display Issues</summary>
 
 **Symptoms:** Chinese or other non-English cursor themes show garbled filenames or incorrect names.
 
@@ -202,7 +223,10 @@ The pointer must use the default color scheme (white outline, black fill) for Mo
 - Ensure the INF file is saved in a supported encoding
 - If issues persist, try resaving the INF file as UTF-8
 
-### Cursor Image Too Large
+</details>
+<br>
+<details>
+<summary>Cursor Image Too Large</summary>
 
 **Symptoms:** Large cursor images are rejected during import.
 
@@ -212,6 +236,8 @@ The pointer must use the default color scheme (white outline, black fill) for Mo
 - Resize images to 512×512 pixels or smaller before importing
 - All imported images are automatically scaled to 64×64 pixels
 - Images larger than 512×512 will be rejected with an error message
+
+</details>
 
 ## Donate
 
@@ -254,24 +280,20 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 
 ## 功能特性
 
-**系统要求：** macOS Sequoia (15) 或更高版本
-
 - 自定义 Mac 系统光标，支持静态和动画光标
-- 一键导入 Windows 格式指针（.cur / .ani）
+- 一键导入 Windows 格式指针（.cur / .ani），覆盖 85% 的 macOS 光标类型
 - 使用私有、非侵入式的 CoreGraphics API，安全可靠
-- 后台助手提供菜单栏图标，快速访问和光标管理
-- 可选开机启动，自动应用光标主题
 
 ## 下载安装
-
-在本 GitHub 页面的 [Releases](https://github.com/sdmj76/Mousecape/releases) 部分下载最新版本。
-
-如果遇到问题，建议优先查看[故障排除](#Troubleshooting_cn)章节。
 
 ### 系统要求
 
 - macOS Sequoia (15) 或更高版本
 - 支持架构：同时支持 Intel 和 Apple Silicon Mac
+
+<br>在本 GitHub 页面的 [Releases](https://github.com/sdmj76/Mousecape-swiftUI/releases) 部分下载最新版本。
+
+如果遇到问题，建议优先查看[故障排除](#Troubleshooting_cn)章节。
 
 ## 示例光标
 
@@ -281,23 +303,23 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 
 此光标由 [ArakiCC](https://space.bilibili.com/14913641) 制作。
 
-查看许可证副本：https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh
-
 ## 快速开始
 
-### 设置开机启动（可选，用于重启后自动应用光标）
+<details>
+<summary>设置开机启动</summary>
 
 1. 下载并打开 Mousecape 应用
-2. 进入 **设置 → 通用**，开启 **Launch at Login**
+2. 进入 **设置 → 通用**，开启 **开机自动应用**
 
-开启后，MousecapeHelper 会在登录时后台启动并自动应用上次使用的光标主题。Helper 提供菜单栏图标，你可以通过它：
-- 打开主 Mousecape 应用
-- 应用或重置光标主题
+开启后，Mousecape 会在登录时后台启动，并提供菜单栏图标，你可以通过它：
+- 打开 Mousecape 应用
+- 重置光标主题
 - 退出 Helper
 
-主 Mousecape 应用可以独立关闭，而 Helper 会继续在后台运行以维持你的光标主题。
-
-### 导入 Windows 格式光标
+</details>
+<br>
+<details>
+<summary>导入 Windows 格式光标</summary>
 
 Mousecape 支持批量导入 Windows 光标主题：
 
@@ -307,7 +329,10 @@ Mousecape 支持批量导入 Windows 光标主题：
 
 如果文件夹中包含 `*.inf` 文件，Mousecape 会自动解析该文件以正确映射光标类型。否则，将使用基于文件名的匹配。
 
-### 创建自定义光标套装
+</details>
+<br>
+<details>
+<summary>创建自定义光标套装</summary>
 
 1. 点击 "+" 按钮添加新光标套装
 2. 点击 "+" 按钮添加要自定义的指针
@@ -315,25 +340,54 @@ Mousecape 支持批量导入 Windows 光标主题：
 4. 调整热点位置和其他参数
 5. 保存并应用你的主题
 
-### 导入/导出 **.cape** 格式光标
+**简易/高级模式**
+
+Mousecape 提供两种编辑模式，可通过工具栏切换：
+
+- **简易模式**：以 15 个 Windows 光标分组展示。编辑一个光标后自动同步到同组内所有相关的 macOS 光标类型。
+- **高级模式**：逐个编辑 52 个 macOS 光标类型，保留完整控制。
+
+首页预览也支持简易/高级显示模式，可在 **设置 → 外观 → 预览面板** 中配置。
+
+</details>
+<br>
+<details>
+<summary>导入/导出 .cape 格式光标</summary>
 
 - 点击 "导入" 按键，在弹出的finder窗口，选择要导入的 **.cape** 格式光标
 - 或直接将 **.cape** 文件拖放到应用窗口即可导入
+- 或在访达中双击 **.cape** 文件即可直接在 Mousecape 中打开
 - 点击 "导出" 按键，在弹出的finder窗口，选择要保存 **.cape** 光标的位置
 
 > **.cape** 为 Mousecape 专用光标格式，文件内包含了一整套光标的内容
+>
+> **注意：** 使用 v1.1.0+ 保存的 Cape 文件采用 HEIF 图像格式，可能无法被旧版本 Mousecape 打开。现有的 Cape 文件可以继续使用，保存时会自动升级到新格式。
 
-### 重置系统光标
+</details>
+<br>
+<details>
+<summary>重置系统光标</summary>
 
 如果你想恢复为 macOS 默认光标，可以：
 
 - 点击 **设置 → 重置为系统光标**
 - 或使用快捷键 **Cmd+R**
 
-### 支持的图片格式
+</details>
+<br>
+<details>
+<summary>支持的图片格式</summary>
 
 - **常规图片格式**：PNG、JPEG、TIFF、GIF
 - **Windows 光标格式**：.cur（静态）、.ani（动画）
+
+</details>
+
+<a id="Troubleshooting_cn"></a>
+
+## 故障排除
+
+如果遇到问题，请先查看以下常见解决方案。更多帮助请[提交 Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues)。
 
 ### 光标限制
 
@@ -354,22 +408,9 @@ Mousecape 支持批量导入 Windows 光标主题：
 
 **示例：** 32 帧的 GIF 动画会被降采样到 24 帧，帧时长会增加以保持原始动画速度。
 
-<a id="Troubleshooting_cn"></a>
-
-## 故障排除
-
-如果遇到问题，请先查看以下常见解决方案。更多帮助请[提交 Issue](https://github.com/sdmj76/Mousecape/issues)。
-
-### 从旧版本迁移
-
-如果你之前安装过带有独立守护进程的旧版 Mousecape，新版本会在首次启动时自动注销旧的 `com.sdmj76.mousecloakhelper` LaunchAgent，无需手动操作。
-
-如果旧守护进程仍在运行，可以手动移除：
-```bash
-launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
-```
-
-### 光标动画仅在 Dock 区域生效
+<br>
+<details>
+<summary>光标动画仅在 Dock 区域生效</summary>
 
 **症状**：自定义光标动画仅在悬停在 Dock 上时显示，移动到其他地方会恢复为系统默认光标。
 
@@ -384,7 +425,10 @@ launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
 
 光标必须使用默认颜色方案（白色轮廓、黑色填充），Mousecape 才能正常工作。
 
-### 动画光标导入失败
+</details>
+<br>
+<details>
+<summary>动画光标导入失败</summary>
 
 **症状**：动画光标文件（.ani 或 .gif）无法导入或被拒绝。
 
@@ -395,7 +439,10 @@ launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
 - 动画速度会通过调整帧时长来保持一致
 - 如果仍然无法导入，请确保文件未损坏，尝试重新下载
 
-### 中文光标主题显示乱码
+</details>
+<br>
+<details>
+<summary>中文光标主题显示乱码</summary>
 
 **症状**：中文或其他非英文光标主题显示乱码或名称不正确。
 
@@ -406,7 +453,10 @@ launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
 - 确保 INF 文件使用支持的编码保存
 - 如果问题持续，尝试将 INF 文件另存为 UTF-8 编码
 
-### 光标图像过大
+</details>
+<br>
+<details>
+<summary>光标图像过大</summary>
 
 **症状**：大型光标图像在导入时被拒绝。
 
@@ -416,6 +466,8 @@ launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
 - 在导入前将图像调整为 512×512 像素或更小
 - 所有导入的图像会自动缩放到 64×64 像素
 - 超过 512×512 的图像将被拒绝并显示错误消息
+
+</details>
 
 ## 捐赠
 
