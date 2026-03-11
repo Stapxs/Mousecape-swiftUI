@@ -10,8 +10,9 @@ import Foundation
 
 /// User preferences manager for Mousecape
 /// Uses CFPreferences to maintain compatibility with mousecloak CLI tool
-final class UserPreferences {
-    @MainActor static let shared = UserPreferences()
+/// Thread-safe: CFPreferences API is thread-safe
+final class UserPreferences: @unchecked Sendable {
+    static let shared = UserPreferences()
 
     // MARK: - Constants
 
@@ -45,7 +46,7 @@ final class UserPreferences {
         }
         #endif
 
-        return value as? Any
+        return value
     }
 
     /// Get a preference value from app-wide preferences
@@ -60,7 +61,7 @@ final class UserPreferences {
         }
         #endif
 
-        return value as? Any
+        return value
     }
 
     /// Get a string preference
@@ -136,10 +137,16 @@ final class UserPreferences {
 @_cdecl("SwiftGetPreference")
 public func SwiftGetPreference(_ key: UnsafePointer<CChar>) -> Unmanaged<AnyObject>? {
     let keyString = String(cString: key)
-    guard let value = UserPreferences.shared.getValue(forKey: keyString) else {
+    // Use CFPreferences directly to avoid MainActor isolation issues
+    guard let value = CFPreferencesCopyValue(
+        keyString as CFString,
+        "com.sdmj76.Mousecape" as CFString,
+        kCFPreferencesCurrentUser,
+        kCFPreferencesCurrentHost
+    ) else {
         return nil
     }
-    return Unmanaged.passRetained(value as AnyObject)
+    return Unmanaged.passRetained(value)
 }
 
 /// Bridge function for Objective-C compatibility
@@ -147,11 +154,19 @@ public func SwiftGetPreference(_ key: UnsafePointer<CChar>) -> Unmanaged<AnyObje
 @_cdecl("SwiftSetPreference")
 public func SwiftSetPreference(_ value: UnsafeRawPointer?, _ key: UnsafePointer<CChar>) {
     let keyString = String(cString: key)
+    // Use CFPreferences directly to avoid MainActor isolation issues
+    let cfValue: CFPropertyList?
     if let value = value {
-        let objcValue = Unmanaged<AnyObject>.fromOpaque(value).takeUnretainedValue()
-        UserPreferences.shared.setValue(objcValue, forKey: keyString)
+        cfValue = Unmanaged<AnyObject>.fromOpaque(value).takeUnretainedValue()
     } else {
-        UserPreferences.shared.setValue(nil, forKey: keyString)
+        cfValue = nil
     }
+    CFPreferencesSetValue(
+        keyString as CFString,
+        cfValue,
+        "com.sdmj76.Mousecape" as CFString,
+        kCFPreferencesCurrentUser,
+        kCFPreferencesCurrentHost
+    )
 }
 

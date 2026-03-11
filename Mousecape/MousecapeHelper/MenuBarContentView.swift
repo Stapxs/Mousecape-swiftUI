@@ -14,8 +14,12 @@ import Combine
 class CursorState: ObservableObject {
     @Published var currentCapeName: String = ""
     private var observer: NSObjectProtocol?
+    private var cfObserverContext: UnsafeMutableRawPointer?
 
     init() {
+        // Store observer context for CFNotificationCenter
+        cfObserverContext = Unmanaged.passUnretained(self).toOpaque()
+
         // Initial refresh
         refresh()
 
@@ -34,7 +38,7 @@ class CursorState: ObservableObject {
         // Also listen for CFPreferences changes
         CFNotificationCenterAddObserver(
             CFNotificationCenterGetDarwinNotifyCenter(),
-            Unmanaged.passUnretained(self).toOpaque(),
+            cfObserverContext,
             { _, observer, _, _, _ in
                 guard let observer = observer else { return }
                 let state = Unmanaged<CursorState>.fromOpaque(observer).takeUnretainedValue()
@@ -52,10 +56,14 @@ class CursorState: ObservableObject {
         if let observer = observer {
             DistributedNotificationCenter.default().removeObserver(observer)
         }
-        CFNotificationCenterRemoveEveryObserver(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            Unmanaged.passUnretained(self).toOpaque()
-        )
+        if let context = cfObserverContext {
+            CFNotificationCenterRemoveObserver(
+                CFNotificationCenterGetDarwinNotifyCenter(),
+                context,
+                CFNotificationName("com.sdmj76.Mousecape.preferencesChanged" as CFString),
+                nil
+            )
+        }
     }
 
     func refresh() {
@@ -89,7 +97,6 @@ struct MenuBarContentView: View {
             // Display current cape name if available
             if !cursorState.currentCapeName.isEmpty {
                 Text(String(localized: "Current Cursor: \(cursorState.currentCapeName)"))
-                    .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)

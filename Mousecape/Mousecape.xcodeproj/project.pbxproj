@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 86D2A987242A45FBB21AE949 /* ArgumentParser */; };
 		9CB312EE7052700D9F29C682 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B757C0780EA0A10BF1469 /* main.swift */; };
+		DE27927D2F61D93200CCEBD3 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE27927C2F61D93200CCEBD3 /* UserPreferences.swift */; };
 		DE2E174E2F5B2BB000055E78 /* listen.m in Sources */ = {isa = PBXBuildFile; fileRef = FA359851189E035900288163 /* listen.m */; };
 		DE2E174F2F5B2BB500055E78 /* apply.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF770189D66D800750E51 /* apply.m */; };
 		DE2E17502F5B2BBF00055E78 /* backup.m in Sources */ = {isa = PBXBuildFile; fileRef = FA8FF76D189D66CB00750E51 /* backup.m */; };
@@ -135,6 +136,7 @@
 /* Begin PBXFileReference section */
 		7A5B757C0780EA0A10BF1469 /* main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CF122E4B298E5744EE9F0578 /* mousecloak-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "mousecloak-Bridging-Header.h"; sourceTree = "<group>"; };
+		DE27927C2F61D93200CCEBD3 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		DE2E172A2F5B290000055E78 /* MousecapeHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MousecapeHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE3661E82EFAAAB600D94521 /* AnimatingCursorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatingCursorView.swift; sourceTree = "<group>"; };
 		DE3661E92EFAAAB600D94521 /* GlassEffectContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassEffectContainer.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 		DE525A812EFE93C200A315A3 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				DE27927C2F61D93200CCEBD3 /* UserPreferences.swift */,
 				DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */,
 				DEBC96022F1657A4004E6C07 /* DebugLogger.swift */,
 				DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */,
@@ -669,6 +672,7 @@
 				DED4B7DC2F39C14F00CAFCCE /* AppState+WindowsImport.swift in Sources */,
 				DE3662032EFAAAB600D94521 /* GlassEffectContainer.swift in Sources */,
 				DE3662042EFAAAB600D94521 /* MousecapeCommands.swift in Sources */,
+				DE27927D2F61D93200CCEBD3 /* UserPreferences.swift in Sources */,
 				DE3662052EFAAAB600D94521 /* SettingsView.swift in Sources */,
 				DE3662062EFAAAB600D94521 /* AnimatingCursorView.swift in Sources */,
 				DE3662072EFAAAB600D94521 /* HomeView.swift in Sources */,
@@ -754,6 +758,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.MousecapeHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -802,6 +807,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.MousecapeHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;

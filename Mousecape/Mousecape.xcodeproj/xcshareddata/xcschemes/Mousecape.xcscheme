@@ -21,6 +21,20 @@
                ReferencedContainer = "container:Mousecape.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DE2E17292F5B290000055E78"
+               BuildableName = "MousecapeHelper.app"
+               BlueprintName = "MousecapeHelper"
+               ReferencedContainer = "container:Mousecape.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

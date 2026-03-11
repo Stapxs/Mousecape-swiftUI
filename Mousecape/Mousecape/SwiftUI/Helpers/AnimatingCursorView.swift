@@ -102,10 +102,13 @@ struct AnimatingCursorView: View {
     /// Get a cached frame image at the given index
     private func getFrameImage(at frameIndex: Int) -> NSImage? {
         guard frameIndex >= 0, frameIndex < cachedFrames.count else {
-            // Fallback: try to build cache if empty
-            if cachedFrames.isEmpty { buildFrameCache() }
-            guard frameIndex >= 0, frameIndex < cachedFrames.count else { return nil }
-            return cachedFrames[frameIndex]
+            // Fallback: try to build cache if empty (defer to avoid modifying state during view update)
+            if cachedFrames.isEmpty {
+                Task { @MainActor in
+                    buildFrameCache()
+                }
+            }
+            return nil
         }
         return cachedFrames[frameIndex]
     }
