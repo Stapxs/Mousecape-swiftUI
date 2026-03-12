@@ -396,12 +396,12 @@ struct AdvancedSettingsView: View {
                         checkForUpdates()
                     }
                     Button("GitHub") {
-                        if let url = URL(string: "https://github.com/sdmj76/Mousecape") {
+                        if let url = URL(string: "https://github.com/sdmj76/Mousecape-swiftUI") {
                             NSWorkspace.shared.open(url)
                         }
                     }
                     Button("Report Issue") {
-                        if let url = URL(string: "https://github.com/sdmj76/Mousecape/issues") {
+                        if let url = URL(string: "https://github.com/sdmj76/Mousecape-swiftUI/issues") {
                             NSWorkspace.shared.open(url)
                         }
                     }
@@ -483,7 +483,7 @@ struct AdvancedSettingsView: View {
 
     private func checkForUpdates() {
         // Open GitHub releases page for manual update checking
-        if let url = URL(string: "https://github.com/sdmj76/Mousecape/releases") {
+        if let url = URL(string: "https://github.com/sdmj76/Mousecape-swiftUI/releases") {
             NSWorkspace.shared.open(url)
         }
     }
