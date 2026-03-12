@@ -4,56 +4,53 @@
 
 ## English
 
-### v1.1.0 - Major Architecture Update
+### v1.1.0 - Architecture Update
 
-**This is a major update that improves launch-at-login functionality and reduces file sizes.**
+**A major update with improved launch-at-login, smaller file sizes, and easier editing.**
 
-**New Features:**
+**What's New:**
 
-- **Rewritten Background Helper** — Launch-at-login helper has been completely rewritten with a menu bar icon
-  - Menu bar quick access shows your currently applied cursor theme name
-  - Quick actions: "Apply Cursor", "Reset Cursor", and "Open Mousecape"
-  - More reliable startup behavior and better system integration
+- **Menu Bar Quick Access** — Enable "Launch at Login" in settings to get a menu bar icon
+  - See your current cursor theme at a glance
+  - Quick actions: Apply cursor, Reset cursor, Open Mousecape
+  - More reliable startup experience
 
-- **Improved Windows Cursor Conversion** — Significantly expanded cursor type mapping
-  - Now maps 44 out of 52 macOS cursor types (85% coverage, up from 20 types in previous versions)
-  - Most previously unmapped cursors now work correctly after import
-  - Better compatibility with Windows cursor themes
+- **Better Windows Cursor Support** — Import Windows cursor themes with better accuracy
+  - Now supports 85% of macOS cursor types (up from 40%)
+  - Most cursors will work correctly after importing
 
-- **Simple/Advanced Modes** — Choose your editing and preview style
-  - **Edit Mode:** Switch between Simple (15 Windows cursor groups) and Advanced (52 individual macOS cursor types)
-    - Simple Mode: Edit one cursor and automatically apply to all related cursor types
-    - Advanced Mode: Full control over each individual cursor type
-    - Switch anytime via the toolbar
-  - **Preview Mode:** Choose how cursors are displayed on the home screen
-    - Simple Mode: Shows one cursor per group (15 main cursors) with localized names
-    - Advanced Mode: Shows all cursors in the cape
-    - Configure in Settings > Appearance > Preview Panel
+- **Simple & Advanced Editing Modes** — Choose how you want to edit
+  - **Simple Mode:** Edit in groups (like Windows), changes apply to related cursors automatically
+  - **Advanced Mode:** Fine-tune each cursor individually
+  - **Preview Mode:** Choose how many cursors to show on the home screen
+  - Switch anytime via the toolbar
 
-- **Double-click to Open** — Double-click `.cape` files in Finder to open them directly in Mousecape
+- **Double-Click to Open** — Double-click any `.cape` file in Finder to open it
 
-- **Cape File Format 3.0** — Cape files now use HEIF image format, reducing file size by 60%
-  - **Compatibility Note:** Older versions of Mousecape may not be able to open cape files saved with v1.1.0. We recommend updating to the latest version.
-  - Existing cape files will continue to work and will be automatically upgraded to the new format when saved
+- **Smaller File Sizes** — Cursor files are now 60% smaller
+
+- **Export System Cursors** — Back up your original Mac cursors
+  - Find it in Settings > Advanced > Reset, or in the File menu
+
+- **Better Import/Export Warnings** — See what's wrong and choose to continue or cancel
+
+- **Left-Hand Mode** — Switch to left-hand cursor layout in Settings > General
+  - Mirrors all cursors horizontally for left-handed users
+  - Preview and system cursors both flip instantly when toggled
 
 **Improvements:**
 
-- Faster command-line tool performance (~80% faster than before)
-- Better memory management and stability
-- Improved thread safety for smoother operation
-- Cleaner project configuration
+- Faster performance and better stability
+- More reliable cursor application
+- Compatible with future macOS versions
 
 **Bug Fixes:**
 
-- Fixed various UI navigation issues
-- Fixed cursor state synchronization between main app and helper
-- Fixed security vulnerabilities
-- Improved compatibility with future macOS versions
+- Fixed cursor application not working when some cursors were missing
+- Fixed menu bar helper stability issues
+- Fixed various UI glitches
 
-**Technical Notes:**
-
-- The old `mousecloakhelper` daemon is automatically removed on first launch
-- If you encounter any issues with launch-at-login, try toggling the setting off and on again in Settings
+**Note:** Older versions of Mousecape may not open files saved with v1.1.0. We recommend updating to the latest version.
 
 ---
 
@@ -218,57 +215,53 @@ For normal use, download the regular version.
 
 ## 中文
 
-### v1.1.0 - 重大架构更新
+### v1.1.0 - 架构更新
 
-**这是一次重大更新，改进了开机启动功能并大幅减小文件体积。**
+**改进开机启动、文件体积更小、编辑更方便的一次重大更新。**
 
 **新功能：**
 
-- **重写后台助手** — 开机启动助手已完全重写，带有菜单栏图标
-  - 菜单栏快速访问可查看当前应用的光标主题名称
-  - 快速操作："应用光标"、"重置光标"和"打开 Mousecape"
-  - 更可靠的启动行为和更好的系统集成
+- **菜单栏快速访问** — 在设置中开启"开机自动应用"后，会显示菜单栏图标
+  - 一眼看到当前使用的光标主题
+  - 快速操作：应用光标、重置光标、打开 Mousecape
+  - 启动更可靠
 
-- **改进 Windows 光标转换** — 大幅扩展光标类型映射
-  - 现在映射 52 个 macOS 光标类型中的 44 个（85% 覆盖率，旧版仅 20 个）
-  - 大部分之前不生效的光标现在导入后可以正常工作
-  - 更好的 Windows 光标主题兼容性
+- **更好的 Windows 光标支持** — 导入 Windows 光标主题更准确
+  - 现在支持 85% 的 macOS 光标类型（之前只有 40%）
+  - 导入后大部分光标都能正常工作
 
-- **简易/高级模式** — 选择你的编辑和预览方式
-  - **编辑模式：** 在简易模式（15 个 Windows 光标分组）和高级模式（52 个独立 macOS 光标类型）之间切换
-    - 简易模式：编辑一个光标后自动应用到所有相关光标类型
-    - 高级模式：完全控制每个独立的光标类型
-    - 随时通过工具栏切换
-  - **预览模式：** 选择首页光标的显示方式
-    - 简易模式：每组显示一个代表光标（15 个主要光标），使用本地化名称
-    - 高级模式：显示 Cape 中所有光标
-    - 在设置 > 外观 > 预览面板中配置
+- **简易/高级编辑模式** — 选择适合你的编辑方式
+  - **简易模式：** 按分组编辑（像 Windows 一样），自动应用到相关光标
+  - **高级模式：** 单独精细调整每个光标
+  - **预览模式：** 选择首页显示多少光标
+  - 随时通过工具栏切换
 
-- **双击打开** — 在访达中双击 `.cape` 文件即可直接在 Mousecape 中打开
+- **双击打开** — 在访达中双击任何 `.cape` 文件即可打开
 
-- **Cape 文件格式 3.0** — Cape 文件现在使用 HEIF 图像格式，文件体积减少 60%
+- **文件体积更小** — 光标文件现在体积减少了 60%
 
-  - **兼容性说明：** 旧版本的 Mousecape 可能无法打开使用 v1.1.0 保存的 cape 文件。建议更新到最新版本。
-  - 现有的 cape 文件可以继续使用，保存时会自动升级到新格式
+- **导出系统光标** — 备份你的 Mac 原始光标
+  - 在 设置 > 高级 > 重置 中找到，或在文件菜单中
+
+- **更好的导入/导出提示** — 显示问题并让你选择继续或取消
+
+- **左手模式** — 在 设置 > 通用 中切换光标方向
+  - 所有光标水平翻转，适合左手用户
+  - 预览和系统光标切换后立即生效
 
 **改进：**
 
-- 命令行工具性能提升约 80%
-- 更好的内存管理和稳定性
-- 改进线程安全性，运行更流畅
-- 更清晰的项目配置
+- 性能更快，运行更稳定
+- 光标应用更可靠
+- 兼容未来的 macOS 版本
 
 **Bug 修复：**
 
-- 修复多个界面导航问题
-- 修复主应用和助手之间的光标状态同步
-- 修复安全漏洞
-- 改进与未来 macOS 版本的兼容性
+- 修复某些光标缺失时无法应用的问题
+- 修复菜单栏助手的稳定性问题
+- 修复多个界面显示问题
 
-**技术说明：**
-
-- 旧的 `mousecloakhelper` 守护进程会在首次启动时自动移除
-- 如果遇到开机启动问题，尝试在设置中关闭再打开该选项
+**注意：** 旧版 Mousecape 可能无法打开 v1.1.0 保存的文件，建议更新到最新版本。
 
 ---
 

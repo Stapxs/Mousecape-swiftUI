@@ -52,6 +52,7 @@ A free macOS cursor manager that allows you to easily replace Mac system pointer
 
 - Customize Mac system cursors, supporting both static and animated cursors
 - One-click import of Windows cursor formats (.cur / .ani), mapping 85% of macOS cursor types
+- Left-hand mode: mirror all cursors horizontally for left-handed users
 - Uses private, non-intrusive CoreGraphics API, safe and reliable
 
 ## Download & Installation
@@ -282,6 +283,7 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 
 - 自定义 Mac 系统光标，支持静态和动画光标
 - 一键导入 Windows 格式指针（.cur / .ani），覆盖 85% 的 macOS 光标类型
+- 左手模式：水平翻转所有光标，适合左手用户
 - 使用私有、非侵入式的 CoreGraphics API，安全可靠
 
 ## 下载安装

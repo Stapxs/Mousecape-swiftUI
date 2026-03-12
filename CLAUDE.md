@@ -5,6 +5,39 @@
 @README.md - 项目介绍、功能说明、使用指南
 @RELEASE_NOTES.md - 版本更新日志
 
+## Release Notes 编写规范
+
+**面向普通用户，避免专业术语：**
+
+- Release Notes 的目标读者是普通用户，不是开发者
+- 避免使用技术术语（如 ARC、GCD、Runloop、KVC、SMAppService 等）
+- 用用户能理解的语言描述功能改进和问题修复
+- 重点告诉用户"有什么新功能"和"对我有什么影响"
+
+**语言风格：**
+- 简洁明了，每个条目不超过 2 行
+- 使用积极、友好的语气
+- 重要的改进放在前面，次要的放在后面
+- Bug Fix 说明要具体，但不过度技术化
+
+**结构建议：**
+- **What's New / 新功能** — 新增的功能
+- **Improvements / 改进** — 性能、稳定性提升
+- **Bug Fixes / Bug 修复** — 修复的问题
+- **Note / 注意** — 兼容性说明等重要提示
+
+**示例对比：**
+
+❌ 技术性描述：
+- `CFNotificationCenter observer memory management`
+- `Swift concurrency safety improvements`
+- `Fixed state modification during view updates`
+
+✅ 用户友好描述：
+- 修复菜单栏助手的稳定性问题
+- 运行更流畅、更稳定
+- 修复界面显示问题
+
 ## 项目概述
 
 Mousecape 是一款免费的 macOS 光标管理器，使用私有 CoreGraphics API 来自定义系统光标。它由两个构建目标组成，协同工作以应用和持久化自定义光标主题（"cape"）。
@@ -205,6 +238,22 @@ MousecapeHelper/（独立后台助手）
 **高级模式（Advanced）：** 显示 cape 中所有光标，名称使用 `CursorType.displayName`。同样过滤掉无图像数据的空光标。
 
 该设置独立于编辑模式（`cursorEditMode`），使用不同的 `@AppStorage` key。
+
+### 左手/右手模式
+
+通过设置 > 通用 > 光标方向切换，使用 CFPreferences 存储 `MCHandedness`（0=右手，1=左手）。
+
+**预览翻转：** 左手模式下所有光标预览水平翻转，通过 `@AppStorage("MCHandedness")` 驱动 `.scaleEffect(x: -1, y: 1)`。涉及视图：
+- `AnimatingCursorView` — 动画光标预览
+- `StaticCursorImageView` — 静态光标预览
+- `StaticCursorFrameView` — Hero 动画帧
+- `SimpleGroupRow` / `CursorListRow`（EditOverlayView.swift）— 编辑页导航栏缩略图
+
+**系统光标翻转：** apply.m 的 `applyCapeForIdentifier()` 读取 `MCFlag(MCPreferencesHandednessKey)`，左手模式下对所有光标执行：
+- 热点 X 坐标镜像：`hotSpot.x = size.width - hotSpot.x - 1`
+- 图像水平翻转：使用 `NSAffineTransform` 的 `scaleXBy:-1 yBy:1`
+
+**设置切换触发：** 使用自定义 Binding 而非 `onChange`，避免 `onAppear` 加载初始值时误触发重新应用。切换时自动调用 `appState.applyCape()` 重新应用当前 cape。
 
 #### WindowsCursorGroup 枚举（AppEnums.swift）
 
