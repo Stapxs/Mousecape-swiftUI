@@ -868,6 +868,62 @@ final class AppState: @unchecked Sendable {
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
     }
 
+    /// Dump current system cursors to a cape file in the capes directory
+    func dumpSystemCursors() {
+        Task { @MainActor in
+            await dumpSystemCursorsAsync()
+        }
+    }
+
+    /// Async implementation of dump system cursors
+    private func dumpSystemCursorsAsync() async {
+        guard let libraryController = libraryController else { return }
+
+        // Show loading overlay
+        isLoading = true
+        loadingMessage = String(localized: "Dumping system cursors...")
+
+        // Perform dump operation in background
+        let tempPath = NSTemporaryDirectory() + "SystemCursorDump.cape"
+        let success = await Task.detached {
+            dumpCursorsToFile(tempPath) { _, _ in
+                return true
+            }
+        }.value
+
+        guard success else {
+            debugLog("Failed to dump system cursors")
+            isLoading = false
+            operationResultMessage = String(localized: "Failed to dump system cursors.")
+            operationResultIsSuccess = false
+            showOperationResult = true
+            return
+        }
+
+        // Import the dumped cape
+        let tempURL = URL(fileURLWithPath: tempPath)
+        let error = libraryController.importCape(at: tempURL)
+        try? FileManager.default.removeItem(at: tempURL)
+
+        if let error = error {
+            debugLog("Failed to import dumped cape: \(error.localizedDescription)")
+            isLoading = false
+            operationResultMessage = String(localized: "Failed to dump system cursors.")
+            operationResultIsSuccess = false
+            showOperationResult = true
+            return
+        }
+
+        debugLog("System cursors dumped and imported successfully")
+        loadCapes()
+        capeListRefreshTrigger += 1
+
+        isLoading = false
+        operationResultMessage = String(localized: "System cursors have been saved to the cape folder.")
+        operationResultIsSuccess = true
+        showOperationResult = true
+    }
+
     // MARK: - Validation
 
     /// Characters allowed in Name and Author fields

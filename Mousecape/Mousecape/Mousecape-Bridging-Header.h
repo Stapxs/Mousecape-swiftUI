@@ -29,6 +29,9 @@
 // Session monitor (listen for user/display changes)
 #import "listen.h"
 
+// Cape creation and dump utilities
+#import "create.h"
+
 // Constants and definitions
 #import "MCDefs.h"
 

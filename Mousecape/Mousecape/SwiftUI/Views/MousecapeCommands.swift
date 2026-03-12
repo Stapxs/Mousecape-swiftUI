@@ -69,6 +69,12 @@ struct MousecapeCommands: Commands {
             .keyboardShortcut("e", modifiers: .command)
             .disabled(selectedCape == nil)
 
+            Button("Dump System Cursors") {
+                Task { @MainActor in
+                    AppState.shared.dumpSystemCursors()
+                }
+            }
+
             Divider()
 
             Button("Delete Cape") {

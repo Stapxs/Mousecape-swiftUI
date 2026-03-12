@@ -267,6 +267,10 @@ struct AdvancedSettingsView: View {
                         showResetOrderSuccess = true
                     }
 
+                    Button("Dump System Cursors") {
+                        appState.dumpSystemCursors()
+                    }
+
                     Button("Restore Default Settings", role: .destructive) {
                         showResetConfirmation = true
                     }

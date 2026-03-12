@@ -1026,6 +1026,16 @@
         }
       }
     },
+    "Dump System Cursors" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提取系统光标"
+          }
+        }
+      }
+    },
     "Duplicate Filename" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1261,6 +1271,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "创建 Cape 文件失败"
+          }
+        }
+      }
+    },
+    "Failed to dump system cursors." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提取系统光标失败。"
           }
         }
       }
@@ -1597,6 +1617,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在导入Windows光标..."
+          }
+        }
+      }
+    },
+    "Dumping system cursors..." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在提取系统光标..."
           }
         }
       }
@@ -2110,17 +2140,6 @@
         }
       }
     },
-    "Scale" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "缩放"
-          }
-        }
-      }
-    },
     "Scale changes are applied immediately." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2327,6 +2346,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "系统光标已恢复为默认。"
+          }
+        }
+      }
+    },
+    "System cursors have been saved to the cape folder." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统光标已保存到 Cape 文件夹。"
           }
         }
       }
