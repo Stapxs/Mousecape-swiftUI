@@ -972,10 +972,27 @@ struct WindowsCursorParser {
                 let a = try reader.readUInt8()
 
                 let offset = (targetY * width + x) * 4
-                pixelData[offset] = r
-                pixelData[offset + 1] = g
-                pixelData[offset + 2] = b
-                pixelData[offset + 3] = a
+                // Windows .cur 32-bit BMP stores straight (non-premultiplied) alpha.
+                // CGImage with premultipliedLast expects premultiplied data, so we
+                // must premultiply here to avoid semi-transparent pixels being
+                // rendered too bright/opaque (which makes thin lines appear thick).
+                if a == 0 {
+                    pixelData[offset] = 0
+                    pixelData[offset + 1] = 0
+                    pixelData[offset + 2] = 0
+                    pixelData[offset + 3] = 0
+                } else if a == 255 {
+                    pixelData[offset] = r
+                    pixelData[offset + 1] = g
+                    pixelData[offset + 2] = b
+                    pixelData[offset + 3] = 255
+                } else {
+                    let alpha = UInt16(a)
+                    pixelData[offset] = UInt8((UInt16(r) * alpha) / 255)
+                    pixelData[offset + 1] = UInt8((UInt16(g) * alpha) / 255)
+                    pixelData[offset + 2] = UInt8((UInt16(b) * alpha) / 255)
+                    pixelData[offset + 3] = a
+                }
             }
         }
 
