@@ -1,8 +1,13 @@
 <div align="center">
-  <a href="https://github.com/sdmj76/Mousecape-swiftUI" target="_blank">
-    <img width="160" src="Screenshot/icon.png" alt="logo">
-  </a>
-  <h2 id="koishi">Mousecape-swiftUI</h1>
+
+<div style="width: 160px;">
+  <!-- Light mode -->
+  <img src="Screenshot/Icon-Light.png#gh-light-mode-only" width="160">
+  <!-- Dark mode -->
+  <img src="Screenshot/Icon-Dark.png#gh-dark-mode-only" width="160">
+</div>
+
+# Mousecape-swiftUI
 
 <p>
   <!-- GitHub Downloads -->
@@ -40,10 +45,8 @@ A free macOS cursor manager that allows you to easily replace Mac system pointer
 
 ## Interface Display
 
-<div align="center" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
-  <img src="Screenshot/Home.gif" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit.gif" width="48%" style="height: auto;" />
-</div>
+![light](Screenshot/Light_en.gif#gh-light-mode-only)
+![dark](Screenshot/Dark_en.gif#gh-dark-mode-only)
 
 
 > The cursor theme "Kiriko" shown in the screenshots is created by [ArakiCC](https://space.bilibili.com/14913641), available in the example files.
@@ -272,10 +275,8 @@ This is just a tool, and I've polished its UI. But what matters most is your cur
 
 ## 界面展示
 
-<div align="center" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
-  <img src="Screenshot/Home.gif" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit.gif" width="48%" style="height: auto;" />
-</div>
+![light](Screenshot/Light_zh.gif#gh-light-mode-only)
+![dark](Screenshot/Dark_zh.gif#gh-dark-mode-only)
 
 > 截图中展示的光标主题 "Kiriko" 由 [ArakiCC](https://space.bilibili.com/14913641) 制作，在示例文件中提供。
 

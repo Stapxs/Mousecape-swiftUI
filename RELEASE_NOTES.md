@@ -6,9 +6,11 @@
 
 ### v1.1.0 - Architecture Update
 
-**A major update with improved launch-at-login, smaller file sizes, and easier editing.**
+**A major update with improved launch-at-login, smaller file sizes, easier editing, and a polished new look.**
 
 **What's New:**
+
+- **New App Icon** — Redesigned with a liquid glass effect that matches macOS 26's design language
 
 - **Menu Bar Quick Access** — Enable "Launch at Login" in settings to get a menu bar icon
   - See your current cursor theme at a glance
@@ -46,11 +48,15 @@
 
 **Bug Fixes:**
 
+- Fixed Windows cursor transparency rendering — thin lines and edges now look crisp and correct
 - Fixed cursor application not working when some cursors were missing
 - Fixed menu bar helper stability issues
 - Fixed various UI glitches
+- Updated documentation links to point to the correct project repository
 
 **Note:** Older versions of Mousecape may not open files saved with v1.1.0. We recommend updating to the latest version.
+
+The transparent window toggle feature has been removed to simplify the codebase.
 
 ---
 
@@ -217,9 +223,11 @@ For normal use, download the regular version.
 
 ### v1.1.0 - 架构更新
 
-**改进开机启动、文件体积更小、编辑更方便的一次重大更新。**
+**改进开机启动、文件体积更小、编辑更方便、界面更精致的一次重大更新。**
 
 **新功能：**
+
+- **全新应用图标** — 采用液态玻璃效果重新设计，完美契合 macOS 26 设计语言
 
 - **菜单栏快速访问** — 在设置中开启"开机自动应用"后，会显示菜单栏图标
   - 一眼看到当前使用的光标主题
@@ -257,11 +265,15 @@ For normal use, download the regular version.
 
 **Bug 修复：**
 
+- 修复 Windows 光标透明度渲染问题，细线和边缘现在显示清晰锐利
 - 修复某些光标缺失时无法应用的问题
 - 修复菜单栏助手的稳定性问题
 - 修复多个界面显示问题
+- 更新文档链接到正确的项目仓库
 
 **注意：** 旧版 Mousecape 可能无法打开 v1.1.0 保存的文件，建议更新到最新版本。
+
+透明窗口切换功能已移除，以简化代码库。
 
 ---
 
