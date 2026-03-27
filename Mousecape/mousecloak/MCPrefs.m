@@ -25,7 +25,12 @@ id MCDefaultFor(NSString *key, NSString *user, NSString *host) {
 }
 
 id MCDefault(NSString *key) {
-    id value = (__bridge_transfer id)CFPreferencesCopyAppValue((__bridge CFStringRef)key, (__bridge CFStringRef)kMCDomain);
+    id value = (__bridge_transfer id)CFPreferencesCopyValue(
+        (__bridge CFStringRef)key,
+        (__bridge CFStringRef)kMCDomain,
+        kCFPreferencesCurrentUser,
+        kCFPreferencesAnyHost
+    );
 #ifdef DEBUG
     MMLog("MCDefault: key=%s, value=%s",
           key.UTF8String,

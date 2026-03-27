@@ -240,11 +240,8 @@ final class AppState: @unchecked Sendable {
 
     /// Load cursor scale from preferences and apply it
     private func applySavedCursorScale() {
-        let preferenceDomain = "com.sdmj76.Mousecape"
-        let cursorScaleKey = "MCCursorScale"
-
-        // Read saved scale value
-        if let value = CFPreferencesCopyAppValue(cursorScaleKey as CFString, preferenceDomain as CFString) as? Double {
+        // Read saved scale value from CFPreferences (kCFPreferencesAnyHost)
+        if let value = UserPreferences.shared.cursorScale {
             debugLog("Loading saved cursor scale: \(value)")
             // Apply the scale using ObjC function
             let success = setCursorScale(Float(value))

@@ -90,19 +90,24 @@ final class DebugLogger: @unchecked Sendable {
         log("  doubleClickAction: \(defaults.integer(forKey: "doubleClickAction"))")
         log("  language: \(defaults.string(forKey: "appLanguage") ?? "system")")
 
-        // Read mousecloak preferences from CFPreferences
-        if let appliedCursor = CFPreferencesCopyAppValue(
+        // Read mousecloak preferences from CFPreferences (kCFPreferencesAnyHost)
+        let prefDomain = "com.sdmj76.Mousecape" as CFString
+        if let appliedCursor = CFPreferencesCopyValue(
             "MCAppliedCursor" as CFString,
-            "com.sdmj76.Mousecape" as CFString
+            prefDomain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
         ) as? String {
             log("  MCAppliedCursor: \(appliedCursor)")
         } else {
             log("  MCAppliedCursor: (not set)")
         }
 
-        if let cursorScale = CFPreferencesCopyAppValue(
+        if let cursorScale = CFPreferencesCopyValue(
             "MCCursorScale" as CFString,
-            "com.sdmj76.Mousecape" as CFString
+            prefDomain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
         ) as? Double {
             log("  MCCursorScale: \(cursorScale)")
         } else {

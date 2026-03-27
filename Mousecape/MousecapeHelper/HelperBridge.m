@@ -21,10 +21,12 @@
 const char* MCPrefsGetLastAppliedCapePath(void) {
     static char buffer[1024]; // Static buffer to persist after function returns
 
-    // Read from app-wide preferences (same domain as AppState writes to)
-    CFPropertyListRef value = CFPreferencesCopyAppValue(
+    // Read from app-wide preferences (kCFPreferencesAnyHost, same domain as AppState writes to)
+    CFPropertyListRef value = CFPreferencesCopyValue(
         CFSTR("MCAppliedCursor"),
-        CFSTR("com.sdmj76.Mousecape")
+        CFSTR("com.sdmj76.Mousecape"),
+        kCFPreferencesCurrentUser,
+        kCFPreferencesAnyHost
     );
 
     if (value) {

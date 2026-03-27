@@ -421,6 +421,16 @@
         }
       }
     },
+    "All settings have been restored to default values." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有设置已恢复为默认值。"
+          }
+        }
+      }
+    },
     "already exists. Please change the Name or Author to use a different filename." : {
       "localizations" : {
         "zh-Hans" : {

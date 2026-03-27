@@ -9,6 +9,12 @@
 import SwiftUI
 import ServiceManagement
 
+// MARK: - Reset Notification
+
+extension Notification.Name {
+    static let settingsDidReset = Notification.Name("com.sdmj76.Mousecape.settingsDidReset")
+}
+
 struct SettingsView: View {
     @State private var selectedCategory: SettingsCategory = .general
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
@@ -67,10 +73,8 @@ struct GeneralSettingsView: View {
     @State private var showLoginError = false
     @Environment(AppState.self) private var appState
 
-    /// The key used by ObjC code for cursor scale
-    private static let cursorScaleKey = "MCCursorScale"
-    private static let handednessKey = "MCHandedness"
-    private static let preferenceDomain = "com.sdmj76.Mousecape"
+    private static let cursorScaleKey = UserPreferences.Keys.cursorScale
+    private static let handednessKey = UserPreferences.Keys.handedness
 
     var body: some View {
         Form {
@@ -158,45 +162,38 @@ struct GeneralSettingsView: View {
         } message: {
             Text(loginToggleError ?? "")
         }
+        .onReceive(NotificationCenter.default.publisher(for: .settingsDidReset)) { _ in
+            cursorScale = 1.0
+            isLeftHanded = false
+        }
     }
 
-    /// Load cursor scale from CFPreferences (same as ObjC code)
+    /// Load cursor scale from CFPreferences (kCFPreferencesAnyHost)
     private func loadCursorScale() {
-        if let value = CFPreferencesCopyAppValue(Self.cursorScaleKey as CFString, Self.preferenceDomain as CFString) as? Double {
+        if let value = UserPreferences.shared.getDouble(forKey: Self.cursorScaleKey) {
             cursorScale = value
         } else {
             cursorScale = 1.0
         }
     }
 
-    /// Save cursor scale to CFPreferences (same as ObjC code)
+    /// Save cursor scale to CFPreferences (kCFPreferencesAnyHost)
     private func saveCursorScale(_ value: Double) {
-        CFPreferencesSetAppValue(
-            Self.cursorScaleKey as CFString,
-            value as CFNumber,
-            Self.preferenceDomain as CFString
-        )
-        CFPreferencesAppSynchronize(Self.preferenceDomain as CFString)
+        UserPreferences.shared.setValue(value, forKey: Self.cursorScaleKey)
+        UserPreferences.shared.synchronize()
     }
 
-    /// Load handedness from CFPreferences (same as ObjC MCFlag)
+    /// Load handedness from CFPreferences (kCFPreferencesAnyHost)
     private func loadHandedness() {
-        if let value = CFPreferencesCopyAppValue(Self.handednessKey as CFString, Self.preferenceDomain as CFString) {
-            isLeftHanded = (value as? NSNumber)?.boolValue ?? false
-        } else {
-            isLeftHanded = false
-        }
+        let value = UserPreferences.shared.getValue(forKey: Self.handednessKey)
+        isLeftHanded = (value as? NSNumber)?.boolValue ?? false
     }
 
     /// Save handedness to CFPreferences and UserDefaults (for @AppStorage reactivity)
     private func saveHandedness(_ leftHanded: Bool) {
         let intValue = leftHanded ? 1 : 0
-        CFPreferencesSetAppValue(
-            Self.handednessKey as CFString,
-            intValue as CFNumber,
-            Self.preferenceDomain as CFString
-        )
-        CFPreferencesAppSynchronize(Self.preferenceDomain as CFString)
+        UserPreferences.shared.setValue(intValue, forKey: Self.handednessKey)
+        UserPreferences.shared.synchronize()
         // Also write to UserDefaults so @AppStorage("MCHandedness") in preview views updates reactively
         UserDefaults.standard.set(intValue, forKey: Self.handednessKey)
     }
@@ -244,6 +241,7 @@ struct AdvancedSettingsView: View {
     @State private var isExportingLogs = false
     @State private var showResetCursorSuccess = false
     @State private var showResetOrderSuccess = false
+    @State private var showResetSettingsSuccess = false
     @Environment(AppState.self) private var appState
 
     var body: some View {
@@ -386,13 +384,38 @@ struct AdvancedSettingsView: View {
         } message: {
             Text("Sidebar order has been reset to alphabetical.")
         }
+        .alert(
+            "Restore Default Settings",
+            isPresented: $showResetSettingsSuccess
+        ) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("All settings have been restored to default values.")
+        }
     }
 
     private func resetToDefaults() {
-        // Reset all settings to defaults
+        debugLog("=== Restoring Default Settings ===")
+
+        // Clear CFPreferences values (kCFPreferencesAnyHost)
+        UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.appliedCursor)
+        UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.cursorScale)
+        UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.handedness)
+        UserPreferences.shared.synchronize()
+
+        // Clear UserDefaults domain
         let defaults = UserDefaults.standard
         let domain = Bundle.main.bundleIdentifier!
         defaults.removePersistentDomain(forName: domain)
+
+        // Reset in-memory state
+        appState.resetCapeOrder()
+
+        // Notify other settings views to reload their @State
+        NotificationCenter.default.post(name: .settingsDidReset, object: nil)
+
+        showResetSettingsSuccess = true
+        debugLog("Default settings restored.")
     }
 
     #if DEBUG

@@ -49,9 +49,14 @@ final class UserPreferences: @unchecked Sendable {
         return value
     }
 
-    /// Get a preference value from app-wide preferences
+    /// Get a preference value from app-wide preferences (kCFPreferencesAnyHost)
     func getAppValue(forKey key: String) -> Any? {
-        let value = CFPreferencesCopyAppValue(key as CFString, domain)
+        let value = CFPreferencesCopyValue(
+            key as CFString,
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        )
 
         #if DEBUG
         if let value = value {
