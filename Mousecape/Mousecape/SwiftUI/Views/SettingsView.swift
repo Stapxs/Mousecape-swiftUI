@@ -180,7 +180,7 @@ struct GeneralSettingsView: View {
     /// Save cursor scale to CFPreferences (kCFPreferencesAnyHost)
     private func saveCursorScale(_ value: Double) {
         UserPreferences.shared.setValue(value, forKey: Self.cursorScaleKey)
-        UserPreferences.shared.synchronize()
+        _ = UserPreferences.shared.synchronize()
     }
 
     /// Load handedness from CFPreferences (kCFPreferencesAnyHost)
@@ -193,7 +193,7 @@ struct GeneralSettingsView: View {
     private func saveHandedness(_ leftHanded: Bool) {
         let intValue = leftHanded ? 1 : 0
         UserPreferences.shared.setValue(intValue, forKey: Self.handednessKey)
-        UserPreferences.shared.synchronize()
+        _ = UserPreferences.shared.synchronize()
         // Also write to UserDefaults so @AppStorage("MCHandedness") in preview views updates reactively
         UserDefaults.standard.set(intValue, forKey: Self.handednessKey)
     }
@@ -401,7 +401,7 @@ struct AdvancedSettingsView: View {
         UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.appliedCursor)
         UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.cursorScale)
         UserPreferences.shared.setValue(nil, forKey: UserPreferences.Keys.handedness)
-        UserPreferences.shared.synchronize()
+        _ = UserPreferences.shared.synchronize()
 
         // Clear UserDefaults domain
         let defaults = UserDefaults.standard
