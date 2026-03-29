@@ -280,10 +280,11 @@ struct SimpleGroupRow: View {
     var body: some View {
         HStack {
             if let cursor = previewCursor, let image = cursor.previewImage(size: 32) {
+                let shouldMirror = handedness != 0 && (CursorType(rawValue: cursor.identifier)?.shouldMirrorInLeftHandMode() ?? true)
                 Image(nsImage: image)
                     .resizable()
                     .frame(width: 32, height: 32)
-                    .scaleEffect(x: handedness != 0 ? -1 : 1, y: 1)
+                    .scaleEffect(x: shouldMirror ? -1 : 1, y: 1)
             } else {
                 Image(systemName: group.previewSymbol)
                     .frame(width: 32, height: 32)
@@ -332,10 +333,11 @@ struct CursorListRow: View {
         HStack {
             // Preview thumbnail
             if let image = cursor.previewImage(size: 32) {
+                let shouldMirror = handedness != 0 && (CursorType(rawValue: cursor.identifier)?.shouldMirrorInLeftHandMode() ?? true)
                 Image(nsImage: image)
                     .resizable()
                     .frame(width: 32, height: 32)
-                    .scaleEffect(x: handedness != 0 ? -1 : 1, y: 1)
+                    .scaleEffect(x: shouldMirror ? -1 : 1, y: 1)
             } else {
                 let identifier = currentIdentifier ?? cursor.identifier
                 Image(systemName: CursorType(rawValue: identifier)?.previewSymbol ?? "cursorarrow")

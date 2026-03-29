@@ -229,6 +229,17 @@ enum CursorType: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Cursor types that should NOT be mirrored in left-hand mode (diagonal resize cursors)
+    static let shouldNotMirrorInLeftHandMode: Set<CursorType> = [
+        .windowNE, .windowNW, .windowSE, .windowSW,
+        .windowNESW, .windowNWSE
+    ]
+
+    /// Whether this cursor should be mirrored in left-hand mode
+    func shouldMirrorInLeftHandMode() -> Bool {
+        return !Self.shouldNotMirrorInLeftHandMode.contains(self)
+    }
+
     /// Returns a SF Symbol name for the cursor type (for preview)
     var previewSymbol: String {
         switch self {
