@@ -161,12 +161,6 @@ If you want to revert to the default macOS cursor, you can:
 
 </details>
 
-<a id="Troubleshooting_en"></a>
-
-## Troubleshooting
-
-If you encounter issues, please check the common solutions below first. For more help, please [submit an Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues).
-
 ### Cursor Limitations
 
 Due to macOS system limitations, Mousecape has the following restrictions:
@@ -192,42 +186,10 @@ Due to macOS system limitations, Mousecape has the following restrictions:
 
 If you encounter issues, please check the common solutions below first. For more help, please [submit an Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues).
 
-### Helper Tool Not Running
-
-If you previously installed an older version of Mousecape, you may need to unload the old daemon first.
-
-**Check daemon status:**
-```bash
-launchctl list | grep mouse
-```
-
-**Normal output when running:**
-```
-12345   0   com.sdmj76.mousecloakhelper
-```
-- First column: PID (Process ID)
-- Second column: Exit code (`0` = running normally, `78` = configuration error)
-
-**If the daemon shows exit code 78 or is not running:**
-
-1. Unload the old daemon:
-   ```bash
-   launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
-   ```
-
-2. Verify it has been removed:
-   ```bash
-   launchctl list | grep mouse
-   ```
-
-3. Open Mousecape, click **Mousecape → Install Helper Tool**
-
-4. Verify the daemon is running:
-   ```bash
-   launchctl list | grep mouse
-   ```
-
-### Cursor Animation Only Works in Dock Area
+</details>
+<br>
+<details>
+<summary>Cursor Animation Only Works in Dock Area</summary>
 
 **Symptoms:** Custom cursor animations only appear when hovering over the Dock, but revert to the default system cursor elsewhere.
 
@@ -435,10 +397,6 @@ Mousecape 提供两种编辑模式，可通过工具栏切换：
 
 <a id="Troubleshooting_cn"></a>
 
-## 故障排除
-
-如果遇到问题，请先查看以下常见解决方案。更多帮助请[提交 Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues)。
-
 ### 光标限制
 
 由于 macOS 系统限制，Mousecape 有以下限制：
@@ -464,42 +422,10 @@ Mousecape 提供两种编辑模式，可通过工具栏切换：
 
 如果遇到问题，请先查看以下常见解决方案。更多帮助请[提交 Issue](https://github.com/sdmj76/Mousecape-swiftUI/issues)。
 
-### 守护进程未运行
-
-如果你之前安装过旧版本的 Mousecape，可能需要先注销旧的守护进程。
-
-**检查守护进程状态：**
-```bash
-launchctl list | grep mouse
-```
-
-**正常运行时的输出：**
-```
-12345   0   com.sdmj76.mousecloakhelper
-```
-- 第一列：PID（进程 ID）
-- 第二列：退出码（`0` = 正常运行，`78` = 配置错误）
-
-**如果守护进程显示退出码 78 或未运行：**
-
-1. 注销旧的守护进程：
-   ```bash
-   launchctl bootout gui/$(id -u)/com.sdmj76.mousecloakhelper
-   ```
-
-2. 验证是否已移除：
-   ```bash
-   launchctl list | grep mouse
-   ```
-
-3. 打开 Mousecape，点击 **Mousecape → Install Helper Tool**
-
-4. 验证守护进程是否正在运行：
-   ```bash
-   launchctl list | grep mouse
-   ```
-
-### 光标动画仅在 Dock 区域生效
+</details>
+<br>
+<details>
+<summary>光标动画仅在 Dock 区域生效</summary>
 
 **症状**：自定义光标动画仅在悬停在 Dock 上时显示，移动到其他地方会恢复为系统默认光标。
 
