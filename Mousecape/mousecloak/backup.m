@@ -11,21 +11,24 @@
 #import "MCDefs.h"
 
 NSString *backupStringForIdentifier(NSString *identifier) {
-    return [NSString stringWithFormat:@"com.alexzielenski.mousecape.%@", identifier];
+    return [NSString stringWithFormat:@"com.AppleInc.%@", identifier];
 }
 
 void backupCursorForIdentifier(NSString *ident) {
     MMLog("  Backing up: %s", ident.UTF8String);
-    bool registered = false;
-    MCIsCursorRegistered(CGSMainConnectionID(), (char *)ident.UTF8String, &registered);
 
-//     dont try to backup a nonexistant cursor
-    if (!registered) {
-        MMLog("    Skipped - cursor not registered");
-        return;
+//     For named cursors, check if registered; core cursors can be read without registration
+    if (![ident hasPrefix:@"com.apple.cursor"]) {
+        bool registered = false;
+        MCIsCursorRegistered(CGSMainConnectionID(), (char *)ident.UTF8String, &registered);
+        if (!registered) {
+            MMLog("    Skipped - cursor not registered");
+            return;
+        }
     }
 
     NSString *backupIdent = backupStringForIdentifier(ident);
+    bool registered = false;
     MCIsCursorRegistered(CGSMainConnectionID(), (char *)backupIdent.UTF8String, &registered);
 
 //     don't re-back it up

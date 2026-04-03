@@ -10,6 +10,8 @@
 #import "NSCursor_Private.h"
 #import "NSBitmapImageRep+ColorSpace.h"
 #import "MCDefs.h"
+#import "MCPrefs.h"
+#import "restore.h"
 
 NSError *createCape(NSString *input, NSString *output, BOOL convert) {
     NSDictionary *cape;
@@ -264,21 +266,79 @@ NSDictionary *createCapeFromMightyMouse(NSDictionary *mightyMouse, NSDictionary 
     return totalDict;
 }
 
+static CGImageRef _Nullable downsampleSpriteSheetImage(CGImageRef spriteSheet, NSUInteger fromCount, NSUInteger toCount) {
+    size_t width = CGImageGetWidth(spriteSheet);
+    size_t totalHeight = CGImageGetHeight(spriteSheet);
+    size_t frameHeight = totalHeight / fromCount;
+    size_t newTotalHeight = frameHeight * toCount;
+
+    CGContextRef ctx = CGBitmapContextCreate(NULL, width, newTotalHeight,
+                                              CGImageGetBitsPerComponent(spriteSheet),
+                                              CGImageGetBitsPerPixel(spriteSheet) / 8 * width,
+                                              CGImageGetColorSpace(spriteSheet),
+                                              CGImageGetBitmapInfo(spriteSheet));
+    if (!ctx) return NULL;
+
+    // Uniform sampling: keep first and last frames, evenly sample in between
+    double step = (double)(fromCount - 1) / (double)(toCount - 1);
+
+    for (NSUInteger i = 0; i < toCount; i++) {
+        NSUInteger sourceIndex = (NSUInteger)round((double)i * step);
+        if (sourceIndex > fromCount - 1) sourceIndex = fromCount - 1;
+
+        CGRect cropRect = CGRectMake(0, sourceIndex * frameHeight, width, frameHeight);
+        CGImageRef frame = CGImageCreateWithImageInRect(spriteSheet, cropRect);
+        if (frame) {
+            CGRect dstRect = CGRectMake(0, i * frameHeight, width, frameHeight);
+            CGContextDrawImage(ctx, dstRect, frame);
+            CGImageRelease(frame);
+        }
+    }
+
+    CGImageRef result = CGBitmapContextCreateImage(ctx);
+    CGContextRelease(ctx);
+    return result;
+}
+
 NSDictionary *processedCapeWithIdentifier(NSString *identifier) {
     NSMutableDictionary *dict = capeWithIdentifier(identifier).mutableCopy;
     if (!dict)
         return nil;
-    
-    NSDictionary *cursors = dict[MCCursorDictionaryRepresentationsKey];
+
+    NSUInteger frameCount = [dict[MCCursorDictionaryFrameCountKey] unsignedIntegerValue];
+    NSArray *representations = dict[MCCursorDictionaryRepresentationsKey];
     NSMutableArray *reps = [NSMutableArray array];
-    
-    for (id image in cursors) {
-        CGImageRef im = (__bridge CGImageRef)image;
-        NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:im];
-    
-        reps[reps.count] = pngDataForImage(rep.ensuredSRGBSpace);
+
+    // Downsample animated cursors exceeding max frame count (e.g. Wait beach ball)
+    if (frameCount > MCMaxFrameCount) {
+        MMLog("  Downsampling %s: %lu frames -> %lu frames",
+              identifier.UTF8String, (unsigned long)frameCount, (unsigned long)MCMaxFrameCount);
+
+        CGFloat frameDuration = [dict[MCCursorDictionaryFrameDuratiomKey] doubleValue];
+        CGFloat adjustedDuration = frameDuration * ((CGFloat)frameCount / (CGFloat)MCMaxFrameCount);
+        dict[MCCursorDictionaryFrameCountKey] = @(MCMaxFrameCount);
+        dict[MCCursorDictionaryFrameDuratiomKey] = @(adjustedDuration);
+
+        for (id imageObj in representations) {
+            CGImageRef spriteSheet = (__bridge CGImageRef)imageObj;
+            CGImageRef downsampled = downsampleSpriteSheetImage(spriteSheet, frameCount, MCMaxFrameCount);
+            if (downsampled) {
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:downsampled];
+                reps[reps.count] = pngDataForImage(rep.ensuredSRGBSpace);
+                CGImageRelease(downsampled);
+            } else {
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:spriteSheet];
+                reps[reps.count] = pngDataForImage(rep.ensuredSRGBSpace);
+            }
+        }
+    } else {
+        for (id imageObj in representations) {
+            CGImageRef im = (__bridge CGImageRef)imageObj;
+            NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:im];
+            reps[reps.count] = pngDataForImage(rep.ensuredSRGBSpace);
+        }
     }
-    
+
     dict[MCCursorDictionaryRepresentationsKey] = reps;
     return dict;
 }
@@ -288,11 +348,19 @@ BOOL dumpCursorsToFile(NSString *path, BOOL (^progress)(NSUInteger current, NSUI
         
     float originalScale;
     CGSGetCursorScale(CGSMainConnectionID(), &originalScale);
-    
-    CGSSetCursorScale(CGSMainConnectionID(), 16.0);
+
+    // Save and reset cursor scale preference to 1.0 so captured data
+    // is independent of the user's current cursor scale setting (e.g. 1.5x).
+    id originalScalePref = MCDefault(MCPreferencesCursorScaleKey);
+    MCSetDefault(@1.0, MCPreferencesCursorScaleKey);
+    CGSSetCursorScale(CGSMainConnectionID(), 1.0);
     CGSHideCursor(CGSMainConnectionID());
 
-    NSInteger total = 9 + 45;
+    // Reset all cursors to system defaults at 1.0x scale before dumping,
+    // so captured data reflects clean system cursor state.
+    resetAllCursors();
+
+    NSInteger total = 9 + 43;
     NSInteger current = 0;
 
     NSMutableDictionary *cursors = [NSMutableDictionary dictionary];
@@ -307,11 +375,43 @@ BOOL dumpCursorsToFile(NSString *path, BOOL (^progress)(NSUInteger current, NSUI
             }
         }
         MMLog("Gathering data for %s", key.UTF8String);
-        cursors[key] = processedCapeWithIdentifier(key);
+        NSDictionary *capeData = processedCapeWithIdentifier(key);
+        // On newer macOS, some cursors are aliases of others (e.g. ArrowCtx -> Arrow,
+        // IBeamXOR -> IBeam). The system may either return nil or a tiny placeholder
+        // image (e.g. 8x8 pixels) instead of real cursor data.
+        // Use the primary cursor's data in both cases.
+        BOOL isPlaceholder = NO;
+        if (capeData) {
+            CGFloat pw = [capeData[MCCursorDictionaryPointsWideKey] doubleValue];
+            CGFloat ph = [capeData[MCCursorDictionaryPointsHighKey] doubleValue];
+            // Real cursors are at least 16x16 points; smaller ones are system placeholders
+            if (pw <= 8 && ph <= 8) {
+                isPlaceholder = YES;
+            }
+        }
+        if (!capeData || isPlaceholder) {
+            NSDictionary *aliasMap = @{
+                @"com.apple.coregraphics.ArrowCtx": @"com.apple.coregraphics.Arrow",
+                @"com.apple.coregraphics.IBeamXOR": @"com.apple.coregraphics.IBeam",
+                @"com.apple.coregraphics.ArrowS":   @"com.apple.coregraphics.Arrow",
+                @"com.apple.coregraphics.IBeamS":   @"com.apple.coregraphics.IBeam",
+            };
+            NSString *primary = aliasMap[key];
+            if (primary && cursors[primary]) {
+                if (isPlaceholder) {
+                    MMLog("  Replacing placeholder image for %s with %s data", key.UTF8String, primary.UTF8String);
+                } else {
+                    MMLog("  Using %s data as fallback for alias %s", primary.UTF8String, key.UTF8String);
+                }
+                capeData = cursors[primary];
+            }
+        }
+        cursors[key] = capeData;
         i++;
     }
-    
-    for (int x = 0; x < 45; x++) {
+
+    // Start from 2: cursor 0 (Arrow) and 1 (IBeam) are already in defaultCursors[]
+    for (int x = 2; x < 45; x++) {
         if (progress) {
             current = i + x;
 
@@ -342,12 +442,15 @@ BOOL dumpCursorsToFile(NSString *path, BOOL (^progress)(NSUInteger current, NSUI
     cape[MCCursorDictionaryCloudKey] = @NO;
     cape[MCCursorDictionaryCursorsKey] = cursors;
     cape[MCCursorDictionaryHiDPIKey] = @YES;
-    cape[MCCursorDictionaryIdentifierKey] = [NSString stringWithFormat:@"com.alexzielenski.mousecape.dump"];
+    cape[MCCursorDictionaryIdentifierKey] = [NSString stringWithFormat:@"com.AppleInc.dump"];
     cape[MCCursorDictionaryVersionKey] = @(MCCursorCreatorVersion);
     cape[MCCursorDictionaryMinimumVersionKey] = @(MCCursorParserVersion);
     
     CGSSetCursorScale(CGSMainConnectionID(), originalScale);
     CGSShowCursor(CGSMainConnectionID());
+
+    // Restore original cursor scale preference
+    MCSetDefault(originalScalePref, MCPreferencesCursorScaleKey);
     
     return [cape writeToFile:path atomically:NO];
 }

@@ -22,7 +22,7 @@ NSString *defaultCursors[] = {
     @"com.apple.coregraphics.Empty",
     nil };
 
-NSString *MCErrorDomain = @"com.alexzielenski.mousecape.error";
+NSString *MCErrorDomain = @"com.sdmj76.mousecape.error";
 
 // Hotspot validation constant
 const CGFloat   MCMaxHotspotValue                    = 31.99;
@@ -108,22 +108,25 @@ NSData *pngDataForImage(id image) {
 }
 
 NSDictionary *capeWithIdentifier(NSString *identifier) {
-    
+
     NSUInteger frameCount;
     CGFloat frameDuration;
     CGPoint hotSpot;
     CGSize size;
     CFArrayRef representations;
-    bool registered = false;
-    
-    MCIsCursorRegistered(CGSMainConnectionID(), (char *)identifier.UTF8String, &registered);
-    if (!registered)
-        return nil;
-
     CGError error = 0;
+
     if (![identifier hasPrefix:@"com.apple.cursor"]) {
+        // Named cursor — must be registered to read
+        bool registered = false;
+        MCIsCursorRegistered(CGSMainConnectionID(), (char *)identifier.UTF8String, &registered);
+        if (!registered)
+            return nil;
         error = CGSCopyRegisteredCursorImages(CGSMainConnectionID(), (char*)identifier.UTF8String, &size, &hotSpot, &frameCount, &frameDuration, &representations);
     } else {
+        // Core cursor — CoreCursorCopyImages can read default images without registration.
+        // Sizes include display backing scale but are consistent with the image pixel data,
+        // so store them as-is to keep PointsWide/PointsHigh aligned with actual resolution.
         error = CoreCursorCopyImages(CGSMainConnectionID(), [[identifier pathExtension] intValue], &representations, &size, &hotSpot, &frameCount, &frameDuration);
     }
     
@@ -303,12 +306,14 @@ BOOL MCCursorIsPointer(NSString *identifier) {
 }
 
 void MCEnumerateAllCursorIdentifiers(void (NS_NOESCAPE ^block)(NSString *identifier)) {
-    NSUInteger i = 0;
-    NSString *key = nil;
-    while ((key = defaultCursors[i]) != nil) {
+    // Enumerate all known cursor identifiers from cursorMap()
+    // (includes both com.apple.coregraphics.* and com.apple.cursor.* types)
+    NSDictionary *map = cursorMap();
+    for (NSString *key in map) {
         block(key);
-        i++;
     }
+    // Also enumerate dynamically discovered Arrow and IBeam synonyms
+    // (may include names not in cursorMap, e.g., new macOS versions)
     for (NSString *name in MCArrowSynonyms()) {
         block(name);
     }
