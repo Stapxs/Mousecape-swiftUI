@@ -13,6 +13,23 @@
 #import "NSBitmapImageRep+ColorSpace.h"
 #import "MCDefs.h"
 
+// Helper function to check if cursor type should be mirrored in left-hand mode
+static BOOL shouldMirrorCursorType(NSString *identifier) {
+    static NSSet *noMirrorTypes = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        noMirrorTypes = [NSSet setWithArray:@[
+            @"com.apple.cursor.29",  // windowNE
+            @"com.apple.cursor.33",  // windowNW
+            @"com.apple.cursor.35",  // windowSE
+            @"com.apple.cursor.37",  // windowSW
+            @"com.apple.cursor.30",  // windowNESW
+            @"com.apple.cursor.34"   // windowNWSE
+        ]];
+    });
+    return ![noMirrorTypes containsObject:identifier];
+}
+
 static BOOL MCRegisterImagesForCursorName(NSUInteger frameCount, CGFloat frameDuration, CGPoint hotSpot, CGSize size, NSArray *images, NSString *name) {
     char *cursorName = (char *)name.UTF8String;
     int seed = 0;
@@ -193,7 +210,8 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
     MMLog("  Size: %.1fx%.1f", size.width, size.height);
     MMLog("  Representations count: %lu", (unsigned long)[reps count]);
 
-    if (lefty && !restore) {
+    BOOL shouldMirror = lefty && !restore && shouldMirrorCursorType(identifier);
+    if (shouldMirror) {
         MMLog("Lefty mode for %s", identifier.UTF8String);
         hotSpot.x = size.width - hotSpot.x - 1;
     }
@@ -208,7 +226,7 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
         }
         rep = rep.retaggedSRGBSpace;
 
-        if (!lefty || restore) {
+        if (!shouldMirror) {
             // special case if array has a type of CGImage already there is no need to convert it
             if (type == CGImageGetTypeID()) {
                 images[images.count] = object;

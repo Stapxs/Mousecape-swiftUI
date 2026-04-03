@@ -67,12 +67,12 @@ class CursorState: ObservableObject {
     }
 
     func refresh() {
-        // Use CFPreferences API (same as main app)
+        // Use CFPreferences API with kCFPreferencesAnyHost (same as main app)
         let value = CFPreferencesCopyValue(
             "MCAppliedCursor" as CFString,
             "com.sdmj76.Mousecape" as CFString,
             kCFPreferencesCurrentUser,
-            kCFPreferencesCurrentHost
+            kCFPreferencesAnyHost
         )
 
         if let capeIdentifier = value as? String {

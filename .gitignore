@@ -68,3 +68,6 @@ fastlane/test_output
 
 iOSInjectionProject/
 .DS_Store
+__pycache__
+.vscode
+CLAUDE.md

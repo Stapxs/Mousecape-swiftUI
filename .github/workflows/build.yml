@@ -4,6 +4,9 @@ on:
   # 推送触发
   push:
     branches: [main, develop, feature]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
 
   # PR 触发
   pull_request:
@@ -19,17 +22,19 @@ concurrency:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       matrix:
         configuration: [Release, Debug]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Cache Xcode DerivedData
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
@@ -89,7 +94,7 @@ jobs:
           fi
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Mousecape-${{ matrix.configuration }}-${{ github.sha }}
           path: /tmp/artifact/*.zip

@@ -72,12 +72,12 @@ void MCLoggerInit(void) {
         // Log user preferences
         MCLoggerWrite("--- User Preferences ---");
 
-        // Read MCAppliedCursor from CFPreferences
+        // Read MCAppliedCursor from CFPreferences (kCFPreferencesAnyHost)
         CFStringRef appliedCursor = CFPreferencesCopyValue(
             CFSTR("MCAppliedCursor"),
             CFSTR("com.sdmj76.Mousecape"),
             kCFPreferencesCurrentUser,
-            kCFPreferencesCurrentHost
+            kCFPreferencesAnyHost
         );
         if (appliedCursor) {
             MCLoggerWrite("  MCAppliedCursor: %s", [(__bridge NSString *)appliedCursor UTF8String]);
@@ -86,12 +86,12 @@ void MCLoggerInit(void) {
             MCLoggerWrite("  MCAppliedCursor: (not set)");
         }
 
-        // Read MCCursorScale from CFPreferences
+        // Read MCCursorScale from CFPreferences (kCFPreferencesAnyHost)
         CFPropertyListRef cursorScale = CFPreferencesCopyValue(
             CFSTR("MCCursorScale"),
             CFSTR("com.sdmj76.Mousecape"),
             kCFPreferencesCurrentUser,
-            kCFPreferencesCurrentHost
+            kCFPreferencesAnyHost
         );
         if (cursorScale) {
             if (CFGetTypeID(cursorScale) == CFNumberGetTypeID()) {

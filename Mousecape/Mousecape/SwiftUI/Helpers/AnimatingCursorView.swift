@@ -25,7 +25,9 @@ struct AnimatingCursorView: View {
     @Environment(AppState.self) private var appState
 
     private var shouldFlip: Bool {
-        handedness != 0
+        guard handedness != 0 else { return false }
+        guard let cursorType = CursorType(rawValue: cursor.identifier) else { return true }
+        return cursorType.shouldMirrorInLeftHandMode()
     }
 
     var body: some View {
