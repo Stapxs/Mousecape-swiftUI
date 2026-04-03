@@ -17,6 +17,9 @@
 
 **Improvements:**
 
+- **Decoupled menu bar icon visibility from Helper lifecycle** — Helper (MousecapeHelper) now always runs in the background for session monitoring. The "Show Menu Bar Tool" toggle now only controls the menu bar icon visibility, no longer starting or stopping the Helper process
+  - Menu bar icon visibility syncs in real-time via `CFPreferences` + `DistributedNotificationCenter` cross-process communication
+  - Added `MenuBarState` observable class for reactive icon visibility control
 - Further optimization for macOS 26 Liquid Glass effect — all overlays, loading indicators, drag feedback, zoom preview, and selection highlights now use native glass effects
 - Optimized left-hand mode: diagonal resize cursors now excluded from mirroring for better usability
 - Improved settings synchronization and preference handling
@@ -258,6 +261,9 @@ For normal use, download the regular version.
 
 **改进：**
 
+- **菜单栏图标显示与 Helper 生命周期解耦** — Helper (MousecapeHelper) 现在始终在后台运行以进行会话监控。"显示菜单栏工具"开关现在仅控制菜单栏图标的可见性，不再启动或停止 Helper 进程
+  - 菜单栏图标可见性通过 `CFPreferences` + `DistributedNotificationCenter` 跨进程通信实时同步
+  - 新增 `MenuBarState` 可观察类，实现图标可见性的响应式控制
 - 进一步适配 macOS 26 液态玻璃效果 — 所有叠加层、加载指示器、拖放反馈、放大预览、选中高亮等均采用原生玻璃效果
 - 优化左手模式：对角线调整光标不再镜像翻转，提升易用性
 - 改进设置同步和偏好设置处理
