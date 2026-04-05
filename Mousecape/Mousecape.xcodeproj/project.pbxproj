@@ -58,6 +58,7 @@
 		DED4B7D62F39BD5800CAFCCE /* CapeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */; };
 		DED4B7D82F39BD5800CAFCCE /* AddCursorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */; };
 		DED4B7DC2F39C14F00CAFCCE /* AppState+WindowsImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4B7DB2F39C14F00CAFCCE /* AppState+WindowsImport.swift */; };
+		DEF629642F82F6FE00371CDF /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF629632F82F6FE00371CDF /* ToastView.swift */; };
 		FA000001UTITYPES00000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA000001UTITYPES00000000 /* UniformTypeIdentifiers.framework */; };
 		FA35983F189DA3BC00288163 /* MCPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35983E189DA3BC00288163 /* MCPrefs.m */; };
 		FA359840189DA3C100288163 /* MCPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35983E189DA3BC00288163 /* MCPrefs.m */; };
@@ -169,6 +170,7 @@
 		DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCursorSheet.swift; sourceTree = "<group>"; };
 		DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapeInfoView.swift; sourceTree = "<group>"; };
 		DED4B7DB2F39C14F00CAFCCE /* AppState+WindowsImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+WindowsImport.swift"; sourceTree = "<group>"; };
+		DEF629632F82F6FE00371CDF /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		FA000001UTITYPES00000000 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		FA1DC01719527A56009E879C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		FA254779189D85890038E1D9 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
@@ -289,6 +291,7 @@
 		DE3661EA2EFAAAB600D94521 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				DEF629632F82F6FE00371CDF /* ToastView.swift */,
 				DE3661E82EFAAAB600D94521 /* AnimatingCursorView.swift */,
 				DE3661E92EFAAAB600D94521 /* GlassEffectContainer.swift */,
 			);
@@ -660,6 +663,7 @@
 				DEAB0D642F39ADB000DB9EB0 /* CursorImageScaler.swift in Sources */,
 				DED4B7D62F39BD5800CAFCCE /* CapeInfoView.swift in Sources */,
 				DED4B7D82F39BD5800CAFCCE /* AddCursorSheet.swift in Sources */,
+				DEF629642F82F6FE00371CDF /* ToastView.swift in Sources */,
 				FAAEF94F189EFC9600145DF8 /* backup.m in Sources */,
 				FAAEF951189F0CC300145DF8 /* restore.m in Sources */,
 				DE654C422F0A6DB40025E5A0 /* WindowsINFParser.swift in Sources */,
