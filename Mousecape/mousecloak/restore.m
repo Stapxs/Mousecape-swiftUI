@@ -46,6 +46,16 @@ void restoreCursorForIdentifier(NSString *ident) {
 void resetAllCursors(void) {
     MMLog("=== resetAllCursors ===");
 
+    // Save current scale settings
+    float originalScale;
+    CGSGetCursorScale(CGSMainConnectionID(), &originalScale);
+    id originalScalePref = MCDefault(MCPreferencesCursorScaleKey);
+
+    // Temporarily set scale to 1.0 to ensure system cursors are restored
+    // at their original size, not scaled by the current preference
+    MCSetDefault(@1.0, MCPreferencesCursorScaleKey);
+    CGSSetCursorScale(CGSMainConnectionID(), 1.0);
+
     // Restore all cursors (default + synonyms)
     MMLog("--- Restoring all cursors ---");
     MCEnumerateAllCursorIdentifiers(^(NSString *name) {
@@ -68,5 +78,10 @@ void resetAllCursors(void) {
     } else {
         MMLog(BOLD RED "Received an error while restoring core cursors." RESET);
     }
+
+    // Restore original scale settings
+    CGSSetCursorScale(CGSMainConnectionID(), originalScale);
+    MCSetDefault(originalScalePref, MCPreferencesCursorScaleKey);
+
     MMLog("=== resetAllCursors complete ===");
 }
