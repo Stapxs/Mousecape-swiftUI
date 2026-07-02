@@ -29,12 +29,8 @@
 </p>
 
 A free macOS cursor manager that allows you to easily replace Mac system pointers.
-<br/>一款免费的 macOS 光标管理器，让你轻松替换 Mac 系统指针。
 <br/>
-<br/>
-**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion to Windows cursor.
-<br/>适配 macOS 26，全面采用液态玻璃设计。支持一键转换Windows光标**
-<br/>
+**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion from Windows cursor.
 <br/>
 English | [中文](README_zh.md)
 </div>
@@ -90,7 +86,7 @@ Example cursors are located in the [Example](Example/) directory, including the 
 <details>
 <summary>Set Up Launch at Login</summary>
 
-1. Download and open the Mousecape app
+1. Open the Mousecape app
 2. Go to **Settings > General** and enable **Launch at Login**
 
 When enabled, Mousecape starts in the background at login and provides a menu bar icon that you can use to:
@@ -102,26 +98,23 @@ When enabled, Mousecape starts in the background at login and provides a menu ba
 </details>
 <br>
 <details>
-<summary>Import Windows Format Cursors</summary>
+<summary>Create Custom Cursor Sets/ Import cursor from Windows format</summary>
 
-Mousecape supports one-click conversion of Windows cursor themes:
+- Import cursor from Windows format
+  Mousecape supports one-click conversion of Windows cursor themes:
 
-1. Extract the downloaded Windows cursor package
-2. Click the "+" button and select "Import Windows Cursors"
-3. Select the folder containing the cursor files to import
+  1. Extract the downloaded Windows cursor package
+  2. Click the "+" button and select "Import Windows Cursors"
+  3. Select the folder containing the cursor files to import
 
-If the folder contains an `*.inf` file, Mousecape will automatically parse it to map cursor files to the correct cursor types. Otherwise, it will use filename-based matching.
+  If the folder contains an `*.inf` file, Mousecape will automatically parse it to map cursor files to the correct cursor types. Otherwise, it will use filename-based matching.
 
-</details>
-<br>
-<details>
-<summary>Create Custom Cursor Sets</summary>
-
-1. Click the "+" button to add a new cursor set
-2. Click the "+" button to add pointers to customize
-3. Drag and drop image or cursor files into the edit window
-4. Adjust hotspot position and other parameters for each cursor
-5. Save and apply your theme
+- Create Custom Cursor Sets
+  1. Click the "+" button to add a new cursor set
+  2. Click the "+" button to add pointers to customize
+  3. Drag and drop image or cursor files into the edit window
+  4. Adjust hotspot position and other parameters for each cursor
+  5. Save and apply your theme
 
 **Modern / Classic Mode**
 
@@ -133,7 +126,7 @@ Mousecape offers two `display / editing` modes, switchable via Settings > Appear
 </details>
 <br>
 <details>
-<summary>Import/Export .cape Format Cursors</summary>
+<summary>Import/Export .cape Format Cursors (For sharing)</summary>
 
 - Click the "Import" button, then select the **.cape** format cursor file in the Finder window
 - Or drag and drop **.cape** files directly onto the app window to import
@@ -218,48 +211,6 @@ If you encounter issues, please check the common solutions below first. For more
 4. Re-apply your cursor theme in Mousecape
 
 The pointer must use the default color scheme (white outline, black fill) for Mousecape to work properly.
-
-</details>
-<br>
-<details>
-<summary>Animated Cursor Import Failed</summary>
-
-**Symptoms:** Animated cursor files (.ani or .gif) fail to import or are rejected.
-
-**Cause:** Animated cursors with more than 24 frames exceed macOS system limits and require automatic downsampling.
-
-**Solution:**
-- Mousecape automatically downsamples animations with more than 24 frames
-- The animation speed is preserved by adjusting frame duration
-- If import still fails, ensure the file is not corrupted and try re-downloading
-
-</details>
-<br>
-<details>
-<summary>Chinese Cursor Theme Display Issues</summary>
-
-**Symptoms:** Chinese or other non-English cursor themes show garbled filenames or incorrect names.
-
-**Cause:** INF file encoding not detected correctly.
-
-**Solution:**
-- Mousecape supports multiple encodings: UTF-8, UTF-16 LE/BE, GBK, GB18030, Big5, Shift_JIS, EUC-KR, ISO-8859-1
-- Ensure the INF file is saved in a supported encoding
-- If issues persist, try resaving the INF file as UTF-8
-
-</details>
-<br>
-<details>
-<summary>Cursor Image Too Large</summary>
-
-**Symptoms:** Large cursor images are rejected during import.
-
-**Cause:** Image exceeds the maximum supported size of 512×512 pixels.
-
-**Solution:**
-- Resize images to 512×512 pixels or smaller before importing
-- All imported images are automatically scaled to 64×64 pixels
-- Images larger than 512×512 will be rejected with an error message
 
 </details>
 <br>

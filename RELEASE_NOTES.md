@@ -1,3 +1,12 @@
+### v1.1.4 - Quality Improvements
+
+**Bug Fixes:**
+
+- Fixed .ani animated cursor conversion blur — imported Windows animated cursors now look sharp and clear
+- Added support for more INF file formats for better Windows cursor theme compatibility
+
+---
+
 ### v1.1.3 - New Navigation & Quick Look
 
 **What's New:**
