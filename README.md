@@ -30,7 +30,7 @@
 
 A free macOS cursor manager that allows you to easily replace Mac system pointers.
 <br/>
-**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion from Windows cursor.
+**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion from Windows cursor.**
 <br/>
 English | [中文](README_zh.md)
 </div>
@@ -186,20 +186,9 @@ If you encounter issues, please check the common solutions below first. For more
 
 <br>
 <details>
-<summary>Cursor Not Working in Some Apps</summary>
+<summary>Custom Cursor Only Applied in Mousecape App / Dock Area</summary>
 
-**Symptoms:** Cursor does not take effect inside certain app windows, such as Terminal or Excel.
-
-**Cause:** Some apps configure their own custom cursors, which override the system cursor settings.
-
-**Solution:** There is currently no safe workaround. This issue only occurs in certain apps and has limited impact.
-
-</details>
-<br>
-<details>
-<summary>Cursor Animation Only Works in Dock Area</summary>
-
-**Symptoms:** Custom cursor animations only appear when hovering over the Dock, but revert to the default system cursor elsewhere.
+**Symptoms:** The custom cursor only applied in Mousecape app or Dock area, moving out will revert cursor to system default.
 
 **Cause:** macOS system settings for custom pointer colors can prevent Mousecape from successfully applying cursors globally.
 
@@ -211,6 +200,17 @@ If you encounter issues, please check the common solutions below first. For more
 4. Re-apply your cursor theme in Mousecape
 
 The pointer must use the default color scheme (white outline, black fill) for Mousecape to work properly.
+
+</details>
+<br>
+<details>
+<summary>Cursor Not Apply in Some Other Apps</summary>
+
+**Symptoms:** Cursor does not take effect inside certain app windows, such as Terminal or Excel.
+
+**Cause:** Some apps configure their own custom cursors, which override the system cursor settings.
+
+**Solution:** There is currently no safe workaround. This issue only occurs in certain apps and has limited impact.
 
 </details>
 <br>
