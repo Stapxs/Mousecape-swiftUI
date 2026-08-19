@@ -110,12 +110,20 @@ void reconfigurationCallback(CGDirectDisplayID display,
         BOOL success = applyCapeAtPathReapply(capePath);
         MMLog("Apply result: %s", success ? "SUCCESS" : "FAILED");
     }
-    float scale;
-    CGSGetCursorScale(CGSMainConnectionID(), &scale);
-    MMLog("Current cursor scale: %.2f", scale);
-    CGSSetCursorScale(CGSMainConnectionID(), scale + .3);
-    CGSSetCursorScale(CGSMainConnectionID(), scale);
-    MMLog("Cursor scale refreshed");
+
+    // Re-apply the saved cursor scale from preferences.
+    // On macOS 27 beta, display reconfiguration can reset the system cursor
+    // scale to 1.0, so we must restore from the user's saved preference rather
+    // than reading the (already-reset) current value from the system.
+    float savedScale = defaultCursorScale();
+    float currentScale = 0;
+    CGSGetCursorScale(CGSMainConnectionID(), &currentScale);
+    MMLog("Cursor scale after display change: %.2f (saved: %.2f)", currentScale, savedScale);
+    // Force a re-apply even if values match — some macOS versions ignore
+    // a "same-value" set and need a nudge to actually take effect.
+    CGSSetCursorScale(CGSMainConnectionID(), savedScale + .3f);
+    setCursorScale(savedScale);
+    MMLog("Cursor scale restored to %.2f", savedScale);
 }
 
 
