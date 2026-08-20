@@ -178,10 +178,11 @@ BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPo
     return MCRegisterImagesForCursorName(frameCount, frameDuration, hotSpot, size, images, ident);
 }
 
-BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore) {
+BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore, BOOL animateOnApply) {
     MMLog("=== applyCapeForIdentifier ===");
     MMLog("  Identifier: %s", identifier.UTF8String);
     MMLog("  Restore mode: %s", restore ? "YES" : "NO");
+    MMLog("  Animate on apply: %s", animateOnApply ? "YES" : "NO");
 
     if (!cursor || !identifier) {
         MMLog(BOLD RED "  Invalid cursor or identifier (bad seed)" RESET);
@@ -264,8 +265,29 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
             [images addObject:(__bridge id)[newRep CGImage]];
         }
     }
-    
-    return applyCursorForIdentifier(frameCount.unsignedIntegerValue, frameDuration.doubleValue, hotSpot, size, images, identifier, 0);
+
+    // Static mode (Animate=NO): register only the first frame so the applied
+    // cursor is static. Crop happens after the mirror loop so the first frame
+    // is already mirrored. The full sprite sheet stays in the file untouched.
+    NSUInteger applyFrameCount = frameCount.unsignedIntegerValue;
+    if (!animateOnApply && applyFrameCount > 1) {
+        MMLog("Static mode: registering first frame only (Animate=NO)");
+        NSMutableArray *staticImages = [NSMutableArray arrayWithCapacity:images.count];
+        for (id image in images) {
+            CGImageRef full = (__bridge CGImageRef)image;
+            size_t w = CGImageGetWidth(full);
+            size_t frameH = CGImageGetHeight(full) / applyFrameCount;
+            CGImageRef firstFrame = CGImageCreateWithImageInRect(full, CGRectMake(0, 0, w, frameH));
+            if (firstFrame)
+                [staticImages addObject:(__bridge_transfer id)firstFrame];  // Create-Rule: array takes ownership
+            else
+                [staticImages addObject:image];  // Fallback to full image on crop failure
+        }
+        images = staticImages;
+        applyFrameCount = 1;
+    }
+
+    return applyCursorForIdentifier(applyFrameCount, frameDuration.doubleValue, hotSpot, size, images, identifier, 0);
 }
 
 // Internal implementation with reapply mode support.
@@ -277,6 +299,9 @@ static BOOL applyCapeInternal(NSDictionary *dictionary, BOOL isReapply) {
         NSDictionary *cursors = dictionary[MCCursorDictionaryCursorsKey];
         NSString *name = dictionary[MCCursorDictionaryCapeNameKey];
         NSNumber *version = dictionary[MCCursorDictionaryCapeVersionKey];
+        // Absent key (older cape) → animate (default YES)
+        NSNumber *animateNum = dictionary[MCCapeDictionaryAnimateKey];
+        BOOL animateOnApply = animateNum ? animateNum.boolValue : YES;
 
         MMLog("========================================");
         MMLog("=== APPLYING CAPE (%s) ===", isReapply ? "REAPPLY" : "FRESH");
@@ -284,6 +309,7 @@ static BOOL applyCapeInternal(NSDictionary *dictionary, BOOL isReapply) {
         MMLog("Cape name: %s", name.UTF8String);
         MMLog("Cape identifier: %s", [dictionary[MCCursorDictionaryIdentifierKey] UTF8String]);
         MMLog("Cape version: %.2f", version.floatValue);
+        MMLog("Animate on apply: %s", animateOnApply ? "YES" : "NO");
         MMLog("Total cursors: %lu", (unsigned long)cursors.count);
         MMLog("Cursor identifiers:");
         for (NSString *key in cursors) {
@@ -317,7 +343,7 @@ static BOOL applyCapeInternal(NSDictionary *dictionary, BOOL isReapply) {
                 continue;
             }
 
-            BOOL success = applyCapeForIdentifier(cape, key, NO);
+            BOOL success = applyCapeForIdentifier(cape, key, NO, animateOnApply);
             if (!success) {
                 MMLog(YELLOW "  Failed to apply cursor %s - continuing with remaining cursors..." RESET, key.UTF8String);
                 failedCount++;
