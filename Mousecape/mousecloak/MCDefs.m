@@ -48,6 +48,7 @@ const NSString *MCCursorDictionaryCapeVersionKey     = @"CapeVersion";
 
 const NSString *MCCursorDictionaryFrameCountKey      = @"FrameCount";
 const NSString *MCCursorDictionaryFrameDuratiomKey   = @"FrameDuration";
+const NSString *MCCursorDictionaryBaseFrameDurationKey = @"BaseFrameDuration";
 //const NSString *MCCursorDictionaryRepeatCountKey     = @"RepeatCount";
 const NSString *MCCursorDictionaryHotSpotXKey        = @"HotSpotX";
 const NSString *MCCursorDictionaryHotSpotYKey        = @"HotSpotY";
