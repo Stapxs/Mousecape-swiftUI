@@ -30,7 +30,7 @@
 
 A free macOS cursor manager that allows you to easily replace Mac system pointers.
 <br/>
-**Compatible with macOS 26, featuring a fully liquid glass design. Supports one-click conversion from Windows cursor.**
+**Compatible with macOS 27, featuring a fully liquid glass design. Supports one-click conversion from Windows cursor.**
 <br/>
 English | [中文](README_zh.md)
 </div>
@@ -40,10 +40,10 @@ English | [中文](README_zh.md)
 ## Interface Display
 
 <div align="center" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
-  <img src="Screenshot/Home_en_lg.gif#gh-light-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit_en_lg.gif#gh-light-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Home_en_dk.gif#gh-dark-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit_en_dk.gif#gh-dark-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Home_lg.png#gh-light-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Edit_lg.png#gh-light-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Home_dk.png#gh-dark-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Edit_dk.png#gh-dark-mode-only" width="48%" style="height: auto;" />
 </div>
 
 > The cursor theme "Kiriko" shown in the screenshots is created by [ArakiCC](https://space.bilibili.com/14913641), available in the example files.
@@ -52,18 +52,17 @@ English | [中文](README_zh.md)
 
 - Customize Mac system cursors, supporting both static and animated cursors
 - One-click conversion of Windows cursor formats (.cur / .ani), mapping 85% of macOS cursor types
+- Intuitive hotspot editing — drag the hotspot directly in the preview, or fine-tune with sliders and one-click centering
+- Animated/static cursor toggle — switch each theme between animated and static cursors, applied system-wide
 - Quickly preview Windows format pointers and support quick preview for macOS.
-- Extract default system cursors, perfect for users who prefer older system cursors
 - Left-hand mode: mirror cursors horizontally for left-handed users
 - Multi-language support: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, German, French
 
 ## Download & Installation
 ### System Requirements
 
-- macOS Sequoia (15) or later
+- macOS Sonoma (14) or later
 - Support Architectures: runs on both Intel and Apple Silicon Macs (Universal Binary)
-
-> **Note:** The Debug version only includes the architecture of the build machine and may not run on all Macs. For normal use, please download the regular (Release) version.
 
 Download the latest version from the [Releases](https://github.com/sdmj76/Mousecape-swiftUI/releases) section of this GitHub page.
 
@@ -113,7 +112,7 @@ When enabled, Mousecape starts in the background at login and provides a menu ba
   1. Click the "+" button to add a new cursor set
   2. Click the "+" button to add pointers to customize
   3. Drag and drop image or cursor files into the edit window
-  4. Adjust hotspot position and other parameters for each cursor
+  4. Drag the hotspot in the preview or fine-tune it with sliders, and adjust other parameters
   5. Save and apply your theme
 
 **Modern / Classic Mode**

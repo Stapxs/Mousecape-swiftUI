@@ -30,7 +30,7 @@
 
 一款免费的 macOS 光标管理器，让你轻松替换 Mac 系统指针。
 <br/>
-**适配 macOS 26，全面采用液态玻璃设计。支持一键转换Windows光标**
+**适配 macOS 27，全面采用液态玻璃设计。支持一键转换Windows光标**
 <br/>
 [English](README.md) | 中文
 </div>
@@ -40,10 +40,10 @@
 ## 界面展示
 
 <div align="center" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
-  <img src="Screenshot/Home_zh_lg.gif#gh-light-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit_zh_lg.gif#gh-light-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Home_zh_dk.gif#gh-dark-mode-only" width="48%" style="height: auto;" />
-  <img src="Screenshot/Edit_zh_dk.gif#gh-dark-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Home_lg.png#gh-light-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Edit_lg.png#gh-light-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Home_dk.png#gh-dark-mode-only" width="48%" style="height: auto;" />
+  <img src="Screenshot/Edit_dk.png#gh-dark-mode-only" width="48%" style="height: auto;" />
 </div>
 
 > 截图中展示的光标主题 "Kiriko" 由 [ArakiCC](https://space.bilibili.com/14913641) 制作，在示例文件中提供。
@@ -52,18 +52,17 @@
 
 - 自定义 Mac 系统光标，支持静态和动画光标
 - 一键转换 Windows 格式指针（.cur / .ani），覆盖 85% 的 macOS 光标类型
+- 直观的热点编辑 — 在预览中直接拖拽热点，或使用滑块精确定位、一键居中
+- 光标动静态切换 — 每个光标主题可独立切换动画/静态显示，应用后同样生效
 - 可快捷预览Windows格式指针，为macOS快速预览支持
-- 提取系统默认光标，适合喜欢旧系统光标的用户
 - 左手模式：水平翻转光标，适合左手用户
 - 多语言支持：简体中文、繁体中文、英语、日语、韩语、德语、法语
 
 ## 下载安装
 ### 系统要求
 
-- macOS Sequoia (15) 或更高版本
+- macOS Sonoma (14) 或更高版本
 - 支持架构：同时支持 Intel 和 Apple Silicon Mac（通用二进制）
-
-> **注意：** Debug 版本仅包含构建机器的架构，可能无法在所有 Mac 上运行。正常使用请下载普通（Release）版本。
 
 在本 GitHub 页面的 [Releases](https://github.com/sdmj76/Mousecape-swiftUI/releases) 部分下载最新版本。
 
@@ -113,7 +112,7 @@
   1. 点击 "+" 按钮添加新光标套装
   2. 点击 "+" 按钮添加要自定义的指针
   3. 将图片或光标文件拖放到编辑窗口中
-  4. 调整热点位置和其他参数
+  4. 在预览中拖拽热点或使用滑块精确定位，并调整其他参数
   5. 保存并应用你的主题
 
 **现代 / 传统 模式**

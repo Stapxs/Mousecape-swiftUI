@@ -1,19 +1,21 @@
-### v1.1.5 - Animation Speed Control
+### v1.2.0 - Animation & Hotspot Editing Upgrade
 
 **What's New:**
 
-- **Animation Speed Slider** — Adjust animation playback speed with a simple slider (0.5×–3×)
-  - 1× is the original speed from when the cursor was imported
-  - Tick marks at 1× and 2× for easy reference
-- **Apply Speed to All Cursors** — One click to sync the current animation speed to all other cursors in the same theme
+- **Upgraded Hotspot Editing** — Position the hotspot more intuitively
+  - Drag the hotspot directly in the preview window
+  - Glass sliders for precise positioning, plus a one-click Center button
+- **Animated / Static Cursor Toggle** — Switch each theme between animated and static cursors
+  - Turn animation off and the theme is applied as a static first-frame cursor
+- **Animated Cursor Speed Editing** — Adjust the playback speed of animated cursors
+  - Speed slider from 0.5× to 3×, with live preview while dragging
 
 **Improvements:**
 
-- The preview updates instantly while dragging the speed slider
-
-**Removed:**
-
-- Removed manual frame count editing — the total frame count is now shown as read-only info
+- Settings page redesigned with liquid glass styling, matching the rest of the app
+- Cursor scale now syncs with system accessibility settings for more reliable scaling
+- Improved compatibility with the macOS 27 beta
+- Now supports macOS 14 and later
 
 ---
 
