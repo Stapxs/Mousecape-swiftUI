@@ -15,7 +15,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPoint hotSpot, CGSize size, NSArray *images, NSString *ident, NSUInteger repeatCount);
-extern BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore);
+extern BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore, BOOL animateOnApply);
 extern BOOL applyCape(NSDictionary *dictionary);
 extern BOOL applyCapeAtPath(NSString *path);
 // Reapply mode: skip resetAllCursors() + backupAllCursors() to avoid cursor flash.

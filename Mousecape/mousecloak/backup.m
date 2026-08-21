@@ -72,7 +72,7 @@ void backupCursorForIdentifier(NSString *ident) {
         cape = processed;
     }
 
-    BOOL success = applyCapeForIdentifier(cape, backupIdent, YES);
+    BOOL success = applyCapeForIdentifier(cape, backupIdent, YES, YES);
     MMLog("    Backup result: %s", success ? "SUCCESS" : "FAILED");
 }
 

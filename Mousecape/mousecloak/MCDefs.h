@@ -71,10 +71,14 @@ extern const NSString *MCCursorDictionaryHiDPIKey;
 extern const NSString *MCCursorDictionaryIdentifierKey;
 extern const NSString *MCCursorDictionaryCapeNameKey;
 extern const NSString *MCCursorDictionaryCapeVersionKey;
+// Optional: whether to apply cursors as animation (YES) or static first frame (NO). Absent = YES.
+extern const NSString *MCCapeDictionaryAnimateKey;
 
 // Required cursors for cape format 2.0
 extern const NSString *MCCursorDictionaryFrameCountKey;
 extern const NSString *MCCursorDictionaryFrameDuratiomKey;
+// Optional: import-time frame duration (speed multiplier baseline). Absent = 0 → falls back to current duration.
+extern const NSString *MCCursorDictionaryBaseFrameDurationKey;
 //extern const NSString *MCCursorDictionaryRepeatCountKey;
 extern const NSString *MCCursorDictionaryHotSpotXKey;
 extern const NSString *MCCursorDictionaryHotSpotYKey;

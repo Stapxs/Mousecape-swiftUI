@@ -1,3 +1,22 @@
+### v1.1.5 - Animation Speed Control
+
+**What's New:**
+
+- **Animation Speed Slider** — Adjust animation playback speed with a simple slider (0.5×–3×)
+  - 1× is the original speed from when the cursor was imported
+  - Tick marks at 1× and 2× for easy reference
+- **Apply Speed to All Cursors** — One click to sync the current animation speed to all other cursors in the same theme
+
+**Improvements:**
+
+- The preview updates instantly while dragging the speed slider
+
+**Removed:**
+
+- Removed manual frame count editing — the total frame count is now shown as read-only info
+
+---
+
 ### v1.1.4 - Quality Improvements
 
 **Bug Fixes:**
