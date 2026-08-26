@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import "../mousecloak/listen.h"
+#import "../mousecloak/apply.h"
 #import "../mousecloak/MCLogger.h"
 #import "../mousecloak/MCPrefs.h"
 #import "../mousecloak/restore.h"
@@ -45,6 +46,19 @@ const char* MCPrefsGetLastAppliedCapePath(void) {
 void ResetCursorsToDefault(void) {
     // Use the same function as main app
     resetAllCursors();
+}
+
+bool ApplyCapeAtPathReapply(const char* path) {
+    if (!path) {
+        return false;
+    }
+
+    NSString *capePath = [NSString stringWithUTF8String:path];
+    if (!capePath) {
+        return false;
+    }
+
+    return applyCapeAtPathReapply(capePath);
 }
 
 // Simple logging wrapper for Swift (non-variadic)

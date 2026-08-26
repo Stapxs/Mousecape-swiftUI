@@ -6,6 +6,8 @@
 #ifndef MousecapeHelper_Bridging_Header_h
 #define MousecapeHelper_Bridging_Header_h
 
+#include <stdbool.h>
+
 // Pure C function declarations (no ObjC syntax)
 // These functions are defined in HelperBridge.m or linked from mousecloak
 
@@ -19,6 +21,7 @@ void startSessionMonitor(void);
 
 // Cursor management
 void ResetCursorsToDefault(void);
+bool ApplyCapeAtPathReapply(const char* path);
 
 // Preferences (returns C string, caller must not free)
 const char* MCPrefsGetLastAppliedCapePath(void);
