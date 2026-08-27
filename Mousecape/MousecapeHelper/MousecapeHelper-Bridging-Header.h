@@ -21,6 +21,7 @@ void startSessionMonitor(void);
 
 // Cursor management
 void ResetCursorsToDefault(void);
+bool ApplyCapeAtPath(const char* path);
 bool ApplyCapeAtPathReapply(const char* path);
 
 // Preferences (returns C string, caller must not free)

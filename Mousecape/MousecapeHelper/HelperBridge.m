@@ -61,6 +61,19 @@ bool ApplyCapeAtPathReapply(const char* path) {
     return applyCapeAtPathReapply(capePath);
 }
 
+bool ApplyCapeAtPath(const char* path) {
+    if (!path) {
+        return false;
+    }
+
+    NSString *capePath = [NSString stringWithUTF8String:path];
+    if (!capePath) {
+        return false;
+    }
+
+    return applyCapeAtPath(capePath);
+}
+
 // Simple logging wrapper for Swift (non-variadic)
 void HelperLog(const char* message) {
     if (message) {

@@ -9,12 +9,24 @@ import SwiftUI
 import AppKit
 import Combine
 
+struct MenuBarCape: Identifiable, Hashable {
+    let identifier: String
+    let name: String
+    let path: String
+
+    var id: String { identifier }
+}
+
 // Observable state manager for cursor name
 @MainActor
 class CursorState: ObservableObject {
     @Published var currentCapeName: String = ""
+    @Published var currentCapeIdentifier: String?
+    @Published var installedCapes: [MenuBarCape] = []
+    @Published var applyingCapeIdentifier: String?
     private var observer: NSObjectProtocol?
     private var cfObserverContext: UnsafeMutableRawPointer?
+    private let domain = "com.sdmj76.Mousecape" as CFString
 
     init() {
         // Store observer context for CFNotificationCenter
@@ -68,24 +80,163 @@ class CursorState: ObservableObject {
 
     func refresh() {
         // Use CFPreferences API with kCFPreferencesAnyHost (same as main app)
+        CFPreferencesSynchronize(
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        )
         let value = CFPreferencesCopyValue(
             "MCAppliedCursor" as CFString,
-            "com.sdmj76.Mousecape" as CFString,
+            domain,
             kCFPreferencesCurrentUser,
             kCFPreferencesAnyHost
         )
 
         if let capeIdentifier = value as? String {
-            // Extract cape name from identifier
-            let components = capeIdentifier.split(separator: ".")
-            if let lastName = components.last {
-                currentCapeName = String(lastName)
-            } else {
-                currentCapeName = capeIdentifier
-            }
+            currentCapeIdentifier = capeIdentifier
+        } else {
+            currentCapeIdentifier = nil
+        }
+
+        installedCapes = loadInstalledCapes()
+        if let currentCapeIdentifier,
+           let currentCape = installedCapes.first(where: { $0.identifier == currentCapeIdentifier }) {
+            currentCapeName = currentCape.name
+        } else if let currentCapeIdentifier {
+            currentCapeName = displayName(fromIdentifier: currentCapeIdentifier)
         } else {
             currentCapeName = ""
         }
+    }
+
+    func applyCape(_ cape: MenuBarCape) {
+        applyingCapeIdentifier = cape.identifier
+        updateAutomaticAppearanceBinding(for: cape)
+
+        let currentIdentifier = readString(forKey: "MCAppliedCursor")
+        let isReapply = currentIdentifier == cape.identifier
+        let success = cape.path.withCString {
+            isReapply ? ApplyCapeAtPathReapply($0) : ApplyCapeAtPath($0)
+        }
+        applyingCapeIdentifier = nil
+
+        if success {
+            currentCapeIdentifier = cape.identifier
+            currentCapeName = cape.name
+        } else {
+            debugLog("Failed to apply cape from menu bar: \(cape.path)")
+        }
+
+        refresh()
+    }
+
+    private func updateAutomaticAppearanceBinding(for cape: MenuBarCape) {
+        guard readBool(forKey: "MCAutoAppearanceCapeEnabled") else {
+            return
+        }
+
+        let key = isSystemDarkAppearance ? "MCDarkAppearanceCape" : "MCLightAppearanceCape"
+        CFPreferencesSetValue(
+            key as CFString,
+            cape.identifier as CFString,
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        )
+        CFPreferencesSynchronize(
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        )
+
+        debugLog("Menu bar automatic appearance cape binding updated: \(key) -> \(cape.identifier)")
+    }
+
+    func resetCursors() {
+        ResetCursorsToDefault()
+        refresh()
+    }
+
+    private func loadInstalledCapes() -> [MenuBarCape] {
+        guard let capesDirectory = capesDirectory else { return [] }
+        let fileManager = FileManager.default
+        guard let capeURLs = try? fileManager.contentsOfDirectory(
+            at: capesDirectory,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return []
+        }
+
+        let directoryPath = capesDirectory.standardizedFileURL.path
+        return capeURLs.compactMap { url in
+            guard url.pathExtension == "cape" else { return nil }
+            let standardizedURL = url.standardizedFileURL
+            guard standardizedURL.path.hasPrefix(directoryPath + "/"),
+                  fileManager.isReadableFile(atPath: standardizedURL.path)
+            else { return nil }
+
+            let identifier = standardizedURL.deletingPathExtension().lastPathComponent
+            let name = capeName(at: standardizedURL) ?? displayName(fromIdentifier: identifier)
+            return MenuBarCape(identifier: identifier, name: name, path: standardizedURL.path)
+        }
+        .sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+    }
+
+    private var capesDirectory: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Mousecape", isDirectory: true)
+            .appendingPathComponent("capes", isDirectory: true)
+            .standardizedFileURL
+    }
+
+    private func capeName(at url: URL) -> String? {
+        guard let dictionary = NSDictionary(contentsOf: url),
+              let name = dictionary["CapeName"] as? String
+        else { return nil }
+
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedName.isEmpty ? nil : trimmedName
+    }
+
+    private func readString(forKey key: String) -> String? {
+        CFPreferencesCopyValue(
+            key as CFString,
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        ) as? String
+    }
+
+    private func readBool(forKey key: String) -> Bool {
+        let value = CFPreferencesCopyValue(
+            key as CFString,
+            domain,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        )
+
+        if let boolValue = value as? Bool {
+            return boolValue
+        }
+        return (value as? NSNumber)?.boolValue ?? false
+    }
+
+    private var isSystemDarkAppearance: Bool {
+        if UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" {
+            return true
+        }
+
+        return NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    }
+
+    private func displayName(fromIdentifier identifier: String) -> String {
+        identifier
+            .split(separator: ".")
+            .last
+            .map(String.init) ?? identifier
     }
 }
 
@@ -103,18 +254,38 @@ struct MenuBarContentView: View {
                 Divider()
             }
 
+            Menu(String(localized: "Switch Cursor")) {
+                if cursorState.installedCapes.isEmpty {
+                    Text(String(localized: "No Capes"))
+                } else {
+                    ForEach(cursorState.installedCapes) { cape in
+                        Toggle(
+                            isOn: Binding(
+                                get: {
+                                    cursorState.currentCapeIdentifier == cape.identifier
+                                },
+                                set: { _ in
+                                    cursorState.applyCape(cape)
+                                }
+                            )
+                        ) {
+                            Text(cape.name)
+                        }
+                        .disabled(cursorState.applyingCapeIdentifier != nil)
+                    }
+                }
+            }
+
+            Button(String(localized: "Reset Cursors")) {
+                cursorState.resetCursors()
+            }
+
+            Divider()
+
             Button(String(localized: "Open Mousecape")) {
                 openMainApp()
             }
             .keyboardShortcut("o", modifiers: .command)
-
-            Divider()
-
-            Button(String(localized: "Reset Cursors")) {
-                resetCursors()
-            }
-
-            Divider()
 
             Button(String(localized: "Quit Mousecape")) {
                 NSApp.terminate(nil)
@@ -136,11 +307,6 @@ struct MenuBarContentView: View {
         NSWorkspace.shared.open(mainAppURL)
     }
 
-    private func resetCursors() {
-        ResetCursorsToDefault()
-        cursorState.currentCapeName = "" // Clear display
-        cursorState.refresh() // Refresh after reset
-    }
 }
 
 #Preview {
