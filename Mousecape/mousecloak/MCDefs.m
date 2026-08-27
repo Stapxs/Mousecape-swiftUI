@@ -45,9 +45,11 @@ const NSString *MCCursorDictionaryHiDPIKey           = @"HiDPI";
 const NSString *MCCursorDictionaryIdentifierKey      = @"Identifier";
 const NSString *MCCursorDictionaryCapeNameKey        = @"CapeName";
 const NSString *MCCursorDictionaryCapeVersionKey     = @"CapeVersion";
+const NSString *MCCapeDictionaryAnimateKey           = @"Animate";
 
 const NSString *MCCursorDictionaryFrameCountKey      = @"FrameCount";
 const NSString *MCCursorDictionaryFrameDuratiomKey   = @"FrameDuration";
+const NSString *MCCursorDictionaryBaseFrameDurationKey = @"BaseFrameDuration";
 //const NSString *MCCursorDictionaryRepeatCountKey     = @"RepeatCount";
 const NSString *MCCursorDictionaryHotSpotXKey        = @"HotSpotX";
 const NSString *MCCursorDictionaryHotSpotYKey        = @"HotSpotY";

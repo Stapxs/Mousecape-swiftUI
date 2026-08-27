@@ -178,10 +178,11 @@ BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPo
     return MCRegisterImagesForCursorName(frameCount, frameDuration, hotSpot, size, images, ident);
 }
 
-BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore) {
+BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore, BOOL animateOnApply) {
     MMLog("=== applyCapeForIdentifier ===");
     MMLog("  Identifier: %s", identifier.UTF8String);
     MMLog("  Restore mode: %s", restore ? "YES" : "NO");
+    MMLog("  Animate on apply: %s", animateOnApply ? "YES" : "NO");
 
     if (!cursor || !identifier) {
         MMLog(BOLD RED "  Invalid cursor or identifier (bad seed)" RESET);
@@ -264,32 +265,65 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
             [images addObject:(__bridge id)[newRep CGImage]];
         }
     }
-    
-    return applyCursorForIdentifier(frameCount.unsignedIntegerValue, frameDuration.doubleValue, hotSpot, size, images, identifier, 0);
+
+    // Static mode (Animate=NO): register only the first frame so the applied
+    // cursor is static. Crop happens after the mirror loop so the first frame
+    // is already mirrored. The full sprite sheet stays in the file untouched.
+    NSUInteger applyFrameCount = frameCount.unsignedIntegerValue;
+    if (!animateOnApply && applyFrameCount > 1) {
+        MMLog("Static mode: registering first frame only (Animate=NO)");
+        NSMutableArray *staticImages = [NSMutableArray arrayWithCapacity:images.count];
+        for (id image in images) {
+            CGImageRef full = (__bridge CGImageRef)image;
+            size_t w = CGImageGetWidth(full);
+            size_t frameH = CGImageGetHeight(full) / applyFrameCount;
+            CGImageRef firstFrame = CGImageCreateWithImageInRect(full, CGRectMake(0, 0, w, frameH));
+            if (firstFrame)
+                [staticImages addObject:(__bridge_transfer id)firstFrame];  // Create-Rule: array takes ownership
+            else
+                [staticImages addObject:image];  // Fallback to full image on crop failure
+        }
+        images = staticImages;
+        applyFrameCount = 1;
+    }
+
+    return applyCursorForIdentifier(applyFrameCount, frameDuration.doubleValue, hotSpot, size, images, identifier, 0);
 }
 
-BOOL applyCape(NSDictionary *dictionary) {
+// Internal implementation with reapply mode support.
+// When isReapply is YES, skip resetAllCursors() + backupAllCursors() to avoid
+// the visible flash when re-applying the same cape (e.g. Helper startup, session change).
+// CGSRegisterCursorWithImages() can directly overwrite already-registered cursors.
+static BOOL applyCapeInternal(NSDictionary *dictionary, BOOL isReapply) {
     @autoreleasepool {
         NSDictionary *cursors = dictionary[MCCursorDictionaryCursorsKey];
         NSString *name = dictionary[MCCursorDictionaryCapeNameKey];
         NSNumber *version = dictionary[MCCursorDictionaryCapeVersionKey];
+        // Absent key (older cape) → animate (default YES)
+        NSNumber *animateNum = dictionary[MCCapeDictionaryAnimateKey];
+        BOOL animateOnApply = animateNum ? animateNum.boolValue : YES;
 
         MMLog("========================================");
-        MMLog("=== APPLYING CAPE ===");
+        MMLog("=== APPLYING CAPE (%s) ===", isReapply ? "REAPPLY" : "FRESH");
         MMLog("========================================");
         MMLog("Cape name: %s", name.UTF8String);
         MMLog("Cape identifier: %s", [dictionary[MCCursorDictionaryIdentifierKey] UTF8String]);
         MMLog("Cape version: %.2f", version.floatValue);
+        MMLog("Animate on apply: %s", animateOnApply ? "YES" : "NO");
         MMLog("Total cursors: %lu", (unsigned long)cursors.count);
         MMLog("Cursor identifiers:");
         for (NSString *key in cursors) {
             MMLog("  - %s", key.UTF8String);
         }
 
-        MMLog("--- Calling resetAllCursors ---");
-        resetAllCursors();
-        MMLog("--- Calling backupAllCursors ---");
-        backupAllCursors();
+        if (!isReapply) {
+            MMLog("--- Calling resetAllCursors ---");
+            resetAllCursors();
+            MMLog("--- Calling backupAllCursors ---");
+            backupAllCursors();
+        } else {
+            MMLog("--- Skipping reset/backup (reapply mode) ---");
+        }
 
         MMLog("--- Applying cursors ---");
 
@@ -309,7 +343,7 @@ BOOL applyCape(NSDictionary *dictionary) {
                 continue;
             }
 
-            BOOL success = applyCapeForIdentifier(cape, key, NO);
+            BOOL success = applyCapeForIdentifier(cape, key, NO, animateOnApply);
             if (!success) {
                 MMLog(YELLOW "  Failed to apply cursor %s - continuing with remaining cursors..." RESET, key.UTF8String);
                 failedCount++;
@@ -342,6 +376,14 @@ BOOL applyCape(NSDictionary *dictionary) {
 
         return YES;
     }
+}
+
+BOOL applyCape(NSDictionary *dictionary) {
+    return applyCapeInternal(dictionary, NO);
+}
+
+BOOL applyCapeReapply(NSDictionary *dictionary) {
+    return applyCapeInternal(dictionary, YES);
 }
 
 BOOL applyCapeAtPath(NSString *path) {
@@ -382,6 +424,49 @@ BOOL applyCapeAtPath(NSString *path) {
     if (cape) {
         MMLog("Cape file loaded successfully, applying...");
         return applyCape(cape);
+    }
+    MMLog(BOLD RED "Could not parse valid cape file" RESET);
+    return NO;
+}
+
+BOOL applyCapeAtPathReapply(NSString *path) {
+    MMLog("========================================");
+    MMLog("=== applyCapeAtPathReapply ===");
+    MMLog("========================================");
+    MMLog("Input path: %s", path ? path.UTF8String : "(null)");
+
+    // Validate path
+    if (!path || path.length == 0) {
+        MMLog(BOLD RED "Invalid path" RESET);
+        return NO;
+    }
+
+    // Resolve symlinks and check for path traversal
+    NSString *realPath = [path stringByResolvingSymlinksInPath];
+    NSString *standardPath = [realPath stringByStandardizingPath];
+
+    MMLog("Real path: %s", realPath.UTF8String);
+    MMLog("Standard path: %s", standardPath.UTF8String);
+    MMLog("File exists: %s", [[NSFileManager defaultManager] fileExistsAtPath:standardPath] ? "YES" : "NO");
+    MMLog("File readable: %s", [[NSFileManager defaultManager] isReadableFileAtPath:standardPath] ? "YES" : "NO");
+
+    // Validate file extension
+    if (![[standardPath pathExtension] isEqualToString:@"cape"]) {
+        MMLog(BOLD RED "Invalid file extension - must be .cape" RESET);
+        return NO;
+    }
+
+    // Check file exists and is readable
+    if (![[NSFileManager defaultManager] isReadableFileAtPath:standardPath]) {
+        MMLog(BOLD RED "File not readable at path" RESET);
+        return NO;
+    }
+
+    MMLog("Loading cape file...");
+    NSDictionary *cape = [NSDictionary dictionaryWithContentsOfFile:standardPath];
+    if (cape) {
+        MMLog("Cape file loaded successfully, applying in reapply mode...");
+        return applyCapeReapply(cape);
     }
     MMLog(BOLD RED "Could not parse valid cape file" RESET);
     return NO;

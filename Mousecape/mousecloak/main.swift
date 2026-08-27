@@ -230,7 +230,7 @@ extension MousecloakCLI {
 extension MousecloakCLI {
     struct Scale: ParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Scale the cursor to obscene multipliers or get the current scale"
+            abstract: "Set cursor scale (syncs to Accessibility settings) or get current scale"
         )
 
         @Argument(help: "Scale value (optional, omit to get current scale)")

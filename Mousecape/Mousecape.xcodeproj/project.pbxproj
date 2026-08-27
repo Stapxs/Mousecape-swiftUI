@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		1B57EC46401E4928B48C5E89 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 86D2A987242A45FBB21AE949 /* ArgumentParser */; };
 		9CB312EE7052700D9F29C682 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B757C0780EA0A10BF1469 /* main.swift */; };
-		AA1000014000000000000001 /* MousecapeQuickLook.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA1000054000000000000001 /* MousecapeQuickLook.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AA1000014000000000000001 /* MousecapeQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA1000054000000000000001 /* MousecapeQuickLook.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AA1000024000000000000001 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
-		AB2000014000000000000001 /* MousecapeQuickLookThumbnail.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AB2000054000000000000001 /* MousecapeQuickLookThumbnail.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AB2000014000000000000001 /* MousecapeQuickLookThumbnail.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB2000054000000000000001 /* MousecapeQuickLookThumbnail.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AB2000024000000000000001 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
 		DE27927D2F61D93200CCEBD3 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE27927C2F61D93200CCEBD3 /* UserPreferences.swift */; };
 		DE2C56182F6F075C00DCFED7 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DE2C56172F6F075C00DCFED7 /* AppIcon.icon */; };
@@ -56,6 +56,7 @@
 		DE654C422F0A6DB40025E5A0 /* WindowsINFParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */; };
 		DE6B14B42F0512EE00742257 /* WindowsCursorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */; };
 		DEAB0D642F39ADB000DB9EB0 /* CursorImageScaler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */; };
+		DEAE0DE02F97F741004E36A7 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAE0DDF2F97F741004E36A7 /* EditView.swift */; };
 		DEBC96002F16577D004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
 		DEBC96032F1657A4004E6C07 /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC96022F1657A4004E6C07 /* DebugLogger.swift */; };
 		DEBC96042F165800004E6C07 /* MCLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DEBC95FF2F16577D004E6C07 /* MCLogger.m */; };
@@ -127,15 +128,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		AA1000044000000000000001 /* Embed App Extensions */ = {
+		AA1000044000000000000001 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				AA1000014000000000000001 /* MousecapeQuickLook.appex in Embed App Extensions */,
-				AB2000014000000000000001 /* MousecapeQuickLookThumbnail.appex in Embed App Extensions */,
+				AA1000014000000000000001 /* MousecapeQuickLook.appex in Embed Foundation Extensions */,
+				AB2000014000000000000001 /* MousecapeQuickLookThumbnail.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 		};
 		DE2E175D2F5B2CCE00055E78 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -194,6 +195,7 @@
 		DE654C412F0A6DB40025E5A0 /* WindowsINFParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsINFParser.swift; sourceTree = "<group>"; };
 		DE6B14B32F0512EE00742257 /* WindowsCursorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowsCursorParser.swift; sourceTree = "<group>"; };
 		DEAB0D632F39ADB000DB9EB0 /* CursorImageScaler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorImageScaler.swift; sourceTree = "<group>"; };
+		DEAE0DDF2F97F741004E36A7 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		DEBC95FE2F16577D004E6C07 /* MCLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCLogger.h; sourceTree = "<group>"; };
 		DEBC95FF2F16577D004E6C07 /* MCLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MCLogger.m; sourceTree = "<group>"; };
 		DEBC96022F1657A4004E6C07 /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
@@ -383,6 +385,7 @@
 		DE3661F82EFAAAB600D94521 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				DEAE0DDF2F97F741004E36A7 /* EditView.swift */,
 				DED4B7D32F39BD5800CAFCCE /* AddCursorSheet.swift */,
 				DED4B7D42F39BD5800CAFCCE /* CapeInfoView.swift */,
 				DE3661F12EFAAAB600D94521 /* CapeContextMenu.swift */,
@@ -652,7 +655,7 @@
 				FAC69F5E189D603C00BC829D /* Frameworks */,
 				FAE5D57D1952734F007620DE /* Copy Tool */,
 				DE2E175D2F5B2CCE00055E78 /* CopyFiles */,
-				AA1000044000000000000001 /* Embed App Extensions */,
+				AA1000044000000000000001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -694,7 +697,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				CLASSPREFIX = MC;
 				LastSwiftUpdateCheck = 2610;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2640;
 				ORGANIZATIONNAME = Sdmj76;
 				TargetAttributes = {
 					AA1000094000000000000001 = {
@@ -825,6 +828,7 @@
 				DE3661FD2EFAAAB600D94521 /* MainView.swift in Sources */,
 				DE3661FE2EFAAAB600D94521 /* EditOverlayView.swift in Sources */,
 				DE3661FF2EFAAAB600D94521 /* AppState.swift in Sources */,
+				DEAE0DE02F97F741004E36A7 /* EditView.swift in Sources */,
 				DE3662002EFAAAB600D94521 /* CursorLibrary.swift in Sources */,
 				DEBC96032F1657A4004E6C07 /* DebugLogger.swift in Sources */,
 				DE3662012EFAAAB600D94521 /* MousecapeApp.swift in Sources */,
@@ -898,14 +902,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MousecapeQuickLook/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape.QuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -925,14 +930,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MousecapeQuickLook/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape.QuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -951,14 +957,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MousecapeQuickLookThumbnail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape.QuickLookThumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -978,14 +985,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MousecapeQuickLookThumbnail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape.QuickLookThumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1028,8 +1036,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.MousecapeHelper;
@@ -1078,8 +1086,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.MousecapeHelper;
@@ -1233,7 +1241,8 @@
 					"$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST))",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1268,7 +1277,8 @@
 					"$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST))",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sdmj76.Mousecape;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1303,6 +1313,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(PROJECT_DIR)/mousecloak/vendor",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -1319,10 +1330,10 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = LZ4NKVK3NY;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "mousecloak/mousecloak-Prefix.pch";
@@ -1331,6 +1342,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(PROJECT_DIR)/mousecloak/vendor",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
